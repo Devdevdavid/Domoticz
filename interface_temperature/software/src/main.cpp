@@ -1,17 +1,6 @@
 //*****************************************
-//
 //  Domoticz_interface_DS1820
-// 
-// Reste a faire un test sous domoticz
-// Module OK le 17/05/18 ajout fonction OTA
-// IDX= 4 & 5
-// Ajout visu led ok le 18/10/18
-// Ajout adresse capteurs le 16/07/19
-// Passage à PlatformIO le 19/07/19
-//
-// Version 1.6.10
-// Version 1.8.9
-// Module Wemos D1 Mini
+//  Version 2.2
 //*****************************************
 
 /*
@@ -32,15 +21,21 @@
 #include <PubSubClient.h>
 #include <ArduinoOTA.h>
 
-// Data wire is plugged into port 4 on the Arduino or ESP32
-#define ONE_WIRE_BUS 2
-#define TEMPERATURE_PRECISION 10
+// Constants
+#define MAX_SENSOR_SUPPORT      2
+#define ADDRESS_LENGTH          sizeof(DeviceAddress)
+#define IDX_insideTemp          3
+#define IDX_outsideTemp         4
 
-#define Led_B 14 //Led Bleu
-#define Led_G 12 //Led Green
-#define Led_R 16 //Led Rouge
-//watchdog timer
-const int   watchdog = 10000; // Fréquence d'envoi des données à Domoticz - Frequency of sending data to Domoticz
+// Pinout
+#define ONE_WIRE_BUS            2
+#define TEMPERATURE_PRECISION   10
+#define Led_R                   14 //Led Rouge
+#define Led_G                   12 //Led Verte
+#define Led_B                   16 //Led Bleu
+
+// Watchdog timer
+const int watchdog = 10000; // Fréquence d'envoi des données à Domoticz - Frequency of sending data to Domoticz
 unsigned long previousMillis = millis();
 
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
@@ -49,30 +44,42 @@ OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature. 
 DallasTemperature sensors(&oneWire);
 
-// Tableaux contenant l'adresse de chaque sonde OneWire | arrays to hold device addresses
+// Client Http pour les requetes vers le serveur
+HTTPClient http;
 
-DeviceAddress insideThermometer = { 0x28, 0xFF, 0xE1, 0xCD, 0xA1, 0x16, 0x05, 0xDF};
-DeviceAddress outsideThermometer = { 0x28, 0xFF, 0x18, 0xE2, 0xA1, 0x16, 0x03, 0xBD};
+// Stockage des adresses des thermometres
+byte thermoCount = 0;
+DeviceAddress thermoList[MAX_SENSOR_SUPPORT] = {};
 
 // Parametres WIFI - WiFi settings
-#define wifi_ssid "freebox"
-#define wifi_password "pascal1961"
+#define wifi_ssid               "freebox"
+#define wifi_password           "pascal1961"
+
 // Nom d'hôte (pour mDNS)
 const char* hostString = "espOTAtest2";
+
 // mot de passe pour l'OTA
 const char* otapass = "1234";
 
 // Paramètres HTTP Domoticz - HTTP Domoticz settings
 const char* host = "192.168.0.32";
 const int   port = 8080;
-#define IDX_insideTemp    3
-#define IDX_outsideTemp   4
-HTTPClient http;
 
 // gestion du temps pour calcul de la durée de la MaJ
 unsigned long otamillis;
 
-void confOTA() {
+void set_visu_led_rgb(byte red, byte green, byte blue)
+{
+  digitalWrite(Led_R, (red) ? HIGH : LOW);
+  digitalWrite(Led_G, (green) ? HIGH : LOW);
+  digitalWrite(Led_B, (blue) ? HIGH : LOW);
+}
+
+/**
+ * @brief Configure la mise a jour Over The Air
+ */
+void confOTA(void) 
+{
   // Port 8266 (défaut)
   ArduinoOTA.setPort(8266);
 
@@ -128,50 +135,103 @@ void confOTA() {
   ArduinoOTA.begin();
 }
 
-void sendToDomoticz(String url){
-  digitalWrite(Led_R, LOW);
-  digitalWrite(Led_B, HIGH);
-  digitalWrite(Led_G, LOW);
-  Serial.print("Connecting to ");
-  Serial.println(host);
-  Serial.print("Requesting URL: ");
+void sendToDomoticz(String url)
+{
+  set_visu_led_rgb(0, 0, 255);
+
+  Serial.print("Request: ");
+  Serial.print(host);
+  Serial.print(" ==> ");
   Serial.println(url);
-  http.begin(host,port,url);
+
+  http.begin(host, port, url);
   int httpCode = http.GET();
-    if (httpCode) {
-      if (httpCode == 200) {
-        String payload = http.getString();
-        Serial.println("Domoticz response "); 
-        Serial.println(payload);
-      }
-    }
-  Serial.println("closing connection");
+  if (httpCode == 200) {
+    Serial.print("[SUCCESS] Domoticz reply:");
+    Serial.println(http.getString());
+  } else {
+    Serial.printf("[ERROR] Bad reply (http code = %d)\n", httpCode);
+  }
   http.end();
 }
 
-void printTemperature(String label, DeviceAddress deviceAddress){
+void printTemperature(byte deviceIndex, DeviceAddress deviceAddress){
   float tempC = sensors.getTempC(deviceAddress);
-  Serial.print(label);
+
+  Serial.printf("[INFO] Sensor %d: ", deviceIndex + 1);
   if (tempC == -127.00) {
-    Serial.print("Error getting temperature");
+    Serial.println("Error getting temperature");
   } else {
     // Format JSON à respecter pour l'API Domoticz - Domoticz JSON API 
     // /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
     // https://www.domoticz.com/wiki/Domoticz_API/JSON_URL%27s#Temperature
-    if ( label == "Inside : " ) {
-      String url = "/json.htm?type=command&param=udevice&idx=";
-        url += String(IDX_insideTemp);
-        url += "&nvalue=0&svalue=";    
-        url += String(tempC); 
-      sendToDomoticz(url);
+    String url = "/json.htm?type=command&param=udevice&idx=";
+    if (deviceIndex == 0) {
+      url += String(IDX_insideTemp);
     } else {
-      String url = "/json.htm?type=command&param=udevice&idx=";
-        url += String(IDX_outsideTemp);
-        url += "&nvalue=0&svalue=";    
-        url += String(tempC);  
-      sendToDomoticz(url);
+      url += String(IDX_outsideTemp);
     }
+    url += "&nvalue=0&svalue=";    
+    url += String(tempC); 
+    sendToDomoticz(url);
   }  
+}
+
+/**
+ * @brief Search for new addresses on the OneWire bus
+ * Results are saved in addressList
+ * @param maxLen: maximum number of address to find
+ * @return The number of address found
+ */
+byte get_onewire_address(DeviceAddress addressList[], byte maxLen)
+{
+  byte index = 0;
+
+  while (1) {
+    if (oneWire.search(addressList[index]) != 1) {
+      Serial.printf("Search finished, %d found\n", index);
+      oneWire.reset_search();
+      break;
+    } else {
+      // Count this new thermometer
+      ++index;
+      // Do we have reach the limit ?
+      if (index >= maxLen) {
+        break;
+      }
+    }
+    delay(100);
+  }
+
+  return index;
+}
+
+/**
+ * @brief Write the thermometers address into thermoList
+ * @note It can write 1 or 2 addresses
+ */
+void get_thermo_address(void)
+{
+  DeviceAddress addressList[MAX_SENSOR_SUPPORT];
+
+  thermoCount = get_onewire_address(addressList, MAX_SENSOR_SUPPORT);
+  if (thermoCount == 1) {
+    memcpy(thermoList[0], addressList[0], ADDRESS_LENGTH);
+  } 
+  else if (thermoCount == 2) {
+    // The addresses smaller goes in first position
+    for (byte index = 0; index < ADDRESS_LENGTH; index++) {
+      if (addressList[0][index] > addressList[1][index]) {
+        memcpy(thermoList[0], addressList[0], ADDRESS_LENGTH);
+        memcpy(thermoList[1], addressList[1], ADDRESS_LENGTH);
+      } else if (addressList[0][index] < addressList[1][index]) {
+        memcpy(thermoList[0], addressList[1], ADDRESS_LENGTH);
+        memcpy(thermoList[1], addressList[0], ADDRESS_LENGTH);
+      }
+    }
+  } else {
+    Serial.printf("[ERROR] %d OneWire address found on the bus", thermoCount);
+  }
 }
 
 //**********************************
@@ -185,15 +245,14 @@ void setup() {
   pinMode(Led_G, OUTPUT);
   pinMode(Led_B, OUTPUT); 
 
-    // mode Wifi client
+  // mode Wifi client
   WiFi.mode(WIFI_STA);
   // connexion
   WiFi.begin(wifi_ssid, wifi_password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     // impossible de se connecter au point d'accès
-    digitalWrite(Led_R, HIGH);
-    digitalWrite(Led_G, LOW);
-    digitalWrite(Led_B, LOW);
+    set_visu_led_rgb(255, 0, 0);
+
     // reboot après 5s
     Serial.println("Erreur connexion Wifi ! Reboot...");
     delay(5000);
@@ -205,72 +264,74 @@ void setup() {
 
   // Tout est prêt,on affiche notre IP
   Serial.print("\nAdresse IP: ");
-  Serial.println(WiFi.localIP());  
+  Serial.println(WiFi.localIP());
+
+  // Locate sensors
+  Serial.print("[INFO] Locating devices... ");
+  get_thermo_address();
+  Serial.printf("Found %d\n", thermoCount);
        
   sensors.begin();
 
-  // locate devices on the bus
-  Serial.print("Locating devices...");
-  Serial.print("Found ");
-  Serial.print(sensors.getDeviceCount(), DEC);
-  Serial.println(" devices.");
-
   // report parasite power requirements
-  Serial.print("Parasite power is: "); 
+  Serial.print("[INFO] Parasite power is: "); 
   if (sensors.isParasitePowerMode()) Serial.println("ON");
   else Serial.println("OFF");
 
-  // Vérifie sir les capteurs sont connectés | check and report if sensors are conneted 
-  if (!sensors.getAddress(insideThermometer, 0)) Serial.println("Unable to find address for Device 0"); 
-//  if (!sensors.getAddress(outsideThermometer, 1)) Serial.println("Unable to find address for Device 1"); 
+  for (byte thermoIndex = 0; thermoIndex < thermoCount; thermoIndex++) {
+    // Print device name and address
+    Serial.printf("[INFO] Device [%d/%d]: ", thermoIndex + 1, thermoCount);
+    for (byte index = 0; index < ADDRESS_LENGTH; index++) {
+      if (thermoList[thermoIndex][index] < 0x10) Serial.write('0');
+      Serial.print(thermoList[thermoIndex][index], HEX);
+      Serial.write(' ');
+    }
+    Serial.println();
 
-  // set the resolution to 9 bit per device
-  sensors.setResolution(insideThermometer, TEMPERATURE_PRECISION);
-  sensors.setResolution(outsideThermometer, TEMPERATURE_PRECISION);
+    // Vérifie si les capteurs sont connectés | check and report if sensors are conneted 
+    if (!sensors.getAddress(thermoList[thermoIndex], thermoIndex)) {
+      Serial.printf("    > Unable to find address for Device %d\n", thermoIndex + 1);
+      continue;
+    }
+    // set the resolution to 9 bit per device
+    sensors.setResolution(thermoList[thermoIndex], TEMPERATURE_PRECISION);
 
-  // On vérifie que le capteur st correctement configuré | Check that ensor is correctly configured
-  Serial.print("Device 0 Resolution: ");
-  Serial.print(sensors.getResolution(insideThermometer), DEC); 
-  Serial.println();
-
-  Serial.print("Device 1 Resolution: ");
-  Serial.print(sensors.getResolution(outsideThermometer), DEC); 
-  Serial.println();
+    // On vérifie que le capteur est correctement configuré | Check that sensor is correctly configured
+    Serial.printf("    > Resolution: %d bits\n", sensors.getResolution(thermoList[thermoIndex]));
+  }
 }
+
+
 
 //**********************************
 // void loop
 //**********************************
 
 void loop() {
-  
   unsigned long currentMillis = millis();
+
   // gestion OTA
   ArduinoOTA.handle();
 
-  if ( currentMillis - previousMillis > watchdog ) {
+  if (currentMillis - previousMillis > watchdog) {
     previousMillis = currentMillis;
-    if(WiFi.status() != WL_CONNECTED) {
-      Serial.println("WiFi not connected !");
-      digitalWrite(Led_R, HIGH); // Pas de connection Wifi
-      digitalWrite(Led_G, LOW);
-      digitalWrite(Led_B, LOW);
-      
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("[ERROR] WiFi not connected !");
+      set_visu_led_rgb(255, 0, 0);
     } else {  
-      Serial.println("Send data to Domoticz");
-      digitalWrite(Led_R, LOW);
-      digitalWrite(Led_B, LOW);
-      digitalWrite(Led_G, HIGH);
+      set_visu_led_rgb(0, 255, 0);
     }
   }
   
-  Serial.print("Requesting temperatures...");
+  Serial.print("[INFO] Requesting temperatures...");
   sensors.requestTemperatures();
   Serial.println("DONE");
 
   // print the device information
-  printTemperature("Inside : ", insideThermometer);
-  printTemperature("Outside : ", outsideThermometer);
+  for (byte thermoIndex = 0; thermoIndex < thermoCount; thermoIndex++) {
+    printTemperature(thermoIndex, thermoList[thermoIndex]);
+  }
   
+  Serial.println("");
   delay(5000);
 }
