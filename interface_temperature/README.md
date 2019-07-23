@@ -2,6 +2,9 @@
 Permet d'envoyer la température de deux sondes etanches vers un serveur Domoticz en Wifi.
 
 ## Changelog
+### [v2.3] - 23/07/19
+- Remplacement des 3 LED R, G, B par une led NéoPixel
+
 ### [v2.2] - 19/07/19
 - Ajout de la détection automatique des sondes
 - Passage du prototype Rev. B de 3v3 à 5V pour l'alim des sondes

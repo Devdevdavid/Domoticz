@@ -1,6 +1,6 @@
 //*****************************************
 //  Domoticz_interface_DS1820
-//  Version 2.2
+//  Version 2.3
 //*****************************************
 
 /*
@@ -11,9 +11,7 @@
 
 #include <OneWire.h>
 #include <DallasTemperature.h>
-// Pour un Arduino ou ESP32 (le SDK Espressif doit être installé) | For Arduino or ESP32 (Espressif SDK must be installed) 
-//#include <WiFi.h>
-//#include <HTTPClient.h>
+#include <Adafruit_NeoPixel.h>
 
 // Pour une carte ESP8266 | For ESP8266 development board
 #include <ESP8266WiFi.h>
@@ -21,18 +19,21 @@
 #include <PubSubClient.h>
 #include <ArduinoOTA.h>
 
+// Configuration
+#define NEOPIXEL_BRIGHTNESS     20
+
+// Pinout
+#define ONE_WIRE_BUS            2
+#define TEMPERATURE_PRECISION   10
+#define NEO_PIXEL_PIN           12 
+
 // Constants
 #define MAX_SENSOR_SUPPORT      2
 #define ADDRESS_LENGTH          sizeof(DeviceAddress)
 #define IDX_insideTemp          3
 #define IDX_outsideTemp         4
-
-// Pinout
-#define ONE_WIRE_BUS            2
-#define TEMPERATURE_PRECISION   10
-#define Led_R                   14 //Led Rouge
-#define Led_G                   12 //Led Verte
-#define Led_B                   16 //Led Bleu
+#define NEO_PIXEL_LENGTH        1
+#define NEO_PIXEL_INDEX         0
 
 // Watchdog timer
 const int watchdog = 10000; // Fréquence d'envoi des données à Domoticz - Frequency of sending data to Domoticz
@@ -51,6 +52,9 @@ HTTPClient http;
 byte thermoCount = 0;
 DeviceAddress thermoList[MAX_SENSOR_SUPPORT] = {};
 
+// NeoPixel Instance
+Adafruit_NeoPixel neoPixel = Adafruit_NeoPixel(NEO_PIXEL_LENGTH, NEO_PIXEL_PIN, NEO_GRB + NEO_KHZ800); 
+
 // Parametres WIFI - WiFi settings
 #define wifi_ssid               "freebox"
 #define wifi_password           "pascal1961"
@@ -68,11 +72,24 @@ const int   port = 8080;
 // gestion du temps pour calcul de la durée de la MaJ
 unsigned long otamillis;
 
+// Save of neopixel color
+uint32_t neopixelColorSave = 0;
+
+void save_visu_led_rgb(void)
+{
+  neopixelColorSave = neoPixel.getPixelColor(NEO_PIXEL_INDEX); 
+}
+
 void set_visu_led_rgb(byte red, byte green, byte blue)
 {
-  digitalWrite(Led_R, (red) ? HIGH : LOW);
-  digitalWrite(Led_G, (green) ? HIGH : LOW);
-  digitalWrite(Led_B, (blue) ? HIGH : LOW);
+  neoPixel.setPixelColor(NEO_PIXEL_INDEX, green, red, blue); 
+  neoPixel.show();
+}
+
+void restore_visu_led_rgb(void)
+{
+  neoPixel.setPixelColor(NEO_PIXEL_INDEX, neopixelColorSave); 
+  neoPixel.show();
 }
 
 /**
@@ -241,9 +258,10 @@ void get_thermo_address(void)
 void setup() {
   Serial.begin(115200);
 
-  pinMode(Led_R, OUTPUT);
-  pinMode(Led_G, OUTPUT);
-  pinMode(Led_B, OUTPUT); 
+  // Init neoPixel
+  neoPixel.begin(); 
+  neoPixel.setBrightness(NEOPIXEL_BRIGHTNESS);
+  set_visu_led_rgb(0, 0, 0);
 
   // mode Wifi client
   WiFi.mode(WIFI_STA);
@@ -251,11 +269,17 @@ void setup() {
   WiFi.begin(wifi_ssid, wifi_password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     // impossible de se connecter au point d'accès
-    set_visu_led_rgb(255, 0, 0);
 
     // reboot après 5s
     Serial.println("Erreur connexion Wifi ! Reboot...");
-    delay(5000);
+    for (int i = 0; i < 10; i++)
+    {
+      set_visu_led_rgb(255, 0, 0);
+      delay(250);
+      set_visu_led_rgb(0, 0, 0);
+      delay(250);
+    }
+    
     ESP.restart();
   }
 
@@ -301,8 +325,6 @@ void setup() {
   }
 }
 
-
-
 //**********************************
 // void loop
 //**********************************
@@ -327,10 +349,17 @@ void loop() {
   sensors.requestTemperatures();
   Serial.println("DONE");
 
+  // Save the current color of the neopixel
+  save_visu_led_rgb();
+
   // print the device information
   for (byte thermoIndex = 0; thermoIndex < thermoCount; thermoIndex++) {
     printTemperature(thermoIndex, thermoList[thermoIndex]);
   }
+
+  // Restore neopixel to previous state (After a little delay to correctly see the light)
+  delay(100);
+  restore_visu_led_rgb();
   
   Serial.println("");
   delay(5000);
