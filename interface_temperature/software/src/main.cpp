@@ -20,7 +20,10 @@
 #include <ArduinoOTA.h>
 
 // Configuration
-#define NEOPIXEL_BRIGHTNESS     20
+#define NEOPIXEL_BRIGHTNESS     20    // Global Brightness affecting all the colors
+#define NEOPIXEL_RED            255
+#define NEOPIXEL_GREEN          255
+#define NEOPIXEL_BLUE           255
 
 // Pinout
 #define ONE_WIRE_BUS            2
@@ -154,7 +157,7 @@ void confOTA(void)
 
 void sendToDomoticz(String url)
 {
-  set_visu_led_rgb(0, 0, 255);
+  set_visu_led_rgb(0, 0, NEOPIXEL_BLUE);
 
   Serial.print("Request: ");
   Serial.print(host);
@@ -274,7 +277,7 @@ void setup() {
     Serial.println("Erreur connexion Wifi ! Reboot...");
     for (int i = 0; i < 10; i++)
     {
-      set_visu_led_rgb(255, 0, 0);
+      set_visu_led_rgb(NEOPIXEL_RED, 0, 0);
       delay(250);
       set_visu_led_rgb(0, 0, 0);
       delay(250);
@@ -339,9 +342,9 @@ void loop() {
     previousMillis = currentMillis;
     if (WiFi.status() != WL_CONNECTED) {
       Serial.println("[ERROR] WiFi not connected !");
-      set_visu_led_rgb(255, 0, 0);
+      set_visu_led_rgb(NEOPIXEL_RED, 0, 0);
     } else {  
-      set_visu_led_rgb(0, 255, 0);
+      set_visu_led_rgb(0, NEOPIXEL_GREEN, 0);
     }
   }
   
