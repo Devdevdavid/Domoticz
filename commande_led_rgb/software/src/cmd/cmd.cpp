@@ -4,15 +4,11 @@ void cmd_print_help(void)
 {
   Serial.println("=== " FIRMWARE_VERSION " ===");
   Serial.println("H                         This help");
-  Serial.println("D                         Print board status");
-  Serial.println("L{State}                  Toggle or set Led Visu Visibility");
+  Serial.println("T                         Print board status");
+  Serial.println("L[State]                  Toggle or set Led Visu Visibility");
   Serial.println("B[Value]                  Set brightness, no value = Auto");
   Serial.println("S[1/0: State]             Set the LED ON or OFF");
-  Serial.println("A<ID> <Period> [Params]   Set animation");
-  Serial.println("> 0: Therm <Nb LED>");
-  Serial.println("> 1: ShotGun");
-  Serial.println("> 2: Equalizer");
-  Serial.println("> 3: Full Color <Red> <Green> <Blue>");
+  Serial.println("A<animID>                 Set animation 0 to 55");
 }
 
 void cmd_print_status(void)
@@ -30,6 +26,9 @@ void cmd_print_status(void)
   Serial.printf("ANIM:    %d\n", STATUS_ANIM);
 }
 
+/**
+ * Enable/Disable the status leds
+ */
 void cmd_set_led_visu(uint8_t isEnabled)
 {
   if (isEnabled) {
@@ -116,7 +115,7 @@ int32_t cmd_set_demo_mode(bool isDemoMode)
 
 /**
  * Call get_animation()
- * @return  animID The animation ID to use
+ * @return  animID The animation ID used
  */
 uint8_t cmd_get_animation(void)
 {

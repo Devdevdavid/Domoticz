@@ -12,12 +12,12 @@ extern uint8_t boardStatus[NB_STATUS];
 #endif
 
 /* STATUS LIST */
-#define STATUS_APPLI                    boardStatus[0]
-#define STATUS_WIFI                     boardStatus[1]
+#define STATUS_APPLI                    boardStatus[0]  /** Flag on application status */
+#define STATUS_WIFI                     boardStatus[1]  /** Flag on wifi connection  */
 #define STATUS_BRIGHTNESS               boardStatus[2]  /** Value of brightness currently set */
-#define STATUS_BUTTON                   boardStatus[3]
+#define STATUS_BUTTON                   boardStatus[3]  /** Flag on button states */
 #define STATUS_BRIGHT_LVL               boardStatus[4]  /** Level of brightness currently set */
-#define STATUS_ANIM                     boardStatus[5]
+#define STATUS_ANIM                     boardStatus[5]  /** ID of the anim currently used */
 
 /* STATUS_APPLI */
 #define STATUS_APPLI_LED_VISU           0x01
@@ -29,9 +29,6 @@ extern uint8_t boardStatus[NB_STATUS];
 
 /* STATUS_WIFI */
 #define STATUS_WIFI_IS_CO               0x01
-
-/* STATUS_BRIGHTNESS */
-#define STATUS_BRIGHTNESS_DEFAULT       32
 
 /* STATUS_BUTTON */
 #define STATUS_BUTTON_RISING            0x01

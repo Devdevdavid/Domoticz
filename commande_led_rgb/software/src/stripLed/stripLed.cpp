@@ -76,7 +76,7 @@ void stripLed_set_demo_mode(bool isDemoModeEn)
 {
   if (isDemoModeEn) {
     _set(STATUS_APPLI, STATUS_APPLI_DEMO_MODE);
-    // Force refresh
+    // Force refresh to now
     demoTick = 0;
   } else {
     _unset(STATUS_APPLI, STATUS_APPLI_DEMO_MODE);
@@ -84,7 +84,7 @@ void stripLed_set_demo_mode(bool isDemoModeEn)
 }
 
 /**
- * Define the state of the LED (ON or OFF)
+ * Define the state of the LED strip (ON or OFF)
  */
 void stripLed_set_state(bool isOn)
 {
@@ -92,7 +92,6 @@ void stripLed_set_state(bool isOn)
     _set(STATUS_APPLI, STATUS_APPLI_LED_IS_ON);
   } else {
     _unset(STATUS_APPLI, STATUS_APPLI_LED_IS_ON);
-    _unset(STATUS_APPLI, STATUS_APPLI_DEMO_MODE);
     ws2812fx.strip_off();
   }
 }
@@ -127,6 +126,7 @@ void stripLed_init(void)
 {
   brightness_table_init();
 
+  /** Init the led driver */
   ws2812fx.init();
   ws2812fx.setSpeed(500);
   ws2812fx.setColor(255, 255, 255);
@@ -135,8 +135,8 @@ void stripLed_init(void)
   autoBrightTick = tick;
 
   // Go into demo mode at startup
-  set_animation(10);
-  brightness_set(STATUS_BRIGHTNESS_DEFAULT);
+  set_animation(DEFAULT_ANIMATION_ID);
+  brightness_set(DEFAULT_BRIGHTNESS_VALUE);
   stripLed_set_state(true);
   stripLed_set_demo_mode(true);
 }

@@ -8,11 +8,14 @@
 #include <ArduinoOTA.h>
 #include "file_sys.hpp"
 
-#define BOOTLOADER_VERSION    "Bootloader v1.0"
-#define WIFI_SSID             "Bbox-9D73DEEB"
-#define WIFI_PWD              "F3436D1346ED55127A61FFF1DE15EE"
-#define OTA_PWD               "macintosh"
-#define OTA_PORT              8266
+#define BOOTLOADER_VERSION          "Bootloader v1.1"
+#define WIFI_SSID                   "Bbox-9D73DEEB"
+#define WIFI_PWD                    "Nope"
+#define OTA_PWD                     "macintosh"
+#define OTA_PORT                    8266
+
+/** Delay between two bootloader connection checks */
+#define BOOTLOADER_CHECK_PERIOD     1000
 
 // Bootloader
 void bootloader_init(void);

@@ -49,23 +49,25 @@
     <h2>Luminosité</h2>
     <p>Défini la luminosité du ruban</p>
     <div id="brightness_label" class="theme">
-      <!-- Filled by JS -->1
+      <!-- Filled by JS -->
     </div>
     <input type="range" min="0" max="100" value="0" class="theme slider" id="brightness_slider">
     <h2>Animation</h2>
     <p>Sélectionne une animation en particulier</p>
     <select id="animation_select" class="theme">
-      <!-- Filled by JS -->1
+      <!-- Filled by JS -->
     </select>
     <h2>Demo</h2>
     <p>Change d'animation toutes les 5 secondes</p>
-    <button id="demo_button" class="theme">1<!-- Filled by JS --></button>
+    <button id="demo_button" class="theme"><!-- Filled by JS --></button>
     <h2>ON/OFF</h2>
     <p>Active/désactive le ruban de LED</p>
-    <button id="on_off_button" class="theme">1<!-- Filled by JS --></button>
+    <button id="on_off_button" class="theme"><!-- Filled by JS --></button>
   </div>
   <div id="footer">
-    Pascal RONDANE - 2019
+    Hardware - Pascal RONDANE<br>
+    Software - David DEVANT<br>
+    Août 2019
   </div>
   <script type="text/javascript">
     var brightnessSlider = document.getElementById("brightness_slider");
@@ -101,7 +103,9 @@
 
     function update_brightness_slider(currentBrightness)
     {
-      brightnessLabel.innerHTML = parseInt(currentBrightness, 10) + "%";
+      currentBrightness = parseInt(currentBrightness, 10);
+      brightnessLabel.innerHTML = currentBrightness + "%";
+      brightnessSlider.value = currentBrightness;
     }
 
     function update_demo_button(currentState)

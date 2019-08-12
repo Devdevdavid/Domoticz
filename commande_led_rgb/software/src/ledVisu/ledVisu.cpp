@@ -25,9 +25,10 @@ void ledVisu_main(void)
   uint8_t index;
 
   /* POWER LED */
-  /*if (STATUS_APPLI & STATUS_APPLI_) {
-
-  } else*/ {
+  if (_isset(STATUS_APPLI, STATUS_APPLI_DEMO_MODE)) {
+    ledVisu[0].timeOn = 500;
+    ledVisu[0].timeOff = 500;
+  } else {
     ledVisu[0].timeOn = 100;
     ledVisu[0].timeOff = 0;
   }

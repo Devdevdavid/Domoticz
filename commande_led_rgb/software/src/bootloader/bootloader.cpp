@@ -1,30 +1,28 @@
 #include "bootloader.hpp"
 
+extern uint32_t tick;
+uint32_t bootloaderTick = 0;
+
 void bootloader_init(void)
 {
   log_info("Starting %s", BOOTLOADER_VERSION);
 
   WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PWD);
+  WiFi.setAutoReconnect(true);
 
   log_info("Trying to connect to %s...", WIFI_SSID);
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    log_error("Connection Failed! Rebooting in 5s...");
-    delay(5000);
-    ESP.restart();
-  }
-
-  _set(STATUS_WIFI, STATUS_WIFI_IS_CO);
+  WiFi.begin(WIFI_SSID, WIFI_PWD);
 
   ArduinoOTA.setPort(OTA_PORT);
   ArduinoOTA.setPassword(OTA_PWD);
 
   ArduinoOTA.onStart([]() {
     String type;
-    if (ArduinoOTA.getCommand() == U_FLASH)
+    if (ArduinoOTA.getCommand() == U_FLASH) {
       type = "sketch";
-    else // U_SPIFFS
+    } else { // U_SPIFFS
       type = "filesystem";
+    }
 
     // if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
     file_sys_end();
@@ -54,4 +52,14 @@ void bootloader_init(void)
 void bootloader_main(void)
 {
   ArduinoOTA.handle();
+
+  if (tick > bootloaderTick) {
+    bootloaderTick = tick + BOOTLOADER_CHECK_PERIOD;
+
+    if (WiFi.status() != WL_CONNECTED) {
+      _unset(STATUS_WIFI, STATUS_WIFI_IS_CO);
+    } else {
+      _set(STATUS_WIFI, STATUS_WIFI_IS_CO);
+    }
+  }
 }

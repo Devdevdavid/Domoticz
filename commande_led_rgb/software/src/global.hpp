@@ -3,7 +3,7 @@
 #include "tools/log.hpp"
 #include "status.hpp"
 
-#define FIRMWARE_VERSION      "LightKit v1.4"
+#define FIRMWARE_VERSION      "LightKit v1.5"
 
 /* PERIPH DEFINITION (-1: Not used) */
 #define LED_POWER_PIN       -1
@@ -13,7 +13,14 @@
 #define STRIP_LED_PIN       2
 
 /* PARAMETERS */
-#define BTN_LONG_HOLD_TIME  3000  // in ms
+/** Hold time in ms for long press on button */
+#define BTN_LONG_HOLD_TIME       3000  // in ms
+/** Brightness level used at startup [0-255] */
+#define DEFAULT_BRIGHTNESS_VALUE 32
+/** ID of the animation used at startup */
+#define DEFAULT_ANIMATION_ID     10
+/** Delay betwwen two animation in demo mode (in ms) */
+#define DEMO_MODE_PERIOD          5000
 
 /* MACRO */
 #if (LED_POWER_PIN != -1)

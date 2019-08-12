@@ -19,18 +19,19 @@ void gpio_init(void)
 
 void setup()
 {
+	Serial.begin(115200);
+	Serial.print("\n\r\n\r"); // Jump some lines after internal firmware stuff
 	status_init();
 	gpio_init();
-	Serial.begin(115200);
-	bootloader_init();
-	log_info("Starting %s", FIRMWARE_VERSION);
-	file_sys_init();
-	web_server_init();
-	stripLed_init();
 #if (LED_POWER_PIN != -1)
 	ledVisu_init();
 #endif
+	file_sys_init();
+	bootloader_init();
+	web_server_init();
+	stripLed_init();
 	cmd_serial_init();
+	log_info("Starting %s", FIRMWARE_VERSION);
 }
 
 #if BUTTON_PIN != -1

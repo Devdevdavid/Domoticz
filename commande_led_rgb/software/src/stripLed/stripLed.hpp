@@ -12,8 +12,6 @@
 #define BRIGHT_HYSTERESIS         10
 /** Period of update of the auto brightness (in ms) */
 #define AUTO_BRIGHT_UPDATE_PERIOD 2000
-/** Delay betwwen two animation in demo mode (in ms) */
-#define DEMO_MODE_PERIOD          5000
 
 /** Data structure for a level */
 struct brightLevel_t {

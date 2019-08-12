@@ -62,7 +62,7 @@ void cmd_serial_execute(void)
     case 'H':
       cmd_print_help();
       break;
-    case 'D':
+    case 'T':
       cmd_print_status();
       break;
     case 'L':
@@ -83,7 +83,7 @@ void cmd_serial_execute(void)
         cmd_set_brightness_auto(true);
         _cmd_serial_ack(OK);
       } else {
-        uint16_t brightness = sToU16(&serialPort.rxBuffer[1], serialPort.rxLength - 1);
+        uint8_t brightness = sToU16(&serialPort.rxBuffer[1], serialPort.rxLength - 1);
         if (brightness <= 100) {
           cmd_set_brightness(brightness);
           _cmd_serial_ack(OK);
@@ -116,12 +116,33 @@ void cmd_serial_execute(void)
       }
       break;
 
-    case 'A':
+    /** DEMO MODE: ON/OFF */
+    case 'D':
       if (serialPort.rxLength < 1) {
         _cmd_serial_ack(ERROR_WRONG_LENGTH);
       } else if (serialPort.rxLength == 1) {
+        /** TOGGLE STATE */
         cmd_set_demo_mode(!cmd_get_demo_mode());
         _cmd_serial_ack(OK);
+      } else {
+        if (serialPort.rxBuffer[1] == '1') {
+          /** SET to ON */
+          cmd_set_demo_mode(true);
+          _cmd_serial_ack(OK);
+        } else if (serialPort.rxBuffer[1] == '0') {
+          /** SET to OFF */
+          cmd_set_demo_mode(false);
+          _cmd_serial_ack(OK);
+        } else {
+          _cmd_serial_ack(ERROR_WRONG_VALUE);
+        }
+      }
+      break;
+    
+    /** ANIMATION */
+    case 'A':
+      if (serialPort.rxLength <= 1) {
+        _cmd_serial_ack(ERROR_WRONG_LENGTH);
       } else {
         uint16_t animID = sToU16(&serialPort.rxBuffer[1], serialPort.rxLength - 1);
         if (cmd_set_animation(animID) == OK) {
@@ -142,7 +163,6 @@ void cmd_serial_init(void)
 {
   serialPort.rxLength = 0;
   serialPort.isInCmdValid = 0;
-  Serial.print("> ");
 }
 
 void cmd_serial_main(void)
