@@ -13,6 +13,9 @@
 #define WIFI_PWD                    "Nope"
 #define OTA_PWD                     "macintosh"
 #define OTA_PORT                    8266
+#define IS_IN_AP_MODE
+#define WIFI_AP_SSID                "RubanLed"
+#define WIFI_AP_PWD                 "pascal2019"
 
 /** Delay between two bootloader connection checks */
 #define BOOTLOADER_CHECK_PERIOD     1000

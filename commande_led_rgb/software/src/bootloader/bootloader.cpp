@@ -7,11 +7,26 @@ void bootloader_init(void)
 {
   log_info("Starting %s", BOOTLOADER_VERSION);
 
+#ifdef IS_IN_AP_MODE
+  IPAddress localIp(192,168,1,1);
+  IPAddress gateway(192,168,1,254);
+  IPAddress subnet(255,255,255,0);
+
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(localIp, gateway, subnet);
+
+  if (WiFi.softAP(WIFI_AP_SSID, WIFI_AP_PWD)) {
+    log_info("Access point is now available at %s", WIFI_AP_SSID);
+  } else {
+    log_error("Failed to launch Access Point");
+  }
+#else
   WiFi.mode(WIFI_STA);
   WiFi.setAutoReconnect(true);
 
   log_info("Trying to connect to %s...", WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PWD);
+#endif
 
   ArduinoOTA.setPort(OTA_PORT);
   ArduinoOTA.setPassword(OTA_PWD);
@@ -46,13 +61,20 @@ void bootloader_init(void)
     else if (error == OTA_END_ERROR) log_error("End Failed");
   });
   ArduinoOTA.begin();
+
+#ifdef IS_IN_AP_MODE
+  log_info("OTA Ready ! IP address: %s", WiFi.softAPIP().toString().c_str());
+#else
   log_info("OTA Ready ! IP address: %s", WiFi.localIP().toString().c_str());
+#endif
 }
 
 void bootloader_main(void)
 {
   ArduinoOTA.handle();
 
+#ifndef IS_IN_AP_MODE
+  // If not in AP mode, periodically check wifi status
   if (tick > bootloaderTick) {
     bootloaderTick = tick + BOOTLOADER_CHECK_PERIOD;
 
@@ -62,4 +84,5 @@ void bootloader_main(void)
       _set(STATUS_WIFI, STATUS_WIFI_IS_CO);
     }
   }
+#endif
 }
