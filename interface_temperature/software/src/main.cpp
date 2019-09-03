@@ -6,7 +6,7 @@
 /*
  * Read multiple One-Wire DS18B20 probes and publish value on Domoticz with HTTP request
  * Lecture multiple de sonde OneWire DS18B20 et plublication des mesures sur un serveur Domoticz requete HTTP
- * Code adapté - Code adaptated 
+ * Code adapté - Code adaptated
  */
 
 #include <OneWire.h>
@@ -24,11 +24,13 @@
 #define NEOPIXEL_RED            255
 #define NEOPIXEL_GREEN          255
 #define NEOPIXEL_BLUE           255
+#define MESURE_PERIOD_MS        10*60*1000    // Interval entre deux mesures de température en ms (10 min)
+#define CHECK_WIFI_PERIOD_MS    10*1000    // Interval entre deux check wifi en ms (10 sec)
 
 // Pinout
 #define ONE_WIRE_BUS            2
 #define TEMPERATURE_PRECISION   10
-#define NEO_PIXEL_PIN           12 
+#define NEO_PIXEL_PIN           12
 
 // Constants
 #define MAX_SENSOR_SUPPORT      2
@@ -38,14 +40,13 @@
 #define NEO_PIXEL_LENGTH        1
 #define NEO_PIXEL_INDEX         0
 
-// Watchdog timer
-const int watchdog = 10000; // Fréquence d'envoi des données à Domoticz - Frequency of sending data to Domoticz
-unsigned long previousMillis = millis();
+unsigned long previousMillis = 0;
+unsigned long lastMillisMesureTemp = 0;
 
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
 
-// Pass our oneWire reference to Dallas Temperature. 
+// Pass our oneWire reference to Dallas Temperature.
 DallasTemperature sensors(&oneWire);
 
 // Client Http pour les requetes vers le serveur
@@ -56,14 +57,14 @@ byte thermoCount = 0;
 DeviceAddress thermoList[MAX_SENSOR_SUPPORT] = {};
 
 // NeoPixel Instance
-Adafruit_NeoPixel neoPixel = Adafruit_NeoPixel(NEO_PIXEL_LENGTH, NEO_PIXEL_PIN, NEO_GRB + NEO_KHZ800); 
+Adafruit_NeoPixel neoPixel = Adafruit_NeoPixel(NEO_PIXEL_LENGTH, NEO_PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 // Parametres WIFI - WiFi settings
 #define wifi_ssid               "freebox"
 #define wifi_password           "pascal1961"
 
 // Nom d'hôte (pour mDNS)
-const char* hostString = "espOTAtest2";
+const char* hostString = "ESP_TEST_TEMP";
 
 // mot de passe pour l'OTA
 const char* otapass = "1234";
@@ -80,25 +81,25 @@ uint32_t neopixelColorSave = 0;
 
 void save_visu_led_rgb(void)
 {
-  neopixelColorSave = neoPixel.getPixelColor(NEO_PIXEL_INDEX); 
+  neopixelColorSave = neoPixel.getPixelColor(NEO_PIXEL_INDEX);
 }
 
 void set_visu_led_rgb(byte red, byte green, byte blue)
 {
-  neoPixel.setPixelColor(NEO_PIXEL_INDEX, green, red, blue); 
+  neoPixel.setPixelColor(NEO_PIXEL_INDEX, green, red, blue);
   neoPixel.show();
 }
 
 void restore_visu_led_rgb(void)
 {
-  neoPixel.setPixelColor(NEO_PIXEL_INDEX, neopixelColorSave); 
+  neoPixel.setPixelColor(NEO_PIXEL_INDEX, neopixelColorSave);
   neoPixel.show();
 }
 
 /**
  * @brief Configure la mise a jour Over The Air
  */
-void confOTA(void) 
+void confOTA(void)
 {
   // Port 8266 (défaut)
   ArduinoOTA.setPort(8266);
@@ -157,7 +158,7 @@ void confOTA(void)
 
 void sendToDomoticz(String url)
 {
-  set_visu_led_rgb(0, 0, NEOPIXEL_BLUE);
+  set_visu_led_rgb(0, NEOPIXEL_GREEN, 0);
 
   Serial.print("Request: ");
   Serial.print(host);
@@ -182,7 +183,7 @@ void printTemperature(byte deviceIndex, DeviceAddress deviceAddress){
   if (tempC == -127.00) {
     Serial.println("Error getting temperature");
   } else {
-    // Format JSON à respecter pour l'API Domoticz - Domoticz JSON API 
+    // Format JSON à respecter pour l'API Domoticz - Domoticz JSON API
     // /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
     // https://www.domoticz.com/wiki/Domoticz_API/JSON_URL%27s#Temperature
     String url = "/json.htm?type=command&param=udevice&idx=";
@@ -191,10 +192,10 @@ void printTemperature(byte deviceIndex, DeviceAddress deviceAddress){
     } else {
       url += String(IDX_outsideTemp);
     }
-    url += "&nvalue=0&svalue=";    
-    url += String(tempC); 
+    url += "&nvalue=0&svalue=";
+    url += String(tempC);
     sendToDomoticz(url);
-  }  
+  }
 }
 
 /**
@@ -237,7 +238,7 @@ void get_thermo_address(void)
   thermoCount = get_onewire_address(addressList, MAX_SENSOR_SUPPORT);
   if (thermoCount == 1) {
     memcpy(thermoList[0], addressList[0], ADDRESS_LENGTH);
-  } 
+  }
   else if (thermoCount == 2) {
     // The addresses smaller goes in first position
     for (byte index = 0; index < ADDRESS_LENGTH; index++) {
@@ -262,7 +263,7 @@ void setup() {
   Serial.begin(115200);
 
   // Init neoPixel
-  neoPixel.begin(); 
+  neoPixel.begin();
   neoPixel.setBrightness(NEOPIXEL_BRIGHTNESS);
   set_visu_led_rgb(0, 0, 0);
 
@@ -282,7 +283,7 @@ void setup() {
       set_visu_led_rgb(0, 0, 0);
       delay(250);
     }
-    
+
     ESP.restart();
   }
 
@@ -297,11 +298,11 @@ void setup() {
   Serial.print("[INFO] Locating devices... ");
   get_thermo_address();
   Serial.printf("Found %d\n", thermoCount);
-       
+
   sensors.begin();
 
   // report parasite power requirements
-  Serial.print("[INFO] Parasite power is: "); 
+  Serial.print("[INFO] Parasite power is: ");
   if (sensors.isParasitePowerMode()) Serial.println("ON");
   else Serial.println("OFF");
 
@@ -315,7 +316,7 @@ void setup() {
     }
     Serial.println();
 
-    // Vérifie si les capteurs sont connectés | check and report if sensors are conneted 
+    // Vérifie si les capteurs sont connectés | check and report if sensors are conneted
     if (!sensors.getAddress(thermoList[thermoIndex], thermoIndex)) {
       Serial.printf("    > Unable to find address for Device %d\n", thermoIndex + 1);
       continue;
@@ -338,32 +339,34 @@ void loop() {
   // gestion OTA
   ArduinoOTA.handle();
 
-  if (currentMillis - previousMillis > watchdog) {
+  if (currentMillis - previousMillis > CHECK_WIFI_PERIOD_MS) {
     previousMillis = currentMillis;
     if (WiFi.status() != WL_CONNECTED) {
       Serial.println("[ERROR] WiFi not connected !");
       set_visu_led_rgb(NEOPIXEL_RED, 0, 0);
-    } else {  
-      set_visu_led_rgb(0, NEOPIXEL_GREEN, 0);
+    } else {
+      set_visu_led_rgb(0, 0, NEOPIXEL_BLUE);
     }
   }
-  
-  Serial.print("[INFO] Requesting temperatures...");
-  sensors.requestTemperatures();
-  Serial.println("DONE");
 
-  // Save the current color of the neopixel
-  save_visu_led_rgb();
+  if (currentMillis - lastMillisMesureTemp > MESURE_PERIOD_MS) {
+    lastMillisMesureTemp = currentMillis;
+    Serial.print("[INFO] Requesting temperatures...");
+    sensors.requestTemperatures();
+    Serial.println("DONE");
 
-  // print the device information
-  for (byte thermoIndex = 0; thermoIndex < thermoCount; thermoIndex++) {
-    printTemperature(thermoIndex, thermoList[thermoIndex]);
+    // Save the current color of the neopixel
+    save_visu_led_rgb();
+
+    // print the device information
+    for (byte thermoIndex = 0; thermoIndex < thermoCount; thermoIndex++) {
+      printTemperature(thermoIndex, thermoList[thermoIndex]);
+    }
+
+    // Restore neopixel to previous state (After a little delay to correctly see the light)
+    delay(100);
+    restore_visu_led_rgb();
+
+    Serial.println("");
   }
-
-  // Restore neopixel to previous state (After a little delay to correctly see the light)
-  delay(100);
-  restore_visu_led_rgb();
-  
-  Serial.println("");
-  delay(5000);
 }
