@@ -19,6 +19,8 @@
 #include <PubSubClient.h>
 #include <ArduinoOTA.h>
 
+#define APP_VERSION             "2.0"
+
 // Configuration
 #define NEOPIXEL_BRIGHTNESS     20    // Global Brightness affecting all the colors
 #define NEOPIXEL_RED            255
@@ -26,6 +28,19 @@
 #define NEOPIXEL_BLUE           255
 #define MESURE_PERIOD_MS        10*60*1000    // Interval entre deux mesures de température en ms (10 min)
 #define CHECK_WIFI_PERIOD_MS    10*1000    // Interval entre deux check wifi en ms (10 sec)
+
+// Parametres WIFI - WiFi settings
+#define WIFI_SSID               "freebox"
+#define WIFI_PASSWORD           "pascal1961"
+
+// Paramètres Over The Air (OTA)
+#define OTA_HOSTNAME            "ESP_TEST_TEMP"                   // Nom d'hôte (pour mDNS)
+#define OTA_PASSWORD            "ThisIsSecureNow"
+#define OTA_PORT                8266
+
+// Paramètres HTTP Domoticz - HTTP Domoticz settings
+#define DOMOTICZ_HOST           "192.168.0.32"
+#define DOMOTICZ_PORT           8080
 
 // Pinout
 #define ONE_WIRE_BUS            2
@@ -59,20 +74,6 @@ DeviceAddress thermoList[MAX_SENSOR_SUPPORT] = {};
 // NeoPixel Instance
 Adafruit_NeoPixel neoPixel = Adafruit_NeoPixel(NEO_PIXEL_LENGTH, NEO_PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
-// Parametres WIFI - WiFi settings
-#define wifi_ssid               "freebox"
-#define wifi_password           "pascal1961"
-
-// Nom d'hôte (pour mDNS)
-const char* hostString = "ESP_TEST_TEMP";
-
-// mot de passe pour l'OTA
-const char* otapass = "1234";
-
-// Paramètres HTTP Domoticz - HTTP Domoticz settings
-const char* host = "192.168.0.32";
-const int   port = 8080;
-
 // gestion du temps pour calcul de la durée de la MaJ
 unsigned long otamillis;
 
@@ -102,13 +103,13 @@ void restore_visu_led_rgb(void)
 void confOTA(void)
 {
   // Port 8266 (défaut)
-  ArduinoOTA.setPort(8266);
+  ArduinoOTA.setPort(OTA_PORT);
 
   // Hostname défaut : esp8266-[ChipID]
-  ArduinoOTA.setHostname(hostString);
+  ArduinoOTA.setHostname(OTA_HOSTNAME);
 
   // mot de passe pour OTA
-  ArduinoOTA.setPassword(otapass);
+  ArduinoOTA.setPassword(OTA_PASSWORD);
 
   // lancé au début de la MaJ
   ArduinoOTA.onStart([]() {
@@ -161,11 +162,11 @@ void sendToDomoticz(String url)
   set_visu_led_rgb(0, NEOPIXEL_GREEN, 0);
 
   Serial.print("Request: ");
-  Serial.print(host);
+  Serial.print(DOMOTICZ_HOST);
   Serial.print(" ==> ");
   Serial.println(url);
 
-  http.begin(host, port, url);
+  http.begin(DOMOTICZ_HOST, DOMOTICZ_PORT, url);
   int httpCode = http.GET();
   if (httpCode == 200) {
     Serial.print("[SUCCESS] Domoticz reply:");
@@ -262,18 +263,21 @@ void get_thermo_address(void)
 void setup() {
   Serial.begin(115200);
 
+  Serial.println("ESP TEMP - v" APP_VERSION);
+
   // Init neoPixel
   neoPixel.begin();
   neoPixel.setBrightness(NEOPIXEL_BRIGHTNESS);
-  set_visu_led_rgb(0, 0, 0);
+
+  // Set to red to indicate that Wifi will attempt to connect
+  set_visu_led_rgb(NEOPIXEL_RED, 0, 0);
 
   // mode Wifi client
   WiFi.mode(WIFI_STA);
   // connexion
-  WiFi.begin(wifi_ssid, wifi_password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     // impossible de se connecter au point d'accès
-
     // reboot après 5s
     Serial.println("Erreur connexion Wifi ! Reboot...");
     for (int i = 0; i < 10; i++)
@@ -286,6 +290,9 @@ void setup() {
 
     ESP.restart();
   }
+
+  // Wifi is ok !
+  set_visu_led_rgb(0, 0, NEOPIXEL_BLUE);
 
   // configuration OTA
   confOTA();

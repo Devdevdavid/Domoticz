@@ -29,6 +29,7 @@ extern uint8_t boardStatus[NB_STATUS];
 
 /* STATUS_WIFI */
 #define STATUS_WIFI_IS_CO               0x01
+#define STATUS_WIFI_DEVICE_CO           0x02
 
 /* STATUS_BUTTON */
 #define STATUS_BUTTON_RISING            0x01
