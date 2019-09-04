@@ -2,8 +2,13 @@
 #define BOOTLOADER_H
 
 #include "global.hpp"
+#ifdef ESP32
+#include <WiFi.h>
+#include <mDNS.h>
+#else
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
+#endif
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include "file_sys.hpp"

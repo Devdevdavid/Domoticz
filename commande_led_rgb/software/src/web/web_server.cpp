@@ -1,6 +1,6 @@
 #include "web_server.hpp"
 
-ESP8266WebServer server(80); //Server on port 80
+G_WebServer server(80); //Server on port 80
 
 void web_server_init(void)
 {

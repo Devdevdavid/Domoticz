@@ -35,5 +35,11 @@
 #define LED_POWER_OFF       
 #endif
 
+#ifdef ESP32
+#define G_WebServer ESP32WebServer
+#else
+#define G_WebServer ESP8266WebServer
+#endif
+
 // Only for shortcut
 #define IS_LED_VISU_EN      ((STATUS_APPLI & STATUS_APPLI_LED_VISU) != 0)

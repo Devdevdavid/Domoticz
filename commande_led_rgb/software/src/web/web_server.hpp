@@ -2,7 +2,11 @@
 #define WEB_WEB_SERVER_H
 
 #include "global.hpp"
+#ifdef ESP32
+#include <ESP32WebServer.h>
+#else
 #include <ESP8266WebServer.h>
+#endif
 #include <FS.h>
 #include "bootloader/file_sys.hpp"
 #include "stripLed/stripLed.hpp"

@@ -12,6 +12,8 @@ void file_sys_end()
   SPIFFS.end();
 }
 
+#ifndef ESP32
+
 int fs_get_last_id(void)
 {
   int id = 0;
@@ -113,3 +115,5 @@ void fs_clear_picc(void)
     SPIFFS.remove(fileName);
   }
 }
+
+#endif /* !ESP32 */

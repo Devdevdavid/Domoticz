@@ -9,8 +9,7 @@ do
         # if [ $? -ne 0 ]; then
             # errorCounter=${errorCounter} + 1
         # fi
-        sleep 1
+        sleep 0.3
     done
 done
 
-echo "Counter Error = $errorCounter"
