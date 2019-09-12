@@ -23,10 +23,7 @@ from subprocess import Popen
 #--------------------VARIABLES------------------------
 
 #Variables bontons poussoir
-BP1 = 13
-BP2 = 15
-BP3 = 29
-BP4 = 31
+buttonPins = [13, 15, 29, 31]
 BP_MA = 7
 #variable interrupteur option
 OPTV1V2 = 33
@@ -69,21 +66,29 @@ movieList = [
 	"/media/pi/VIDEO_ACHDR/achdr.mp4"
 ]
 
+# DEFINES
+# VIDEO INDEX for movieList
+VIDEO_1 = 0
+VIDEO_2 = 1
+VIDEO_3 = 2
+VIDEO_4 = 3
+VIDEO_HOME = 5
+
+# 
+
+
 buttonStateOld = [0, 0, 0, 0]
 
 
 #-------------------FONCTIONS-----------------------
 
 def checkProcessRunning():
-	i = 0
-	#Cherche le processus omxplayer
+	# Cherche le processus omxplayer
 	for proc in psutil.process_iter():
 		if (proc.name() == "omxplayer.bin"):
-			i += 1
-	if (i == 0):
-		return False
-	else:
-		return True
+			return True # Found it !
+	
+	return False
 
 def ventilateurControler():
 	TEMP_MIN = 60 #temperature d'arret du ventilateur
@@ -91,7 +96,7 @@ def ventilateurControler():
 
 	tFile = open('/sys/class/thermal/thermal_zone0/temp')
 	temp = float(tFile.read())
-	tempC = temp/1000
+	tempC = temp / 1000
 	#affichage de la valeure
 	print("Temp CPU = " + str(tempC) + " C")
 
@@ -102,21 +107,25 @@ def ventilateurControler():
 	tFile.close()
 
 def kill_video():
+	global player
 	os.system('killall omxplayer.bin')
 	player = 0
 
 def launch_video(videoIndex):
+	global player
 	kill_video()
-	omxc = Popen(['omxplayer', '-b', movieList[videoIndex]])
+	Popen(['omxplayer', '-b', movieList[videoIndex]])
 	player = videoIndex + 1
 
 def read_video_buttons():
-	buttonPins = [BP1, BP2, BP3, BP4]
+	global buttonStateOld
 
+	# Init those variable
 	buttonRising = [0] * len(buttonPins)
 	buttonFalling = [0] * len(buttonPins)
 	buttonLongPress = [0] * len(buttonPins)
 
+	# Read each buttons
 	for buttonIndex, buttonPin in enumerate(buttonPins):
 		buttonState = GPIO.input(buttonPin)
 
@@ -133,18 +142,16 @@ def read_video_buttons():
 		else:
 			buttonLongPress[buttonIndex] = 0
 
+		# Save current button state
 		buttonStateOld[buttonIndex] = buttonState
 
-	# Kill video if extrem button pressed
+	# Kill video if extrem buttons are pressed
 	if buttonRising[0] and buttonRising[3]:
-		buttonRising[0] = buttonRising[3] = 0
-		# Kill video
 		kill_video()
 	else:
 		# Launch video of the selected button
 		for buttonRisingIndex, buttonRisingState in enumerate(buttonRising):
 			if buttonRisingState:
-				buttonRising[buttonRisingIndex] = 0
 				# Launch corresponding video
 				launch_video(buttonRisingIndex)
 				break
@@ -152,13 +159,12 @@ def read_video_buttons():
 #--------------------DEMARRAGE--------------------------
 
 GPIO.setmode(GPIO.BOARD) ## Use board pin numbering
-GPIO.setup(BP1, GPIO.IN)
-GPIO.setup(BP2, GPIO.IN)
-GPIO.setup(BP3, GPIO.IN)
-GPIO.setup(BP4, GPIO.IN)
+
+# Buttons
+for btnPin in buttonPins:
+	GPIO.setup(btnPin, GPIO.IN)
 
 GPIO.setup(BP_MA, GPIO.IN)
-
 GPIO.setup(OPTV1V2, GPIO.IN)
 
 for led in LEDS:
@@ -167,7 +173,8 @@ for led in LEDS:
 GPIO.setup(LED_MAV, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(LED_MAR, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(VENTILATEUR, GPIO.OUT, initial=GPIO.LOW)
-#Si la cle USB n'est pas presente
+
+# Si la cle USB n'est pas presente
 while (not os.path.exists("/media/pi/VIDEO_ACHDR")):
 	GPIO.output(LED_MAR, GPIO.HIGH)
 	time.sleep(0.1)
@@ -196,9 +203,10 @@ if not inputV1V2:
 
 #-------------------BOUCLE PRINCIPALE--------------------
 while True:
-	#Read states of inputs
-	quit_video = GPIO.input(BP_MA)
+	# tempo de la boucle principale
+	time.sleep(0.100)
 
+	# Read buttons and launch/kill video if necessary
 	read_video_buttons()
 
 	#Si pas de video en cours -> animation suivant option
@@ -224,29 +232,23 @@ while True:
 				else:
 					flagAnimCli = True
 	else:
-		# LED management
+		# LED management (Show the one selected by the player)
 		for ledIndex, ledPin in enumerate(LEDS):
-			print(ledPin)
 			if player == (ledIndex + 1):
-				print("H")
 				GPIO.output(ledPin, GPIO.HIGH)
 			else:
-				print("L")
 				GPIO.output(ledPin, GPIO.LOW)
 
 	#GPIO(24) to close omxplayer manually - used during debug
-	if quit_video == False:
+	if not GPIO.input(BP_MA):
 		GPIO.output(LED_MAV, GPIO.LOW)
 		GPIO.output(LED_MAR, GPIO.HIGH)
 		GPIO.output(VENTILATEUR, GPIO.LOW)
-		time.sleep(1)
+		kill_video()
 		GPIO.cleanup()
-		os.system('killall omxplayer.bin')
 		os.system('sudo shutdown -h now')
 		exit(0)
 
-	#tempo de la boucle principale
-	time.sleep(0.100)
 	#check de la temperature du systeme
 	if (tempoPrint > 100):
 		ventilateurControler()
@@ -258,7 +260,7 @@ while True:
 	if not checkProcessRunning():
 		player = 0
 		if (inputV1V2):
-			launch_video(4) # Video d'acceuil
+			launch_video(VIDEO_HOME) # Video d'acceuil
 
 #-------------------FIN DE LA BOUCLE PRINCIPALE----------------------
 GPIO.output(LED_MAV, GPIO.LOW)
