@@ -2,5 +2,15 @@
     "terminal.integrated.env.osx": {
         "PATH": "/Users/David/.platformio/penv/bin:/Users/David/.platformio/penv:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Wireshark.app/Contents/MacOS",
         "PLATFORMIO_CALLER": "vscode"
+    },
+    "files.associations": {
+        "*.old": "c",
+        "array": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "initializer_list": "cpp"
     }
 }

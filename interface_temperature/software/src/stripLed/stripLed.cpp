@@ -1,13 +1,16 @@
 #include "stripLed.hpp"
+#include <WS2812FX.h>
+
+#ifdef MODULE_STRIPLED
 
 // Get the tick from main
 extern uint32_t tick;
 
 // Instanciate the library
-WS2812FX ws2812fx = WS2812FX(NB_PIXELS, STRIP_LED_PIN, NEO_GRB + NEO_KHZ800);
+WS2812FX ws2812fx = WS2812FX(STRIPLED_NB_PIXELS, STRIPLED_PIN, NEO_GRB + NEO_KHZ800);
 
 // Create the brightness table and animation Table
-struct brightLevel_t brightTable[BRIGHT_NB_LEVEL];
+struct brightLevel_t brightTable[STRIPLED_NB_BRIGHT_LEVEL];
 
 // Next tick of animation change and brightness update
 uint32_t demoTick;
@@ -105,15 +108,15 @@ void stripLed_set_state(bool isOn)
  */
 void brightness_table_init(void)
 {
-  for (uint8_t index = 0; index < BRIGHT_NB_LEVEL; index++) {
-    brightTable[index].output = 10 + (index * 245) / (BRIGHT_NB_LEVEL - 1);
-    brightTable[index].low = (index * 1023) / (BRIGHT_NB_LEVEL - 1);
+  for (uint8_t index = 0; index < STRIPLED_NB_BRIGHT_LEVEL; index++) {
+    brightTable[index].output = 10 + (index * 245) / (STRIPLED_NB_BRIGHT_LEVEL - 1);
+    brightTable[index].low = (index * 1023) / (STRIPLED_NB_BRIGHT_LEVEL - 1);
     if (index > 0) {
-      brightTable[index].low -= BRIGHT_HYSTERESIS / 2;
+      brightTable[index].low -= STRIPLED_BRIGHT_HYSTERESIS / 2;
     }
-    brightTable[index].high = ((1 + index) * 1023) / (BRIGHT_NB_LEVEL - 1);
-    if (index < (BRIGHT_NB_LEVEL - 1)) {
-      brightTable[index].high += BRIGHT_HYSTERESIS / 2;
+    brightTable[index].high = ((1 + index) * 1023) / (STRIPLED_NB_BRIGHT_LEVEL - 1);
+    if (index < (STRIPLED_NB_BRIGHT_LEVEL - 1)) {
+      brightTable[index].high += STRIPLED_BRIGHT_HYSTERESIS / 2;
     }
   }
   STATUS_BRIGHT_LVL = 0;
@@ -139,8 +142,6 @@ void stripLed_init(void)
   brightness_set(DEFAULT_BRIGHTNESS_VALUE);
   stripLed_set_state(true);
   stripLed_set_demo_mode(true);
-
-  pinMode(5, OUTPUT);
 }
 
 /**
@@ -151,9 +152,7 @@ void stripLed_main(void)
 {
   if (_isset(STATUS_APPLI, STATUS_APPLI_LED_IS_ON)) {
     // Refresh strip display
-    digitalWrite(5, HIGH);
     ws2812fx.service();
-    digitalWrite(5, LOW);
   }
 
   // Update brightness level
@@ -181,3 +180,5 @@ void stripLed_main(void)
   }
 #endif
 }
+
+#endif /* MODULE_STRIPLED */
