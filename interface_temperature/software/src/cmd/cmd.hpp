@@ -4,6 +4,7 @@
 #include "global.hpp"
 #include "status_led/status_led.hpp"
 #include "stripLed/stripLed.hpp"
+#include "relay/relay.hpp"
 
 void cmd_print_help(void);
 void cmd_print_status(void);

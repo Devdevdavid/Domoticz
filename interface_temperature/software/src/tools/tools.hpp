@@ -20,6 +20,7 @@
 #define _set(base, flag)    (base) |= (flag);
 #define _unset(base, flag)  (base) &= ~(flag);
 #define _isset(base, flag)  (((base) & (flag)) != 0)
+#define _isunset(base, flag)  (((base) & (flag)) == 0)
 
 uint16_t sToU16(const char * str, uint16_t length);
 

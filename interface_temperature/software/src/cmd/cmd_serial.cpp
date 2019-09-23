@@ -160,6 +160,19 @@ void cmd_serial_execute(void)
       }
       break;
 #endif
+#ifdef MODULE_RELAY
+    case 'R':
+      if (serialPort.rxLength == 1) {
+        relay_set_state(!relay_get_state());
+      } else if (serialPort.rxLength == 2) {
+        relay_set_state(sToU16(&serialPort.rxBuffer[1], 1));
+      } else {
+        _cmd_serial_ack(ERROR_WRONG_LENGTH);
+        break;
+      }
+      _cmd_serial_ack(OK);
+      break;
+#endif
     default:
       _cmd_serial_ack(ERROR_UNKNOWN_CMD);
       break;

@@ -6,11 +6,11 @@
 #define FIRMWARE_VERSION      "LightKit v1.6"
 
 /* MODULE DEFINITION (Use #define or #undef) */
-#define MODULE_TEMPERATURE   
+#undef MODULE_TEMPERATURE   
 #undef MODULE_DOMOTICZ   
 #define MODULE_STATUS_LED       
 #undef MODULE_BUTTON    
-#undef MODULE_RELAY            
+#define MODULE_RELAY            
 #undef MODULE_BUZZER           
 #undef MODULE_WEBSERVER        
 #undef MODULE_STRIPLED         
@@ -51,14 +51,15 @@
 
 /* MODULE_RELAY */
 #define RELAY_FEEDBACK_PIN                      0                     /** Define the input to use to get the feedback information */
+#define RELAY_CHECK_PERIOD                      60*1000               /** Delays between 2 relay checks in ms */
 #define RELAY_CHECK_BEFORE_ERROR                3                     /** Try n times to resend commmand before going to error */
-#undef RELAY_IS_BISTABLE                                             /** Define this if the relay is bistable, undef it for monostable */
+#undef RELAY_IS_BISTABLE                                              /** Define this if the relay is bistable, undef it for monostable */
 #ifdef RELAY_IS_BISTABLE
 #define RELAY_BISTABLE_ON_TIME_MS               30                    /** Duration of the active state for bistable relay */
-#define RELAY_CMD_PIN_1                         -1                     /** Define the output to use for bistable relay command */
-#define RELAY_CMD_PIN_2                         -1                     /** Define the output to use for bistable relay command */
+#define RELAY_CMD_PIN_1                         2                     /** Define the output to use for bistable relay command */
+#define RELAY_CMD_PIN_2                         2                     /** Define the output to use for bistable relay command */
 #else
-#define RELAY_CMD_PIN                           6                     /** Define the output to use for monostable relay command */
+#define RELAY_CMD_PIN                           2                     /** Define the output to use for monostable relay command */
 #endif
 
 /* MODULE_STRIPLED */

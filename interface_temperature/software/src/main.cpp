@@ -9,6 +9,7 @@
 #include "stripLed/stripLed.hpp"
 #include "status_led/status_led.hpp"
 #include "cmd/cmd_serial.hpp"
+#include "relay/relay.hpp"
 #include "script/script.hpp"
 
 uint32_t tick, curTick;
@@ -36,6 +37,9 @@ void setup()
 #endif
 #ifdef MODULE_STRIPLED
 	stripLed_init();
+#endif
+#ifdef MODULE_RELAY
+		relay_init();
 #endif
 #ifdef MODULE_CMD_SERIAL
 	cmd_serial_init();
@@ -67,6 +71,9 @@ void loop(void)
 #endif
 #ifdef MODULE_STATUS_LED
 		status_led_main();
+#endif
+#ifdef MODULE_RELAY
+		relay_main();
 #endif
 		script_execute();
 	}

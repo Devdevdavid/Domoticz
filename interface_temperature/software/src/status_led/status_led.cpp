@@ -149,22 +149,23 @@ void status_led_main(void)
   uint8_t index;
 
   if (!_isset(STATUS_APPLI, STATUS_APPLI_STATUS_LED)) {
+    // Status led disabled
     status_led[0].timeOn = 0;
     status_led[0].timeOff = 500;
     status_led[0].color = '-';
-  } else if (!_isset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
-    status_led[0].timeOn = 100;
-    status_led[0].timeOff = 500;
-    status_led[0].color = 'b';
   } else if (_isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT)) {
+    // Software Alert
     status_led[0].timeOn = 200;
     status_led[0].timeOff = 200;
     status_led[0].color = 'r';
-  } else if (_isset(STATUS_APPLI, STATUS_APPLI_TEMP_1_FAULT | STATUS_APPLI_TEMP_2_FAULT)) {
+  } else if (_isset(STATUS_APPLI, STATUS_APPLI_TEMP_1_FAULT | STATUS_APPLI_TEMP_2_FAULT | STATUS_APPLI_RELAY_FAULT)) {
+    // Hardware Fault
     status_led[0].timeOn = 100;
     status_led[0].timeOff = 900;
     status_led[0].color = 'r';
-  } else if (_isset(STATUS_WIFI, STATUS_WIFI_DOMOTICZ_FAULT)) {
+  } else if (_isset(STATUS_WIFI, STATUS_WIFI_DOMOTICZ_FAULT) 
+          || _isunset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
+    // Wireless fault
     status_led[0].timeOn = 100;
     status_led[0].timeOff = 900;
     status_led[0].color = 'b';

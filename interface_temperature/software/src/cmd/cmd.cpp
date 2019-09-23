@@ -11,6 +11,9 @@ void cmd_print_help(void)
   Serial.println("S[1/0: State]             Set the LED ON or OFF");
   Serial.println("A<animID>                 Set animation 0 to 55");
 #endif
+#ifdef MODULE_RELAY
+  Serial.println("R[1/0: State]             Toggle or Set Relay On or Off");
+#endif
 }
 
 void cmd_print_status(void)

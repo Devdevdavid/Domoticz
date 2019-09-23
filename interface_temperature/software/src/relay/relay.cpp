@@ -19,9 +19,12 @@ void relay_set_state(bool isClose)
         digitalWrite(RELAY_CMD_PIN, (isClose) ? HIGH : LOW);
     #endif
     relayTheoreticalState = isClose;
+    
+    // Force to check the relay in 1 sec
+    nextRelayCheckTick = tick + 1000;
 }
 
-bool relay_get_state()
+bool relay_get_state(void)
 {
     return digitalRead(RELAY_FEEDBACK_PIN) ? false : true;
 }
@@ -44,29 +47,35 @@ void relay_main(void)
 {
 #ifdef RELAY_IS_BISTABLE
     if (tick > nextRelayTurnOffTick) {
-        nextRelayTurnOffTick = 0;
+        nextRelayTurnOffTick = UINT32_MAX;
         digitalWrite(RELAY_CMD_PIN_1, LOW);
         digitalWrite(RELAY_CMD_PIN_2, LOW);
     }
 #endif
 
     if (tick > nextRelayCheckTick) {
-        nextRelayCheckTick = tick + 60*1000; // This period check is not changeable
-        
         // Does the relay have the right state ?
         if (relay_get_state() != relayTheoreticalState) {
-            if (checkCountBeforeError <= 0) {
-                _set(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
-            } else {
-                // Try to resend command
-                relay_set_state(relayTheoreticalState);
+            // Try to resend command
+            relay_set_state(relayTheoreticalState);
+            
+            if (checkCountBeforeError > 0) {
                 --checkCountBeforeError;
+                log_warn("Bad feedback for relay %d/%d", RELAY_CHECK_BEFORE_ERROR - checkCountBeforeError, RELAY_CHECK_BEFORE_ERROR);
+            }
+
+            if (checkCountBeforeError == 0) {
+                _set(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
+                log_error("Relay seems to be broken (Bad feedback)");
             }
         } else {
             _unset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
             // Reset error counter
             checkCountBeforeError = RELAY_CHECK_BEFORE_ERROR;
         }
+        // EasyFix: Exceptional case, this has to be after relay_set_state() because
+        // it overwrites the variable "nextRelayCheckTick" and we don't want that here
+        nextRelayCheckTick = tick + RELAY_CHECK_PERIOD;
     }
 }
 
