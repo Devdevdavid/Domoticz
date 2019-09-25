@@ -39,6 +39,7 @@ extern uint8_t boardStatus[NB_STATUS];
 #define STATUS_BUTTON_RISING            0x01
 #define STATUS_BUTTON_FALLING           0x02
 #define STATUS_BUTTON_LONG_HOLD         0x04
+#define STATUS_BUTTON_IS_PRESSED        0x08
 
 /* STATUS_SCRIPT */
 #define STATUS_SCRIPT_IN_ALERT          0x01

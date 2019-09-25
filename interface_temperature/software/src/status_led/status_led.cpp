@@ -43,8 +43,8 @@ void status_led_turnoff(void)
 
 void status_led_init(void)
 {
-  status_led[0].pin = LED_POWER_PIN;
-  status_led[1].pin = LED_FAULT_PIN;
+  status_led[0].pin = STATUS_LED_POWER_PIN;
+  status_led[1].pin = STATUS_LED_FAULT_PIN;
 
   for (uint8_t index = 0; index < STATUS_LED_NB_LED; index++) {
     status_led[index].nextChange = 0;

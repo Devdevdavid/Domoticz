@@ -24,7 +24,6 @@ from subprocess import Popen
 
 #Variables bontons poussoir
 buttonPins = [13, 15, 29, 31]
-BP_MA = 7
 #variable interrupteur option
 OPTV1V2 = 33
 #Variable LEDs
@@ -52,11 +51,10 @@ inputV1V2 = True
 
 quit_video = True
 
-player = 0
-
 timeout = 100
 
 tempoPrint = 0
+tempoCheckProcess = 9999 # Grosse valeur pour commencer tout de suite
 
 movieList = [
 	"/media/pi/VIDEO_ACHDR/1.mp4",
@@ -68,14 +66,14 @@ movieList = [
 
 # DEFINES
 # VIDEO INDEX for movieList
+VIDEO_NONE = -1
 VIDEO_1 = 0
 VIDEO_2 = 1
 VIDEO_3 = 2
 VIDEO_4 = 3
-VIDEO_HOME = 5
+VIDEO_HOME = 4
 
-# 
-
+player = VIDEO_NONE
 
 buttonStateOld = [0, 0, 0, 0]
 
@@ -97,7 +95,7 @@ def ventilateurControler():
 	tFile = open('/sys/class/thermal/thermal_zone0/temp')
 	temp = float(tFile.read())
 	tempC = temp / 1000
-	#affichage de la valeure
+	#affichage de la valeur
 	print("Temp CPU = " + str(tempC) + " C")
 
 	if (tempC > TEMP_MAX):
@@ -109,13 +107,18 @@ def ventilateurControler():
 def kill_video():
 	global player
 	os.system('killall omxplayer.bin')
-	player = 0
+	player = VIDEO_NONE
 
 def launch_video(videoIndex):
 	global player
+	global tempoCheckProcess
+	print("Launching video index {:d}".format(videoIndex))
 	kill_video()
 	Popen(['omxplayer', '-b', movieList[videoIndex]])
-	player = videoIndex + 1
+	player = videoIndex
+	# Reset de la tempo de check process pour laisser le temps
+	# a omxPlayer de démarrer
+	tempoCheckProcess = 0;
 
 def read_video_buttons():
 	global buttonStateOld
@@ -164,7 +167,6 @@ GPIO.setmode(GPIO.BOARD) ## Use board pin numbering
 for btnPin in buttonPins:
 	GPIO.setup(btnPin, GPIO.IN)
 
-GPIO.setup(BP_MA, GPIO.IN)
 GPIO.setup(OPTV1V2, GPIO.IN)
 
 for led in LEDS:
@@ -185,8 +187,8 @@ GPIO.output(LED_MAV, GPIO.HIGH)
 #Test demarrage chenillard + ventilateur
 GPIO.output(VENTILATEUR, GPIO.HIGH)
 GPIO.output(LEDS[0], GPIO.HIGH)
+time.sleep(TEMPO_START)
 for i in range(len(LEDS) - 1):
-    time.sleep(TEMPO_START)
     GPIO.output(LEDS[i + 1], GPIO.HIGH)
     GPIO.output(LEDS[i], GPIO.LOW)
     time.sleep(TEMPO_START)
@@ -196,11 +198,6 @@ GPIO.output(VENTILATEUR, GPIO.LOW)
 #TEST Option 1 or 2
 inputV1V2 = GPIO.input(OPTV1V2)
 
-if not inputV1V2:
-	GPIO.output(LEDS[0], GPIO.HIGH)
-	GPIO.output(LEDS[1], GPIO.HIGH)
-	time.sleep(TEMPO_START)
-
 #-------------------BOUCLE PRINCIPALE--------------------
 while True:
 	# tempo de la boucle principale
@@ -209,18 +206,21 @@ while True:
 	# Read buttons and launch/kill video if necessary
 	read_video_buttons()
 
-	#Si pas de video en cours -> animation suivant option
-	if player == 0:
+	#Si pas de video en cours ou si video home -> animation suivant option
+	if player == VIDEO_NONE or player == VIDEO_HOME:
 		currentMillis = int(round(time.time() * 1000))
 		if (currentMillis - lastMillis) > TEMPO_ANIM:
 			lastMillis = currentMillis
 			if not inputV1V2:
-				GPIO.output(LEDS[cmptAnim], GPIO.LOW)
-				if cmptAnim == 3:
+				for ledIndex, ledPin in enumerate(LEDS):
+					if cmptAnim == ledIndex:
+						GPIO.output(ledPin, GPIO.HIGH)
+					else:
+						GPIO.output(ledPin, GPIO.LOW)
+				# chenillar
+				cmptAnim += 1
+				if cmptAnim >= len(LEDS):
 					cmptAnim = 0
-				else:
-					cmptAnim += 1
-				GPIO.output(LEDS[cmptAnim], GPIO.HIGH)
 			else:
 				for led in LEDS:
 					if flagAnimCli:
@@ -234,33 +234,30 @@ while True:
 	else:
 		# LED management (Show the one selected by the player)
 		for ledIndex, ledPin in enumerate(LEDS):
-			if player == (ledIndex + 1):
+			if player == ledIndex:
 				GPIO.output(ledPin, GPIO.HIGH)
 			else:
 				GPIO.output(ledPin, GPIO.LOW)
 
-	#GPIO(24) to close omxplayer manually - used during debug
-	if not GPIO.input(BP_MA):
-		GPIO.output(LED_MAV, GPIO.LOW)
-		GPIO.output(LED_MAR, GPIO.HIGH)
-		GPIO.output(VENTILATEUR, GPIO.LOW)
-		kill_video()
-		GPIO.cleanup()
-		os.system('sudo shutdown -h now')
-		exit(0)
-
 	#check de la temperature du systeme
 	if (tempoPrint > 100):
-		ventilateurControler()
 		tempoPrint = 0
+		ventilateurControler()
 	else:
 		tempoPrint += 1
 
-	#check de l'etat de la video (en cours ou termine)
-	if not checkProcessRunning():
-		player = 0
-		if (inputV1V2):
-			launch_video(VIDEO_HOME) # Video d'acceuil
+	# Tempo a 1 sec
+	if (tempoCheckProcess > 10):
+		tempoCheckProcess = 0
+		#check de l'etat de la video (en cours ou termine)
+		if not checkProcessRunning():
+			player = VIDEO_NONE
+			if (inputV1V2):
+				print("Process was not launched ! Relaunching home...")
+				launch_video(VIDEO_HOME) # Video d'acceuil
+	else:
+		tempoCheckProcess += 1
+
 
 #-------------------FIN DE LA BOUCLE PRINCIPALE----------------------
 GPIO.output(LED_MAV, GPIO.LOW)

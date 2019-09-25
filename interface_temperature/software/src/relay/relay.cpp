@@ -6,6 +6,7 @@
 uint32_t nextRelayTurnOffTick = 0;
 #endif
 extern uint32_t tick;
+uint32_t nextRelayToggleTick = UINT32_MAX;
 uint32_t nextRelayCheckTick = 0;
 bool relayTheoreticalState = false; /** true: is close, false: is open */
 uint8_t checkCountBeforeError = RELAY_CHECK_BEFORE_ERROR;  /** Soft will try to re-send the command n times before declaring error */
@@ -27,6 +28,11 @@ void relay_set_state(bool isClose)
 bool relay_get_state(void)
 {
     return digitalRead(RELAY_FEEDBACK_PIN) ? false : true;
+}
+
+void relay_set_toogle_timeout(uint32_t timeoutMs)
+{
+    nextRelayToggleTick = tick + timeoutMs;
 }
 
 void relay_init(void)
@@ -52,6 +58,12 @@ void relay_main(void)
         digitalWrite(RELAY_CMD_PIN_2, LOW);
     }
 #endif
+
+    // When timeout expires, toggle the relay state by using theorical state
+    if (tick > nextRelayToggleTick) {
+        nextRelayToggleTick = UINT32_MAX;
+        relay_set_state(!relayTheoreticalState);
+    }
 
     if (tick > nextRelayCheckTick) {
         // Does the relay have the right state ?

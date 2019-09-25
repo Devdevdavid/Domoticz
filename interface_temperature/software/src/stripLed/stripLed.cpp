@@ -138,8 +138,8 @@ void stripLed_init(void)
   autoBrightTick = tick;
 
   // Go into demo mode at startup
-  set_animation(DEFAULT_ANIMATION_ID);
-  brightness_set(DEFAULT_BRIGHTNESS_VALUE);
+  set_animation(STRIPLED_DEFAULT_ANIMATION_ID);
+  brightness_set(STRIPLED_DEFAULT_BRIGHTNESS_VALUE);
   stripLed_set_state(true);
   stripLed_set_demo_mode(true);
 }
@@ -158,7 +158,7 @@ void stripLed_main(void)
   // Update brightness level
   if (_isset(STATUS_APPLI, STATUS_APPLI_DEMO_MODE)) {
     if (tick >= demoTick) {
-      demoTick = tick + DEMO_MODE_PERIOD;
+      demoTick = tick + STRIPLED_DEMO_MODE_PERIOD;
 
       if (STATUS_ANIM == (ws2812fx.getModeCount() - 1)) {
         set_animation(0);
