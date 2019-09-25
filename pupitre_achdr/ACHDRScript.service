@@ -1,0 +1,11 @@
+[Unit]
+Description=Service for Loop video python
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/Scripts/LoopVideoIO.py
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

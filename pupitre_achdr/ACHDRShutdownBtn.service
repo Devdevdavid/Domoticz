@@ -1,0 +1,11 @@
+[Unit]
+Description=Service for the Shutdown Button Script
+
+[Service]
+Type=idle
+ExecStart=/bin/bash /home/pi/Scripts/shutdownBtn.sh
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
