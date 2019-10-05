@@ -3,7 +3,7 @@
 #include "tools/log.hpp"
 #include "status.hpp"
 
-#define FIRMWARE_VERSION      "LightKit v1.6"
+#define FIRMWARE_VERSION      "LightKit v1.6.1"
 
 /* MODULE DEFINITION (Use #define or #undef) */
 #define MODULE_TEMPERATURE   
@@ -81,6 +81,7 @@
 #define SCRIPT_TEMP_ALERT_FRIDGE                27
 #define SCRIPT_TEMP_ALERT_FREEZER               30
 #define SCRIPT_RELAY_IMPULSION_DURATION         3*1000                /** Duration of the impulsion when the alert is triggered */
+#define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    2*1000                /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
 
 #ifdef ESP32
 #define G_WebServer ESP32WebServer
