@@ -1,12 +1,14 @@
 # *************************************************
 #
 # Logiciel pupitre muulimedia ACHDR
-# Version 1.1 31/05/19
+# Version 1.3 16/10/19
+# Ajout image plein écran (OK)
+# Modification scrutation des touches
 # Modification des E/S/ Ajout clef USB
 # Ajout de la gestion du ventilateur
 #
 #
-# P.Rondane / B.Bourchardon
+# P.Rondane / B.Bourchardon / D.Devant
 #
 # *************************************************
 
@@ -19,6 +21,9 @@ import os
 import psutil
 import time
 from subprocess import Popen
+from tkinter import *
+#pip3 install Pillow
+from PIL import Image, ImageTk
 
 #--------------------VARIABLES------------------------
 
@@ -85,7 +90,7 @@ def checkProcessRunning():
 	for proc in psutil.process_iter():
 		if (proc.name() == "omxplayer.bin"):
 			return True # Found it !
-	
+
 	return False
 
 def ventilateurControler():
@@ -197,9 +202,22 @@ GPIO.output(VENTILATEUR, GPIO.LOW)
 
 #TEST Option 1 or 2
 inputV1V2 = GPIO.input(OPTV1V2)
+#fenetre principale
+root = Tk()
+#en fullscreen
+root.attributes('-fullscreen', 1)
+#on recupere la photo
+ara = ImageTk.PhotoImage(Image.open("/media/pi/VIDEO_ACHDR/Image/achdr.jpg"))
+#creation d'un label pour afficher la photo
+panel = Label(root, image=ara)
+#expand pour prendre la taille de la fenetre donc de l'ecran
+panel.pack(fill=BOTH, expand=YES)
+panel.image = ara
 
 #-------------------BOUCLE PRINCIPALE--------------------
 while True:
+	#update de la fenetre graphique
+	root.update()
 	# tempo de la boucle principale
 	time.sleep(0.100)
 
