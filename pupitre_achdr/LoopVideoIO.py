@@ -6,6 +6,7 @@
 # Modification scrutation des touches
 # Modification des E/S/ Ajout clef USB
 # Ajout de la gestion du ventilateur
+# Ajout d'un test au demarrage pour eviter les problemes sur l'USB
 #
 #
 # P.Rondane / B.Bourchardon / D.Devant
@@ -123,7 +124,7 @@ def launch_video(videoIndex):
 	player = videoIndex
 	# Reset de la tempo de check process pour laisser le temps
 	# a omxPlayer de démarrer
-	tempoCheckProcess = 0;
+	tempoCheckProcess = 0
 
 def read_video_buttons():
 	global buttonStateOld
@@ -180,6 +181,12 @@ for led in LEDS:
 GPIO.setup(LED_MAV, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(LED_MAR, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(VENTILATEUR, GPIO.OUT, initial=GPIO.LOW)
+
+#Test si il y a eu un probleme avec une cle USB
+if (os.path.exists("/media/pi/VIDEO_ACHDR1")):
+	os.system('rm -rf /media/pi/VIDEO_ACHDR')
+	os.system('umount /media/pi/*')
+	os.system('reboot')
 
 # Si la cle USB n'est pas presente
 while (not os.path.exists("/media/pi/VIDEO_ACHDR")):
