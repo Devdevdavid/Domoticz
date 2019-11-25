@@ -35,7 +35,7 @@
 #define STATUS_LED_TYPE_NEOPIXEL                1                     /** Constant for STATUS_LED_TYPE */
 
 #if STATUS_LED_TYPE == STATUS_LED_TYPE_NEOPIXEL
-#define STATUS_LED_NEOPIXEL_PIN                 12                    /** If Neopixel, indicates the NeoPixel Pin */
+#define STATUS_LED_NEOPIXEL_PIN                 14                    /** If Neopixel, indicates the NeoPixel Pin */
 #define STATUS_LED_NB_LED                       1                     /** Number of led in the neopixel chain */
 #define STATUS_LED_NEOPIXEL_BRIGHTNESS          100                   /** Brightness of the neopixel LED [0-255] */
 #define STATUS_LED_NEOPIXEL_RED                 255                   /** Brightness of red led */
