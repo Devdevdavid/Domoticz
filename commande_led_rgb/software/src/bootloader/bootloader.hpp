@@ -23,11 +23,11 @@
 #define OTA_PORT                    8266
 
 // ACESS POINT CONFIGURATION
-#define WIFI_AP_LOCAL_IP            192,168,1,1
-#define WIFI_AP_GATEWAY             192,168,1,254
+#define WIFI_AP_LOCAL_IP            192,168,4,1
+#define WIFI_AP_GATEWAY             192,168,4,254
 #define WIFI_AP_SUBNET              255,255,255,0
-#define WIFI_AP_SSID                "RubanLed"
-#define WIFI_AP_PWD                 "pascal2019"
+#define WIFI_AP_SSID                "Led_RGB"
+#define WIFI_AP_PWD                 "Tours2017"
 #define WIFI_AP_CHANNEL             13                  // Wifi Channel [1-13] (Default = 1)
 #define WIFI_AP_HIDDEN              false               // Tell if SSID is hidden
 #define WIFI_AP_MAX_CO              1                   // Max connection supported by AP

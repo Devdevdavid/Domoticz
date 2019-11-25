@@ -151,9 +151,7 @@ void stripLed_main(void)
 {
   if (_isset(STATUS_APPLI, STATUS_APPLI_LED_IS_ON)) {
     // Refresh strip display
-    digitalWrite(5, HIGH);
     ws2812fx.service();
-    digitalWrite(5, LOW);
   }
 
   // Update brightness level
