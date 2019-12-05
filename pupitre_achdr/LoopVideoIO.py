@@ -1,6 +1,9 @@
 # *************************************************
 #
 # Logiciel pupitre muulimedia ACHDR
+# === Version 1.5 5/12/19 - DD
+# Ajout du tempoSuspendCheckProcess pour palier à un check
+# de process durant le demarrage du media
 # === Version 1.4 25/11/19 - DD
 # Cache Curseur sur l'image de home
 # Ajout image de loading pour le chargement de libreoffice
@@ -67,7 +70,8 @@ quit_video = True
 timeout = 100
 
 tempoPrint = 0
-tempoCheckProcess = 9999 # Grosse valeur pour commencer tout de suite
+tempoCheckProcess = 0
+tempoSuspendCheckProcess = 0;
 
 # DEFINES
 MOUNT_PATH = "/media/pi/"
@@ -101,7 +105,7 @@ def ventilateur_controler():
 
 def launch_media(mediaName):
 	global currentlyPlaying
-	global tempoCheckProcess
+	global tempoSuspendCheckProcess
 
 	# Turn off
 	if mediaName == VIDEO_NONE:
@@ -129,8 +133,6 @@ def launch_media(mediaName):
 				# Launch
 				print("Launching presentation: " + fileName + fileExt)
 				subprocess.Popen(['libreoffice', '--norestore', '--invisible', '--show', mediaPath], stdout=DEVNULL, stderr=STDOUT)
-				# Give some time to libreoffice to start before checking process
-				tempoCheckProcess = 0
 			elif fileExt == ".mp4":
 				print("Launching video: " + fileName + fileExt)
 				subprocess.Popen(['omxplayer', '-b', mediaPath], stdout=DEVNULL, stderr=STDOUT)
@@ -138,9 +140,8 @@ def launch_media(mediaName):
 				print("File extension not supported: \'" + fileExt + "\'")
 			# Store the current media name
 			currentlyPlaying = mediaName
-			# Reset de la tempo de check process pour laisser le temps
-			# a omxPlayer de démarrer
-			tempoCheckProcess = 0
+			# Give some time to start
+			tempoSuspendCheckProcess = 80 # Give 8 sec
 			# We found the file, leave the function
 			return True
 
@@ -343,19 +344,22 @@ while True:
 	else:
 		tempoPrint += 1
 
-	# Tempo a 1 sec
-	if (tempoCheckProcess > 20):
-		tempoCheckProcess = 0
-		#check de l'etat de la video (en cours ou termine)
-		if not check_media_running():
-			if (inputV1V2):
-				print("Process was not launched ! Relaunching home...")
-				launch_media(VIDEO_HOME) # Video d'acceuil
-			else:
-				currentlyPlaying = VIDEO_NONE
+	if tempoSuspendCheckProcess <= 0:
+		# Tempo a 2 sec
+		if (tempoCheckProcess > 20):
+			tempoCheckProcess = 0
+			#check de l'etat de la video (en cours ou termine)
+			if not check_media_running():
+				if (inputV1V2):
+					print("Process was not launched ! Relaunching home...")
+					launch_media(VIDEO_HOME) # Video d'acceuil
+				else:
+					currentlyPlaying = VIDEO_NONE
 
+		else:
+			tempoCheckProcess += 1
 	else:
-		tempoCheckProcess += 1
+		tempoSuspendCheckProcess -= 1
 
 
 #-------------------FIN DE LA BOUCLE PRINCIPALE----------------------
