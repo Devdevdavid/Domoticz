@@ -30,6 +30,18 @@ void web_server_init(void)
   server.on("/set_brightness", HTTP_GET, [](){
     handle_set_brightness();
   });
+  server.on("/get_nb_led", HTTP_GET, [](){
+    handle_get_nb_led();
+  });
+  server.on("/set_nb_led", HTTP_GET, [](){
+    handle_set_nb_led();
+  });
+  server.on("/get_color", HTTP_GET, [](){
+    handle_get_color();
+  });
+  server.on("/set_color", HTTP_GET, [](){
+    handle_set_color();
+  });
 
   server.onNotFound([](){
     if(!handle_file_read(server.uri())) {
@@ -170,7 +182,7 @@ void handle_get_brightness(void)
 }
 
 /**
- * Get the arg "level" and set the current brightness level [0; 100]
+ * Get the arg "v" and set the current brightness level [0; 100]
  */
 void handle_set_brightness(void)
 {
@@ -184,4 +196,52 @@ void handle_set_brightness(void)
   cmd_set_brightness(level);
 
   handle_get_brightness();
+}
+
+/**
+ * Send the nb of LED value [1; STRIP_LED_MAX_NB_PIXELS]
+ */
+void handle_get_nb_led(void)
+{
+  server.send(200, "text/plain", String(cmd_get_nb_led()));
+}
+
+/**
+ * Get the arg "v" and set the number of LED [0; STRIP_LED_MAX_NB_PIXELS]
+ */
+void handle_set_nb_led(void)
+{
+  if (!server.hasArg("v")) {
+    handle_bad_parameter();
+    return;
+  }
+
+  uint8_t nbLed = server.arg("v").toInt();
+
+  cmd_set_nb_led(nbLed);
+  handle_get_nb_led();
+}
+
+/**
+ * Send the color currently configured
+ */
+void handle_get_color(void)
+{
+  server.send(200, "text/plain", String(cmd_get_color()));
+}
+
+/**
+ * Get the arg "v" and set the color of some LED animation
+ */
+void handle_set_color(void)
+{
+  if (!server.hasArg("v")) {
+    handle_bad_parameter();
+    return;
+  }
+
+  uint32_t color = server.arg("v").toInt();
+
+  cmd_set_color(color);
+  handle_get_color();
 }

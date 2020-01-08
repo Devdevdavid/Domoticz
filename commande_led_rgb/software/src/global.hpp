@@ -21,6 +21,10 @@
 #define DEFAULT_ANIMATION_ID     10
 /** Delay betwwen two animation in demo mode (in ms) */
 #define DEMO_MODE_PERIOD          5000
+/** Maximum number of LED allowed */
+#define STRIP_LED_MAX_NB_PIXELS   100
+/** EEPROM used size in bytes */
+#define EEPROM_USED_SIZE          4
 
 /* MACRO */
 #if (LED_POWER_PIN != -1)
@@ -40,6 +44,12 @@
 #else
 #define G_WebServer ESP8266WebServer
 #endif
+
+// CONSTANTS
+#define EEPROM_NB_LED_ADDRESS        0
+#define EEPROM_COLOR_R_ADDRESS       1
+#define EEPROM_COLOR_G_ADDRESS       2
+#define EEPROM_COLOR_B_ADDRESS       3
 
 // Only for shortcut
 #define IS_LED_VISU_EN      ((STATUS_APPLI & STATUS_APPLI_LED_VISU) != 0)

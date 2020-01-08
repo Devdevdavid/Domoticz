@@ -21,6 +21,7 @@ void setup()
 {
 	Serial.begin(115200);
 	Serial.print("\n\r\n\r"); // Jump some lines after internal firmware stuff
+	EEPROM.begin(EEPROM_USED_SIZE);
 	status_init();
 	gpio_init();
 #if (LED_POWER_PIN != -1)

@@ -4,7 +4,8 @@
 extern uint32_t tick;
 
 // Instanciate the library
-WS2812FX ws2812fx = WS2812FX(NB_PIXELS, STRIP_LED_PIN, NEO_GRB + NEO_KHZ800);
+// 1: Nb led is defined during init
+WS2812FX ws2812fx = WS2812FX(1, STRIP_LED_PIN, NEO_GRB + NEO_KHZ800);
 
 // Create the brightness table and animation Table
 struct brightLevel_t brightTable[BRIGHT_NB_LEVEL];
@@ -23,6 +24,31 @@ void brightness_set(uint8_t brightness)
 
   // Apply new value
   ws2812fx.setBrightness(brightness);
+}
+
+void nb_led_set(uint8_t nbLed)
+{
+  STATUS_NB_LED = nbLed;
+  EEPROM.write(EEPROM_NB_LED_ADDRESS, STATUS_NB_LED);
+  EEPROM.commit();
+
+  // Apply new value
+  ws2812fx.setLength(STATUS_NB_LED);
+}
+
+void color_set(uint32_t color)
+{
+  STATUS_COLOR_R = (color >> 16) & 0xFF;
+  STATUS_COLOR_G = (color >> 8) & 0xFF;
+  STATUS_COLOR_B = color & 0xFF;
+
+  EEPROM.write(EEPROM_COLOR_R_ADDRESS, STATUS_COLOR_R);
+  EEPROM.write(EEPROM_COLOR_G_ADDRESS, STATUS_COLOR_G);
+  EEPROM.write(EEPROM_COLOR_B_ADDRESS, STATUS_COLOR_B);
+  EEPROM.commit();
+
+  // Apply new value
+  ws2812fx.setColor(color);
 }
 
 #if (LIGHT_SENSOR_PIN != -1)
@@ -126,10 +152,17 @@ void stripLed_init(void)
 {
   brightness_table_init();
 
+  // Read data written in EEPROM
+  STATUS_NB_LED = EEPROM.read(EEPROM_NB_LED_ADDRESS);
+  STATUS_COLOR_R = EEPROM.read(EEPROM_COLOR_R_ADDRESS);
+  STATUS_COLOR_G = EEPROM.read(EEPROM_COLOR_G_ADDRESS);
+  STATUS_COLOR_B = EEPROM.read(EEPROM_COLOR_B_ADDRESS);
+
   /** Init the led driver */
   ws2812fx.init();
   ws2812fx.setSpeed(500);
-  ws2812fx.setColor(255, 255, 255);
+  ws2812fx.setColor(STATUS_COLOR_R, STATUS_COLOR_G, STATUS_COLOR_B);
+  ws2812fx.setLength(STATUS_NB_LED);
   ws2812fx.start();
 
   autoBrightTick = tick;
@@ -139,8 +172,6 @@ void stripLed_init(void)
   brightness_set(DEFAULT_BRIGHTNESS_VALUE);
   stripLed_set_state(true);
   stripLed_set_demo_mode(true);
-
-  pinMode(5, OUTPUT);
 }
 
 /**

@@ -26,5 +26,9 @@ void handle_get_state(void);
 void handle_set_state(void);
 void handle_get_brightness(void);
 void handle_set_brightness(void);
+void handle_get_nb_led(void);
+void handle_set_nb_led(void);
+void handle_get_color(void);
+void handle_set_color(void);
 
 #endif /* WEB_WEB_SERVER_H */

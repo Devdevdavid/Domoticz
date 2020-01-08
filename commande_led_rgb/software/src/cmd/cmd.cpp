@@ -54,7 +54,7 @@ void cmd_set_brightness_auto(bool newValue)
 /**
  * Set the output brightness value and
  * disable auto bright if set
- * @param newValue [0-100]
+ * @param newValue [0; 100]
  */
 void cmd_set_brightness(uint8_t newValue)
 {
@@ -66,11 +66,51 @@ void cmd_set_brightness(uint8_t newValue)
 
 /**
  * Get the output brightness value
- * @param newValue [0-100]
+ * @return brightness [0; 100]
  */
 uint8_t cmd_get_brightness(void)
 {
   return ((uint16_t) (STATUS_BRIGHTNESS * 100)) / 255;
+}
+
+/**
+ * Set the number of LED for the strip
+ * @param newValue [1; STRIP_LED_MAX_NB_PIXELS]
+ */
+void cmd_set_nb_led(uint8_t newValue)
+{
+  if (newValue >= 1 && newValue <= STRIP_LED_MAX_NB_PIXELS) {
+    nb_led_set(newValue);
+  }
+}
+
+/**
+ * Get the number of LED
+ * @return nbLed [1; STRIP_LED_MAX_NB_PIXELS]
+ */
+uint8_t cmd_get_nb_led(void)
+{
+  return STATUS_NB_LED;
+}
+
+/**
+ * Set the color for some LED animations
+ * @param newValue [0x0; 0xFFFFFF]
+ */
+void cmd_set_color(uint32_t newValue)
+{
+  if (newValue >= 0 && newValue <= 0xFFFFFF) {
+    color_set(newValue);
+  }
+}
+
+/**
+ * Get the color currently configured
+ * @return nbLed [0x0; 0xFFFFFF]
+ */
+uint32_t cmd_get_color(void)
+{
+  return (STATUS_COLOR_R << 16) | (STATUS_COLOR_G << 8) | (STATUS_COLOR_B);
 }
 
 /**

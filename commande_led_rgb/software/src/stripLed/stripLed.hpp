@@ -3,6 +3,7 @@
 
 #include "global.hpp"
 #include <WS2812FX.h>
+#include <EEPROM.h>
 
 /** Number of Pixel on the strip */
 #define NB_PIXELS                 59
@@ -23,6 +24,8 @@ struct brightLevel_t {
 // StripLed
 void brightness_set(uint8_t brightness);
 void brightness_auto_set(void);
+void nb_led_set(uint8_t nbLed);
+void color_set(uint32_t color);
 int32_t set_animation(uint8_t animID);
 void stripLed_set_demo_mode(bool isDemoModeEn);
 void stripLed_set_state(bool isOn);
