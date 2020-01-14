@@ -1,3 +1,5 @@
+#define STATUS_CPP
+
 #include "status.hpp"
 #include "cmd/cmd.hpp"
 

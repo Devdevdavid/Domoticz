@@ -1,7 +1,7 @@
 #ifndef STRIPLED_STRIPLED_H
 #define STRIPLED_STRIPLED_H
 
-#include "global.hpp"
+#include <Arduino.h>
 
 /** Data structure for a level */
 struct brightLevel_t {
@@ -13,12 +13,14 @@ struct brightLevel_t {
 // StripLed
 void brightness_set(uint8_t brightness);
 void brightness_auto_set(void);
+void nb_led_set(uint8_t nbLed);
+void color_set(uint32_t color);
 int32_t set_animation(uint8_t animID);
-void stripLed_set_demo_mode(bool isDemoModeEn);
-void stripLed_set_state(bool isOn);
+void stripled_set_demo_mode(bool isDemoModeEn);
+void stripled_set_state(bool isOn);
 
 void brightness_table_init(void);
-void stripLed_init(void);
-void stripLed_main(void);
+void stripled_init(void);
+void stripled_main(void);
 
 #endif /* STRIPLED_STRIPLED_H */

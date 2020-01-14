@@ -1,6 +1,8 @@
-#include "temp.hpp"
 #include <OneWire.h>
 #include <DallasTemperature.h>
+
+#include "global.hpp"
+#include "temp.hpp"
 #include "domoticz/domoticz.hpp"
 #include "status_led/status_led.hpp"
 

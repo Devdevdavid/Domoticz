@@ -2,6 +2,9 @@
 #include "temp/temp.hpp"
 #include "relay/relay.hpp"
 #include "domoticz/domoticz.hpp"
+#include "io/inputs.hpp"
+#include "io/outputs.hpp"
+#include "cmd/cmd.hpp"
 
 extern uint32_t tick;
 uint32_t nextTempCheckTick = 0;
@@ -16,7 +19,7 @@ void script_send_relay_impulse(uint32_t impulseDurationMs);
 
 void script_execute(void)
 {
-#if defined(MODULE_DOMOTICZ) && defined(MODULE_TEMPERATURE)
+#ifdef BOARD_TEMP_DOMOTICZ
     if (tick > nextDomoticzUpdateTick) {
         nextTempCheckTick = tick + SCRIPT_DOMOTICZ_UPT_PERIOD;
 
@@ -25,17 +28,8 @@ void script_execute(void)
         domoticz_send_temperature(DOMOTICZ_SENSOR_ID_OUTSIDE, temp_get_value(DEVICE_INDEX_1));
     }
 #endif
-    // This is only to test buttons 
-    if (_isset(STATUS_BUTTON, STATUS_BUTTON_RISING)) {
-        _unset(STATUS_BUTTON, STATUS_BUTTON_RISING);
-        log_info("Rising edge");
-    }
-    if (_isset(STATUS_BUTTON, STATUS_BUTTON_FALLING)) {
-        _unset(STATUS_BUTTON, STATUS_BUTTON_FALLING);
-        log_info("Falling edge");
-    }
 
-#ifdef MODULE_TEMPERATURE
+#ifdef BOARD_TEMP_DOMOTICZ
     if (tick > nextTempCheckTick) {
         nextTempCheckTick = tick + SCRIPT_TEMP_CHECK_PERIOD;
         float fridgeTemp = temp_get_value(DEVICE_INDEX_0);
@@ -57,9 +51,9 @@ void script_execute(void)
         if (isInAlertOld != _isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT)) {
             isInAlertOld = _isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
             log_error("Script alert is now %s", isInAlertOld ? "active" : "inactive");
-#ifdef MODULE_RELAY
-            // Are we in impulsion mode ? (OPT jumper)
-            if (_isset(STATUS_BUTTON, STATUS_BUTTON_IS_PRESSED)) {
+#ifdef BOARD_TEMP_DOMOTICZ_RELAY
+            // Are we in impulsion mode (Jumper set) ? (OPT jumper JP1)
+            if (is_input_low(INPUTS_OPT_RELAY_IMPULSION_MODE)) {
                 script_send_relay_impulse(SCRIPT_RELAY_IMPULSION_DURATION);
 
                 // If 2nd impulsion is activated and the alert is going from OFF to ON then
@@ -73,9 +67,9 @@ void script_execute(void)
                 // No impulsion, just set the relay ON when alert is ON and vice versa
                 relay_set_state(isInAlertOld);
             }
+#ifdef BOARD_TEMP_DOMOTICZ_BUZZER
+            output_set(OUTPUTS_BUZZER, isInAlertOld);
 #endif
-#ifdef MODULE_BUZZER
-            buzzer_set_state(isInAlertOld);
 #endif
         }
     }
@@ -87,6 +81,28 @@ void script_execute(void)
         script_send_relay_impulse(SCRIPT_RELAY_IMPULSION_DURATION);
     }
 #endif
+#endif
+
+#if defined(BOARD_RING) && (DETECTOR_ENABLED != 0)
+    static uint32_t detectorEndTick = 0;
+    /** PIR Detector */
+    #if (DETECTOR_INVERSE_POLARITY == 0)
+    if (is_input_rising(INPUTS_PIR_DETECTOR)) {
+        reset_input_rising(INPUTS_PIR_DETECTOR);
+    #else
+    if (is_input_falling(INPUTS_PIR_DETECTOR)) {
+        reset_input_falling(INPUTS_PIR_DETECTOR);
+    #endif
+        // Detection ! Turn on the strip
+        detectorEndTick = tick + (DETECTOR_ON_DURATION_MIN * 60 * 1000);
+        cmd_set_state(true);
+    }
+
+    // Detector duration end
+    if (tick > detectorEndTick) {
+        cmd_set_state(false);
+        detectorEndTick = 0;
+    }
 #endif
 }
 
