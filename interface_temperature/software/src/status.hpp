@@ -3,9 +3,9 @@
 
 #include "global.hpp"
 
-#define NB_STATUS               7
+#define NB_STATUS               10
 
-#ifdef MAIN_C
+#ifdef STATUS_CPP
 uint8_t boardStatus[NB_STATUS];
 #else
 extern uint8_t boardStatus[NB_STATUS];
@@ -15,10 +15,13 @@ extern uint8_t boardStatus[NB_STATUS];
 #define STATUS_APPLI                    boardStatus[0]  /** Flag on application status */
 #define STATUS_WIFI                     boardStatus[1]  /** Flag on wifi connection  */
 #define STATUS_BRIGHTNESS               boardStatus[2]  /** Value of brightness currently set */
-#define STATUS_BUTTON                   boardStatus[3]  /** Flag on button states */
-#define STATUS_BRIGHT_LVL               boardStatus[4]  /** Level of brightness currently set */
-#define STATUS_ANIM                     boardStatus[5]  /** ID of the anim currently used */
-#define STATUS_SCRIPT                   boardStatus[6]  /** Script values */
+#define STATUS_BRIGHT_LVL               boardStatus[3]  /** Level of brightness currently set */
+#define STATUS_ANIM                     boardStatus[4]  /** ID of the anim currently used */
+#define STATUS_SCRIPT                   boardStatus[5]  /** Script values */
+#define STATUS_NB_LED                   boardStatus[6]  /** RAM copy of EEPROM_NB_LED_ADDRESS */
+#define STATUS_COLOR_R                  boardStatus[7]  /** RAM copy of EEPROM_NB_COLOR_R */
+#define STATUS_COLOR_G                  boardStatus[8]  /** RAM copy of EEPROM_NB_COLOR_G */
+#define STATUS_COLOR_B                  boardStatus[9] /** RAM copy of EEPROM_NB_COLOR_B */
 
 /* STATUS_APPLI */
 #define STATUS_APPLI_STATUS_LED         0x01
@@ -34,12 +37,6 @@ extern uint8_t boardStatus[NB_STATUS];
 #define STATUS_WIFI_IS_CO               0x01
 #define STATUS_WIFI_DEVICE_CO           0x02
 #define STATUS_WIFI_DOMOTICZ_FAULT      0x04
-
-/* STATUS_BUTTON */
-#define STATUS_BUTTON_RISING            0x01
-#define STATUS_BUTTON_FALLING           0x02
-#define STATUS_BUTTON_LONG_HOLD         0x04
-#define STATUS_BUTTON_IS_PRESSED        0x08
 
 /* STATUS_SCRIPT */
 #define STATUS_SCRIPT_IN_ALERT          0x01

@@ -1,5 +1,5 @@
-#ifndef TEMP_TEMP_H
-#define TEMP_TEMP_H
+#ifndef TEMP_TEMP_HPP
+#define TEMP_TEMP_HPP
 
 #include "global.hpp"
 
@@ -10,4 +10,4 @@ float temp_get_value(uint8_t deviceIndex);
 void temp_init(void);
 void temp_main(void);
 
-#endif /* TEMP_TEMP_H */
+#endif /* TEMP_TEMP_HPP */

@@ -1,5 +1,7 @@
-#include "stripLed.hpp"
+#include <EEPROM.h>
 #include <WS2812FX.h>
+#include "global.hpp"
+#include "stripled.hpp"
 
 #ifdef MODULE_STRIPLED
 
@@ -26,6 +28,34 @@ void brightness_set(uint8_t brightness)
 
   // Apply new value
   ws2812fx.setBrightness(brightness);
+}
+
+void nb_led_set(uint8_t nbLed)
+{
+  STATUS_NB_LED = nbLed;
+  EEPROM.write(EEPROM_NB_LED_ADDRESS, STATUS_NB_LED);
+  EEPROM.commit();
+
+  // Clear all the pixel before changing length
+  ws2812fx.strip_off();
+
+  // Apply new value
+  ws2812fx.setLength(STATUS_NB_LED);
+}
+
+void color_set(uint32_t color)
+{
+  STATUS_COLOR_R = (color >> 16) & 0xFF;
+  STATUS_COLOR_G = (color >> 8) & 0xFF;
+  STATUS_COLOR_B = color & 0xFF;
+
+  EEPROM.write(EEPROM_COLOR_R_ADDRESS, STATUS_COLOR_R);
+  EEPROM.write(EEPROM_COLOR_G_ADDRESS, STATUS_COLOR_G);
+  EEPROM.write(EEPROM_COLOR_B_ADDRESS, STATUS_COLOR_B);
+  EEPROM.commit();
+
+  // Apply new value
+  ws2812fx.setColor(color);
 }
 
 #if (LIGHT_SENSOR_PIN != -1)
@@ -75,7 +105,7 @@ int32_t set_animation(uint8_t animID)
  * Enable/Disable demo mode
  * @param isDemoModeEn : bool
  */
-void stripLed_set_demo_mode(bool isDemoModeEn)
+void stripled_set_demo_mode(bool isDemoModeEn)
 {
   if (isDemoModeEn) {
     _set(STATUS_APPLI, STATUS_APPLI_DEMO_MODE);
@@ -89,7 +119,7 @@ void stripLed_set_demo_mode(bool isDemoModeEn)
 /**
  * Define the state of the LED strip (ON or OFF)
  */
-void stripLed_set_state(bool isOn)
+void stripled_set_state(bool isOn)
 {
   if (isOn) {
     _set(STATUS_APPLI, STATUS_APPLI_LED_IS_ON);
@@ -125,14 +155,21 @@ void brightness_table_init(void)
 /**
  * Init the strip led
  */
-void stripLed_init(void)
+void stripled_init(void)
 {
   brightness_table_init();
+
+  // Read data written in EEPROM
+  STATUS_NB_LED = EEPROM.read(EEPROM_NB_LED_ADDRESS);
+  STATUS_COLOR_R = EEPROM.read(EEPROM_COLOR_R_ADDRESS);
+  STATUS_COLOR_G = EEPROM.read(EEPROM_COLOR_G_ADDRESS);
+  STATUS_COLOR_B = EEPROM.read(EEPROM_COLOR_B_ADDRESS);
 
   /** Init the led driver */
   ws2812fx.init();
   ws2812fx.setSpeed(500);
-  ws2812fx.setColor(255, 255, 255);
+  ws2812fx.setColor(STATUS_COLOR_R, STATUS_COLOR_G, STATUS_COLOR_B);
+  ws2812fx.setLength(STATUS_NB_LED);
   ws2812fx.start();
 
   autoBrightTick = tick;
@@ -140,15 +177,15 @@ void stripLed_init(void)
   // Go into demo mode at startup
   set_animation(STRIPLED_DEFAULT_ANIMATION_ID);
   brightness_set(STRIPLED_DEFAULT_BRIGHTNESS_VALUE);
-  stripLed_set_state(true);
-  stripLed_set_demo_mode(true);
+  stripled_set_state(true);
+  stripled_set_demo_mode(true);
 }
 
 /**
- * Main function of stripLed
+ * Main function of stripled
  * Should be executed every 1ms
  */
-void stripLed_main(void)
+void stripled_main(void)
 {
   if (_isset(STATUS_APPLI, STATUS_APPLI_LED_IS_ON)) {
     // Refresh strip display

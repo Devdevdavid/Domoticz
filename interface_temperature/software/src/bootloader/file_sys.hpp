@@ -1,12 +1,7 @@
 #ifndef BOOTLOADER_FILE_SYS_H
 #define BOOTLOADER_FILE_SYS_H
 
-#include "global.hpp"
-#include "FS.h"
-
-#ifdef ESP32
-#include "SPIFFS.h"
-#endif
+#include <Arduino.h>
 
 // File system
 void file_sys_init(void);

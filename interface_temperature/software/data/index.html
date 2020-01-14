@@ -38,31 +38,85 @@
       background-color: rgb(100, 100, 100);
       text-align: center;
     }
-    .slider {
+    .sliderH {
       -webkit-appearance: slider-horizontal; /* WebKit */
+    }
+    .sliderV {
+      writing-mode: bt-lr; /* IE */
+      -webkit-appearance: slider-vertical; /* WebKit */
+      width: 8px;
+      height: 175px;
+      padding: 0 5px;
+    }
+
+    .slidersTable {
+      margin: 0 auto;
+      text-align: center;
+    }
+    .slidersTable td {
+      width: 30%;
     }
   </style>
 </head>
 <body onload="page_start()">
   <h1 id="title">Ruban RGB</h1>
   <div id="content">
-    <h2>Luminosité</h2>
-    <p>Défini la luminosité du ruban</p>
-    <div id="brightness_label" class="theme">
-      <!-- Filled by JS -->
+    <div id="part_brightness">
+      <h2>Luminosité</h2>
+      <p>Défini la luminosité du ruban</p>
+      <div id="brightness_label" class="theme">
+        <!-- Filled by JS -->
+      </div>
+      <input type="range" min="0" max="100" value="0" class="theme sliderH" id="brightness_slider">
     </div>
-    <input type="range" min="0" max="100" value="0" class="theme slider" id="brightness_slider">
-    <h2>Animation</h2>
-    <p>Sélectionne une animation en particulier</p>
-    <select id="animation_select" class="theme">
-      <!-- Filled by JS -->
-    </select>
-    <h2>Demo</h2>
-    <p>Change d'animation toutes les 5 secondes</p>
-    <button id="demo_button" class="theme"><!-- Filled by JS --></button>
-    <h2>ON/OFF</h2>
-    <p>Active/désactive le ruban de LED</p>
-    <button id="on_off_button" class="theme"><!-- Filled by JS --></button>
+
+    <div id="part_animation">
+      <h2>Animation</h2>
+      <p>Sélectionne une animation en particulier</p>
+      <select id="animation_select" class="theme">
+        <!-- Filled by JS -->
+      </select>
+    </div>
+    
+    <div id="part_color">
+      <h2>Couleur</h2>
+      <p>Change la couleur du ruban</p>
+      <table class="slidersTable">
+        <tr>
+          <td><span>Rouge</<span></td>
+          <td><span>Vert</<span></td>
+          <td><span>Bleu</<span></td>
+        </tr>
+        <tr>
+          <td><input type="range" min="0" max="255" value="0" class="sliderV" id="sliderRed"></td>
+          <td><input type="range" min="0" max="255" value="0" class="sliderV" id="sliderGreen"></td>
+          <td><input type="range" min="0" max="255" value="0" class="sliderV" id="sliderBlue"></td>
+        </tr>
+        <tr>
+          <td><span id="spanRed"><!-- Filled by JS --></<span></td>
+          <td><span id="spanGreen"><!-- Filled by JS --></<span></td>
+          <td><span id="spanBlue"><!-- Filled by JS --></<span></td>
+        </tr>
+      </table>
+    </div>
+    
+    <div id="part_demo">
+      <h2>Demo</h2>
+      <p>Change d'animation toutes les 5 secondes</p>
+      <button id="demo_button" class="theme"><!-- Filled by JS --></button>
+    </div>
+    
+    <div id="part_on_off">
+      <h2>ON/OFF</h2>
+      <p>Active/désactive le ruban de LED</p>
+      <button id="on_off_button" class="theme"><!-- Filled by JS --></button>
+    </div>
+    
+    <div id="part_nb_led">
+      <h2>Nombre de LED</h2>
+      <p>Défini le nombre de LED du ruban</p>
+      <input id="nb_led_input" class="theme"type="number" min="1" max="100">
+    </div>
   </div>
   <div id="footer">
     Hardware - Pascal RONDANE<br>
@@ -70,11 +124,21 @@
     Août 2019
   </div>
   <script type="text/javascript">
+    var displayInfo = 0x00;
+    const DISPLAY_INFO_KEEP_COLOR = 0x01;
+
     var brightnessSlider = document.getElementById("brightness_slider");
     var brightnessLabel = document.getElementById("brightness_label");
     var animSelect = document.getElementById("animation_select");
     var demoButton = document.getElementById("demo_button");
     var onOffButton = document.getElementById("on_off_button");
+    var nbLedInput = document.getElementById("nb_led_input");
+    var sliderRed = document.getElementById("sliderRed");
+    var sliderGreen = document.getElementById("sliderGreen");
+    var sliderBlue = document.getElementById("sliderBlue");
+    var spanRed = document.getElementById("spanRed");
+    var spanGreen = document.getElementById("spanGreen");
+    var spanBlue = document.getElementById("spanBlue");
 
     var animTable = ["Static", "Blink", "Breath", "Color Wipe", "Color Wipe Inverse", "Color Wipe Reverse", "Color Wipe Reverse Inverse", "Color Wipe Random", "Random Color", "Single Dynamic", "Multi Dynamic", "Rainbow", "Rainbow Cycle", "Scan", "Dual Scan", "Fade", "Theater Chase", "Theater Chase Rainbow", "Running Lights", "Twinkle", "Twinkle Random", "Twinkle Fade", "Twinkle Fade Random", "Sparkle", "Flash Sparkle", "Hyper Sparkle", "Strobe", "Strobe Rainbow", "Multi Strobe", "Blink Rainbow", "Chase White", "Chase Color", "Chase Random", "Chase Rainbow", "Chase Flash", "Chase Flash Random", "Chase Rainbow White", "Chase Blackout", "Chase Blackout Rainbow", "Color Sweep Random", "Running Color", "Running Red Blue", "Running Random", "Larson Scanner", "Comet", "Fireworks", "Fireworks Random", "Merry Christmas", "Fire Flicker", "Fire Flicker (soft)", "Fire Flicker (intense)", "Circus Combustus", "Halloween", "Bicolor Chase", "Tricolor Chase", "ICU"];
 
@@ -132,6 +196,12 @@
       }
     }
 
+    function update_nb_led_input(currentNbLed)
+    {
+      currentNbLed = parseInt(currentNbLed, 10);
+      nbLedInput.value = currentNbLed;
+    }
+
     /**
      * Send params to url and call callback when response is ok
      */
@@ -146,11 +216,65 @@
       xhttp.open('GET', url + '?' + params, true);
       xhttp.send();
     }
+
+    function handle_color_slider_update()
+    {
+      r = parseInt(sliderRed.value, 10);
+      g = parseInt(sliderGreen.value, 10);
+      b = parseInt(sliderBlue.value, 10);
+      var params = 'v=' + ((r << 16) + (g << 8) + b);
+      cgi_request('/set_color', params, function(textReply) {
+        update_color_slider(textReply);
+      });
+    }
+
+    /**
+     * Get percentage value [0; 255] to [0; 100]
+     * with a truncated value
+     * */
+    function get_color_percent(c) 
+    {
+      return Math.trunc((c * 100) / 255) + "%";
+    }
+
+    function update_color_slider(currentColor)
+    {
+      currentColor = parseInt(currentColor, 10);
+      r = (currentColor >> 16) & 0xFF;
+      g = (currentColor >> 8) & 0xFF;
+      b = currentColor & 0xFF;
+      spanRed.innerHTML = get_color_percent(r);
+      sliderRed.value = r;
+      spanGreen.innerHTML = get_color_percent(g);
+      sliderGreen.value = g;
+      spanBlue.innerHTML = get_color_percent(b);
+      sliderBlue.value = b;
+    }
+
+    /**
+     * Link sliders to the handle function
+     * @return {[type]} [description]
+     */
+    function init_sliders()
+    {
+      sliderRed.oninput = function() {
+        handle_color_slider_update();
+      }
+      sliderGreen.oninput = function() {
+        handle_color_slider_update();
+      }
+      sliderBlue.oninput = function() {
+        handle_color_slider_update();
+      }
+      cgi_request('/get_color', '', function(textReply) {
+        update_on_off_button(textReply);
+      });
+    }
     
     /**
      * Start function to load the page
      */
-    function page_start()
+    function page_init()
     {
       cgi_request('/get_animation', '', function(textReply) {
         create_animation_select(textReply);
@@ -184,6 +308,35 @@
       }
       cgi_request('/get_state', '', function(textReply) {
         update_on_off_button(textReply);
+      });
+
+      nbLedInput.onchange = function() {
+        var params = 'v=' + nbLedInput.value;
+        cgi_request('/set_nb_led', params, function(textReply) {
+          update_nb_led_input(textReply);
+        });
+      };
+      cgi_request('/get_nb_led', '', function(textReply) {
+        update_nb_led_input(textReply);
+      });
+
+      init_sliders();
+    }
+
+    /**
+     * Start function to load the page
+     */
+    function page_start()
+    {
+      cgi_request('/get_display_info', '', function(displayInfoStr) {
+        displayInfo = parseInt(displayInfoStr, 10);
+        if (displayInfo & DISPLAY_INFO_KEEP_COLOR) {
+          partToHide = ["brightness", "animation", "demo", "on_off", "nb_led"];
+          partToHide.forEach(element => {
+            document.getElementById("part_" + element).style.display = 'none';
+          });
+        }
+        page_init();
       });
     }
   </script>

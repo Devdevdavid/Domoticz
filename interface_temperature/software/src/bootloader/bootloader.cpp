@@ -1,4 +1,16 @@
+#ifdef ESP32
+#include <WiFi.h>
+#include <mDNS.h>
+#else
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#endif
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+
+#include "global.hpp"
 #include "bootloader.hpp"
+#include "file_sys.hpp"
 
 extern uint32_t tick;
 uint32_t bootloaderTick = 0;

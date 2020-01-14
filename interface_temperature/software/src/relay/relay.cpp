@@ -1,3 +1,4 @@
+#include "global.hpp"
 #include "relay.hpp"
 
 #ifdef MODULE_RELAY

@@ -1,8 +1,10 @@
+#include "global.hpp"
 #include "domoticz.hpp"
-#include <ESP8266HTTPClient.h>
 #include "status_led/status_led.hpp"
 
 #ifdef MODULE_DOMOTICZ
+
+#include <ESP8266HTTPClient.h>
 
 HTTPClient http;
 

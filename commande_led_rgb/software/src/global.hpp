@@ -5,12 +5,27 @@
 
 #define FIRMWARE_VERSION      "LightKit v1.5"
 
+#define MODULE_RING_D
+#undef MODULE_ESP8266_D
+
 /* PERIPH DEFINITION (-1: Not used) */
-#define LED_POWER_PIN       -1
-#define LED_FAULT_PIN       -1
-#define BUTTON_PIN          -1
-#define LIGHT_SENSOR_PIN    -1
-#define STRIP_LED_PIN       2
+#if defined(MODULE_ESP8266_D)
+    #define LED_POWER_PIN       -1
+    #define LED_FAULT_PIN       -1
+    #define BUTTON_PIN          -1
+    #define LIGHT_SENSOR_PIN    -1
+    #define STRIP_LED_PIN       2
+    #define OPT_MODE_PIN        -1
+    #define OPT_IN_PIN          -1
+#elif defined(MODULE_RING_D)
+    #define LED_POWER_PIN       -1
+    #define LED_FAULT_PIN       -1
+    #define BUTTON_PIN          -1
+    #define LIGHT_SENSOR_PIN    -1
+    #define STRIP_LED_PIN       2
+    #define OPT_MODE_PIN        0
+    #define OPT_IN_PIN          4
+#endif
 
 /* PARAMETERS */
 /** Hold time in ms for long press on button */

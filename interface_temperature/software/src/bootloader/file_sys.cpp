@@ -1,4 +1,9 @@
+#include "global.hpp"
 #include "file_sys.hpp"
+#include "FS.h"
+#ifdef ESP32
+#include "SPIFFS.h"
+#endif
 
 void file_sys_init(void)
 {

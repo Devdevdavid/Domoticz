@@ -1,4 +1,8 @@
+#include "global.hpp"
 #include "cmd.hpp"
+#include "status_led/status_led.hpp"
+#include "stripled/stripled.hpp"
+#include "relay/relay.hpp"
 
 void cmd_print_help(void)
 {
@@ -26,7 +30,6 @@ void cmd_print_status(void)
   } else {
     Serial.printf("\n");
   }
-  Serial.printf("BUTTON:  0x%02X\n", STATUS_BUTTON);
   Serial.printf("LEVEL:   %d\n", STATUS_BRIGHT_LVL);
   Serial.printf("ANIM:    %d\n", STATUS_ANIM);
 }
@@ -84,13 +87,66 @@ uint8_t cmd_get_brightness(void)
 #endif
 
 /**
+ * Set the number of LED for the strip
+ * @param newValue [1; STRIPLED_MAX_NB_PIXELS]
+ */
+#ifdef MODULE_STRIPLED
+void cmd_set_nb_led(uint8_t newValue)
+{
+  if (newValue >= 1 && newValue <= STRIPLED_MAX_NB_PIXELS) {
+    nb_led_set(newValue);
+  }
+}
+#endif
+
+/**
+ * Get the number of LED
+ * @return nbLed [1; STRIPLED_MAX_NB_PIXELS]
+ */
+#ifdef MODULE_STRIPLED
+uint8_t cmd_get_nb_led(void)
+{
+  return STATUS_NB_LED;
+}
+#endif
+
+/**
+ * Set the color for some LED animations
+ * @param newValue [0x0; 0xFFFFFF]
+ */
+#ifdef MODULE_STRIPLED
+void cmd_set_color(uint32_t newValue)
+{
+  if (newValue >= 0 && newValue <= 0xFFFFFF) {
+    color_set(newValue);
+    cmd_set_state(true);
+    cmd_set_demo_mode(false);
+    cmd_set_animation(0); // 0: Static
+  }
+}
+#endif
+
+/**
+ * Get the color currently configured
+ * @return nbLed [0x0; 0xFFFFFF]
+ */
+#ifdef MODULE_STRIPLED
+uint32_t cmd_get_color(void)
+{
+  return (STATUS_COLOR_R << 16) | (STATUS_COLOR_G << 8) | (STATUS_COLOR_B);
+}
+#endif
+
+/**
  * Get the LED State
  * @return  0: LED are OFF, 1: LED are ON
  */
+#ifdef MODULE_STRIPLED
 bool cmd_get_state(void)
 {
   return _isset(STATUS_APPLI, STATUS_APPLI_LED_IS_ON);
 }
+#endif
 
 /**
  * Set the state of LED
@@ -100,7 +156,7 @@ bool cmd_get_state(void)
 #ifdef MODULE_STRIPLED
 int32_t cmd_set_state(bool state)
 {
-  stripLed_set_state(state);
+  stripled_set_state(state);
   return 0;
 }
 #endif
@@ -124,7 +180,7 @@ bool cmd_get_demo_mode(void)
 #ifdef MODULE_STRIPLED
 int32_t cmd_set_demo_mode(bool isDemoMode)
 {
-  stripLed_set_demo_mode(isDemoMode);
+  stripled_set_demo_mode(isDemoMode);
   return 0;
 }
 #endif

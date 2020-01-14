@@ -1,5 +1,5 @@
-#ifndef STATUS_LED_STATUS_LED_H
-#define STATUS_LED_STATUS_LED_H
+#ifndef STATUS_LED_STATUS_LED_HPP
+#define STATUS_LED_STATUS_LED_HPP
 
 #include "global.hpp"
 
@@ -23,4 +23,4 @@ void status_led_turnoff(void);
 void status_led_init(void);
 void status_led_main(void);
 
-#endif /* STATUS_LED_STATUS_LED_H */
+#endif /* STATUS_LED_STATUS_LED_HPP */

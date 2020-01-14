@@ -1,7 +1,7 @@
 #ifndef CMD_CMD_SERIAL_H
 #define CMD_CMD_SERIAL_H
 
-#include "global.hpp"
+#include <Arduino.h>
 
 #define ERROR_UNKNOWN_CMD     1
 #define ERROR_WRONG_LENGTH    2

@@ -1,5 +1,7 @@
+#include "global.hpp"
 #include "cmd_serial.hpp"
 #include "cmd.hpp"
+#include "relay/relay.hpp"
 
 #ifdef MODULE_CMD_SERIAL
 

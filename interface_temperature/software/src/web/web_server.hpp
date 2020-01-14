@@ -1,7 +1,7 @@
-#ifndef WEB_WEB_SERVER_H
-#define WEB_WEB_SERVER_H
+#ifndef WEB_WEB_SERVER_HPP
+#define WEB_WEB_SERVER_HPP
 
-#include "global.hpp"
+#include <Arduino.h>
 
 // Web Server
 void web_server_init(void);
@@ -17,5 +17,10 @@ void handle_get_state(void);
 void handle_set_state(void);
 void handle_get_brightness(void);
 void handle_set_brightness(void);
+void handle_get_nb_led(void);
+void handle_set_nb_led(void);
+void handle_get_color(void);
+void handle_set_color(void);
+void handle_get_display_info(void);
 
-#endif /* WEB_WEB_SERVER_H */
+#endif /* WEB_WEB_SERVER_HPP */
