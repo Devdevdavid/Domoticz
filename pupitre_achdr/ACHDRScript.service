@@ -8,7 +8,6 @@ Environment=XAUTHORITY=/home/pi/.Xauthority
 ExecStart=/usr/bin/python3 /home/pi/Scripts/LoopVideoIO.py
 Restart=on-failure
 RestartSec=5s
-ExecStartPre=/bin/sleep 5
 
 [Install]
 WantedBy=multi-user.target
