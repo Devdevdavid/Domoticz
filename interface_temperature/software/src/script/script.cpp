@@ -84,7 +84,7 @@ void script_execute(void)
 #endif
 
 #if defined(BOARD_RING) && (DETECTOR_ENABLED != 0)
-    static uint32_t detectorEndTick = 0;
+    static uint32_t detectorEndTick = UINT32_MAX;
     /** PIR Detector */
     #if (DETECTOR_INVERSE_POLARITY == 0)
     if (is_input_rising(INPUTS_PIR_DETECTOR)) {
@@ -96,12 +96,13 @@ void script_execute(void)
         // Detection ! Turn on the strip
         detectorEndTick = tick + (DETECTOR_ON_DURATION_MIN * 60 * 1000);
         cmd_set_state(true);
+        log_info("Detection triggered !");
     }
 
     // Detector duration end
     if (tick > detectorEndTick) {
         cmd_set_state(false);
-        detectorEndTick = 0;
+        detectorEndTick = UINT32_MAX;
     }
 #endif
 }
