@@ -1,12 +1,11 @@
 #ifndef BOOTLOADER_H
 #define BOOTLOADER_H
 
-// Define wether the ESP is in Access point or in connected to a network
-#undef IS_IN_AP_MODE
+#include "global.hpp"
 
 #define BOOTLOADER_VERSION          "Bootloader v1.1"
-#define WIFI_SSID                   "Bbox-9D73DEEB"
-#define WIFI_PWD                    "F3436D1346ED55127A61FFF1DE15EE"
+#define WIFI_SSID                   "Bbox-"
+#define WIFI_PWD                    "pwd"
 #define OTA_PORT                    8266
 #define OTA_PWD                     "ThisIsSecureNow"
 

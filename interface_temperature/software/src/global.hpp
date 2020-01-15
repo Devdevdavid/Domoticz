@@ -93,6 +93,9 @@
 #define SCRIPT_RELAY_IMPULSION_DURATION         3*1000                /** Duration of the impulsion when the alert is triggered */
 #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    2*1000                /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
 
+/** CUSTOM DEFINE for this board */
+#undef IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
+
 /** Compilation checks */
 #if defined(BOARD_TEMP_DOMOTICZ_RELAIS) && defined(BOARD_TEMP_DOMOTICZ_BUZZER)
     #error BOARD_TEMP_DOMOTICZ_RELAIS cannot be defined with BOARD_TEMP_DOMOTICZ_BUZZER
@@ -141,9 +144,10 @@
 #define INPUTS_PIR_DETECTOR                    1                     /** The PIR detector is set as the second button in the module */
 
 /** CUSTOM DEFINE for this board */
-#define DETECTOR_ENABLED                       1                    /** Enable (1) or disbale (0) the PIR Detector option */
-#define DETECTOR_ON_DURATION_MIN               30                   /** Duration of the ON State after detector found someone (in minute) */
-#define DETECTOR_INVERSE_POLARITY              0                    /** Inverse the polarity of the detector input: 0 -> goes HIGH on trigger, 1 -> goes LOW on trigger */                   
+#define IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
+#define DETECTOR_ENABLED                       1                     /** Enable (1) or disbale (0) the PIR Detector option */
+#define DETECTOR_ON_DURATION_MIN               1                     /** Duration of the ON State after detector found someone (in minute) */
+#define DETECTOR_INVERSE_POLARITY              0                     /** Inverse the polarity of the detector input: 0 -> goes HIGH on trigger, 1 -> goes LOW on trigger */                   
 
 /** Compilation checks */
 #if !defined(MODULE_INPUTS)
@@ -246,6 +250,9 @@
 #define SCRIPT_TEMP_ALERT_FREEZER               30
 #define SCRIPT_RELAY_IMPULSION_DURATION         3*1000                /** Duration of the impulsion when the alert is triggered */
 #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    2*1000                /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
+
+/** CUSTOM DEFINE for this board */
+#undef IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
 
 #endif /* BOARD_ANY */
 
