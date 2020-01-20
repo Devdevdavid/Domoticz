@@ -81,23 +81,7 @@
     <div id="part_color">
       <h2>Couleur</h2>
       <p>Change la couleur du ruban</p>
-      <table class="slidersTable">
-        <tr>
-          <td><span>Rouge</<span></td>
-          <td><span>Vert</<span></td>
-          <td><span>Bleu</<span></td>
-        </tr>
-        <tr>
-          <td><input type="range" min="0" max="255" value="0" class="sliderV" id="sliderRed"></td>
-          <td><input type="range" min="0" max="255" value="0" class="sliderV" id="sliderGreen"></td>
-          <td><input type="range" min="0" max="255" value="0" class="sliderV" id="sliderBlue"></td>
-        </tr>
-        <tr>
-          <td><span id="spanRed"><!-- Filled by JS --></<span></td>
-          <td><span id="spanGreen"><!-- Filled by JS --></<span></td>
-          <td><span id="spanBlue"><!-- Filled by JS --></<span></td>
-        </tr>
-      </table>
+      <input type="color" name="color_picker" id="color_picker" value="#000000">
     </div>
     
     <div id="part_demo">
@@ -133,9 +117,7 @@
     var demoButton = document.getElementById("demo_button");
     var onOffButton = document.getElementById("on_off_button");
     var nbLedInput = document.getElementById("nb_led_input");
-    var sliderRed = document.getElementById("sliderRed");
-    var sliderGreen = document.getElementById("sliderGreen");
-    var sliderBlue = document.getElementById("sliderBlue");
+    var colorPicker = document.getElementById("color_picker");
     var spanRed = document.getElementById("spanRed");
     var spanGreen = document.getElementById("spanGreen");
     var spanBlue = document.getElementById("spanBlue");
@@ -217,60 +199,27 @@
       xhttp.send();
     }
 
-    function handle_color_slider_update()
+    function HEXToIntColor(hrrggbb) {
+      
+    }
+
+    function handle_color_picker_update()
     {
-      r = parseInt(sliderRed.value, 10);
-      g = parseInt(sliderGreen.value, 10);
-      b = parseInt(sliderBlue.value, 10);
-      var params = 'v=' + ((r << 16) + (g << 8) + b);
+      var rgb = parseInt(colorPicker.value.substr(1, 6), 16);
+
+      var params = 'v=' + rgb;
       cgi_request('/set_color', params, function(textReply) {
-        update_color_slider(textReply);
+        update_color_picker(textReply);
       });
     }
 
-    /**
-     * Get percentage value [0; 255] to [0; 100]
-     * with a truncated value
-     * */
-    function get_color_percent(c) 
-    {
-      return Math.trunc((c * 100) / 255) + "%";
-    }
-
-    function update_color_slider(currentColor)
+    function update_color_picker(currentColor)
     {
       currentColor = parseInt(currentColor, 10);
-      r = (currentColor >> 16) & 0xFF;
-      g = (currentColor >> 8) & 0xFF;
-      b = currentColor & 0xFF;
-      spanRed.innerHTML = get_color_percent(r);
-      sliderRed.value = r;
-      spanGreen.innerHTML = get_color_percent(g);
-      sliderGreen.value = g;
-      spanBlue.innerHTML = get_color_percent(b);
-      sliderBlue.value = b;
+      currentColor = "000000" + currentColor.toString(16);
+      colorPicker.value = '#' + currentColor.substr(currentColor.length - 6);
     }
 
-    /**
-     * Link sliders to the handle function
-     * @return {[type]} [description]
-     */
-    function init_sliders()
-    {
-      sliderRed.oninput = function() {
-        handle_color_slider_update();
-      }
-      sliderGreen.oninput = function() {
-        handle_color_slider_update();
-      }
-      sliderBlue.oninput = function() {
-        handle_color_slider_update();
-      }
-      cgi_request('/get_color', '', function(textReply) {
-        update_color_slider(textReply);
-      });
-    }
-    
     /**
      * Start function to load the page
      */
@@ -320,7 +269,12 @@
         update_nb_led_input(textReply);
       });
 
-      init_sliders();
+      colorPicker.onchange = function() {
+        handle_color_picker_update();
+      };
+      cgi_request('/get_color', '', function(textReply) {
+        update_color_picker(textReply);
+      });
     }
 
     /**

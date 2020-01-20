@@ -2,6 +2,7 @@
 #include <WS2812FX.h>
 #include "global.hpp"
 #include "stripled.hpp"
+#include "io/inputs.hpp"
 
 #ifdef MODULE_STRIPLED
 
@@ -25,6 +26,8 @@ uint32_t autoBrightTick;
 void brightness_set(uint8_t brightness)
 {
   STATUS_BRIGHTNESS = brightness;
+  EEPROM.write(EEPROM_BRIGHTNESS_ADDRESS, STATUS_BRIGHTNESS);
+  EEPROM.commit();
 
   // Apply new value
   ws2812fx.setBrightness(brightness);
@@ -48,6 +51,8 @@ void color_set(uint32_t color)
   STATUS_COLOR_R = (color >> 16) & 0xFF;
   STATUS_COLOR_G = (color >> 8) & 0xFF;
   STATUS_COLOR_B = color & 0xFF;
+
+  log_info("Setting color to %02X - %02X - %02X", STATUS_COLOR_R, STATUS_COLOR_G, STATUS_COLOR_B);
 
   EEPROM.write(EEPROM_COLOR_R_ADDRESS, STATUS_COLOR_R);
   EEPROM.write(EEPROM_COLOR_G_ADDRESS, STATUS_COLOR_G);
@@ -121,6 +126,7 @@ void stripled_set_demo_mode(bool isDemoModeEn)
  */
 void stripled_set_state(bool isOn)
 {
+  log_info("Stripled is now %s", isOn ? "on" : "off");
   if (isOn) {
     _set(STATUS_APPLI, STATUS_APPLI_LED_IS_ON);
   } else {
@@ -164,21 +170,41 @@ void stripled_init(void)
   STATUS_COLOR_R = EEPROM.read(EEPROM_COLOR_R_ADDRESS);
   STATUS_COLOR_G = EEPROM.read(EEPROM_COLOR_G_ADDRESS);
   STATUS_COLOR_B = EEPROM.read(EEPROM_COLOR_B_ADDRESS);
+  STATUS_BRIGHTNESS = EEPROM.read(EEPROM_BRIGHTNESS_ADDRESS);
+
+  /** Sanity check */
+  if (STATUS_BRIGHTNESS == 0) {
+    STATUS_BRIGHTNESS = STRIPLED_DEFAULT_BRIGHTNESS_VALUE;
+  }
+  if (STATUS_NB_LED == 0) {
+    STATUS_NB_LED = 5;
+  }
+  if ((STATUS_COLOR_R == 0) && (STATUS_COLOR_G == 0) && (STATUS_COLOR_B == 0)) {
+    STATUS_COLOR_R = 100;
+  }
 
   /** Init the led driver */
   ws2812fx.init();
   ws2812fx.setSpeed(500);
   ws2812fx.setColor(STATUS_COLOR_R, STATUS_COLOR_G, STATUS_COLOR_B);
   ws2812fx.setLength(STATUS_NB_LED);
-  ws2812fx.start();
+  ws2812fx.setBrightness(STATUS_BRIGHTNESS);
 
+  // Brightness
   autoBrightTick = tick;
 
+#if defined(BOARD_RING)
+  stripled_set_state(false);
+  set_animation(0); // 0: Static
+  stripled_set_demo_mode(false);
+#else
   // Go into demo mode at startup
-  set_animation(STRIPLED_DEFAULT_ANIMATION_ID);
-  brightness_set(STRIPLED_DEFAULT_BRIGHTNESS_VALUE);
   stripled_set_state(true);
+  set_animation(STRIPLED_DEFAULT_ANIMATION_ID);
   stripled_set_demo_mode(true);
+#endif
+
+  ws2812fx.start();
 }
 
 /**

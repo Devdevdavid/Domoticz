@@ -32,6 +32,7 @@ extern uint8_t inputStates[INPUTS_COUNT];
 #define reset_input_rising(i)       _unset(inputStates[i], INPUT_STATE_RISING)
 
 void inputs_init();
+uint16_t input_analog_read(uint8_t i);
 void inputs_main();
 
 #endif /** MODULE_INPUTS */

@@ -83,20 +83,31 @@ void script_execute(void)
 #endif
 #endif
 
-#if defined(BOARD_RING) && (DETECTOR_ENABLED != 0)
+#ifdef BOARD_RING
     static uint32_t detectorEndTick = UINT32_MAX;
-    /** PIR Detector */
-    #if (DETECTOR_INVERSE_POLARITY == 0)
-    if (is_input_rising(INPUTS_PIR_DETECTOR)) {
-        reset_input_rising(INPUTS_PIR_DETECTOR);
-    #else
-    if (is_input_falling(INPUTS_PIR_DETECTOR)) {
-        reset_input_falling(INPUTS_PIR_DETECTOR);
-    #endif
-        // Detection ! Turn on the strip
-        detectorEndTick = tick + (DETECTOR_ON_DURATION_MIN * 60 * 1000);
-        cmd_set_state(true);
-        log_info("Detection triggered !");
+
+    /** Is the jumper set to enable the detector ? */
+    if (is_input_low(INPUTS_PIR_DETECTOR_ENABLE)) {
+        /** PIR Detector */
+        #if (DETECTOR_INVERSE_POLARITY == 0)
+        if (is_input_rising(INPUTS_PIR_DETECTOR)) {
+            reset_input_rising(INPUTS_PIR_DETECTOR);
+        #else
+        if (is_input_falling(INPUTS_PIR_DETECTOR)) {
+            reset_input_falling(INPUTS_PIR_DETECTOR);
+        #endif
+            // Detection ! Turn on the strip
+            uint32_t duration = input_analog_read(INPUTS_PIR_DETECTOR_DELAY);
+            // Convert to [0; MAX min - 1 min], 12 bits so 4095
+            duration = ((duration * ((DETECTOR_MAX_DURATION_MIN - 1) * 60)) / 4095) * 1000;
+            // Convert to [1 min; MAX min]
+            duration += 1 * 60 * 1000;
+            // Set the moment of closure
+            detectorEndTick = tick + duration;
+
+            cmd_set_state(true);
+            log_info("Detection triggered ! Delay = %dmin", duration / (1000 * 60));
+        }
     }
 
     // Detector duration end
@@ -104,6 +115,15 @@ void script_execute(void)
         cmd_set_state(false);
         detectorEndTick = UINT32_MAX;
     }
+
+    // static uint32_t tick1s = 0;
+    // if (tick > tick1s) {
+    //     tick1s = tick + 1000;
+    //     log_info("OPT_WEB = %d", is_input_high(INPUTS_OPT_WEB_SERVER_DISPLAY));
+    //     log_info("PIR = %d", is_input_high(INPUTS_PIR_DETECTOR));
+    //     log_info("PIR OPT = %d", is_input_high(INPUTS_PIR_DETECTOR_ENABLE));
+    // }
+
 #endif
 }
 

@@ -136,17 +136,19 @@
 #define LIGHT_SENSOR_PIN                        -1                    /** Pin for Light sensor used to ajust output light level (-1 if not used) */
 
 /* MODULE_INPUTS */
-#define INPUTS_COUNT                           2                     /** Number of inputs managed by the module */
-#define INPUTS_PINS                            {0, 4}                /** Define the pin of the input with following format: {x, y, z} */
+#define INPUTS_COUNT                           4                     /** Number of inputs managed by the module */
+#define INPUTS_PINS                            {26, 4, 25, 32}       /** Define the pin of the input with following format: {x, y, z} */
+#define INPUTS_MODES                           { N, N,  N,  A}       /** Define the init mode of the input pin (U or A) */
 #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
 // Aliases
 #define INPUTS_OPT_WEB_SERVER_DISPLAY          0                     /** Option jumper JP1 is set as the first button in the module */
 #define INPUTS_PIR_DETECTOR                    1                     /** The PIR detector is set as the second button in the module */
+#define INPUTS_PIR_DETECTOR_ENABLE             2                     /** This Jumper tell if Detector is enabled or not */
+#define INPUTS_PIR_DETECTOR_DELAY              3                     /** Analog input to set the detector duration */
 
 /** CUSTOM DEFINE for this board */
 #define IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
-#define DETECTOR_ENABLED                       1                     /** Enable (1) or disbale (0) the PIR Detector option */
-#define DETECTOR_ON_DURATION_MIN               1                     /** Duration of the ON State after detector found someone (in minute) */
+#define DETECTOR_MAX_DURATION_MIN              20                    /** Maximum duration of the ON State after detector found someone (in minute) */
 #define DETECTOR_INVERSE_POLARITY              0                     /** Inverse the polarity of the detector input: 0 -> goes HIGH on trigger, 1 -> goes LOW on trigger */                   
 
 /** Compilation checks */
@@ -211,8 +213,9 @@
 #define INPUTS_OPT_RELAY_IMPULSION_MODE        0                     /** Option jumper JP1 is set as the first button in the module */
 
 /* MODULE_OUTPUTS */
-#define OUTPUTS_COUNT                           2                    /** Number of outputs managed by the module */
-#define OUTPUTS_PINS                            {12}                 /** Define the pin of the output with following format: {x, y, z} */
+#define OUTPUTS_COUNT                          2                    /** Number of outputs managed by the module */
+#define OUTPUTS_PINS                           {12}                 /** Define the pin of the output with following format: {x, y, z} */
+#define INPUTS_MODES                           {U}                  /** Define the init mode of the input pin (U or A) */
 
 /* MODULE_RELAY */
 #define RELAY_FEEDBACK_PIN                      0                     /** Define the input to use to get the feedback information */
@@ -252,7 +255,7 @@
 #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    2*1000                /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
 
 /** CUSTOM DEFINE for this board */
-#undef IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
+#undef IS_IN_AP_MODE                                                  /** Define wether the ESP is in Access point or in connected to a network */
 
 #endif /* BOARD_ANY */
 
@@ -266,13 +269,18 @@
 #endif
 
 /** Types of Led status */
-#define STATUS_LED_TYPE_CLASSIC                 0                     /** Constant for STATUS_LED_TYPE */
-#define STATUS_LED_TYPE_NEOPIXEL                1                     /** Constant for STATUS_LED_TYPE */
+#define STATUS_LED_TYPE_CLASSIC                 0                       /** Constant for STATUS_LED_TYPE */
+#define STATUS_LED_TYPE_NEOPIXEL                1                       /** Constant for STATUS_LED_TYPE */
 
+/** Modes for inputs pins */
+#define N                                       0                       /** Input no-pull-up */
+#define U                                       1                       /** Input pull-up */
+#define A                                       2                       /** Input analog */
 
 /** EEPROM used size in bytes */
-#define EEPROM_USED_SIZE                        4
+#define EEPROM_USED_SIZE                        5
 #define EEPROM_NB_LED_ADDRESS                   0
 #define EEPROM_COLOR_R_ADDRESS                  1
 #define EEPROM_COLOR_G_ADDRESS                  2
 #define EEPROM_COLOR_B_ADDRESS                  3
+#define EEPROM_BRIGHTNESS_ADDRESS               4

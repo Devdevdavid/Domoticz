@@ -7,6 +7,7 @@
 
 extern uint32_t tick;
 const uint8_t inputPins[INPUTS_COUNT] = INPUTS_PINS;
+const uint8_t inputModes[INPUTS_COUNT] = INPUTS_MODES;
 uint8_t inputReads[INPUTS_COUNT] = {0};
 uint8_t inputStates[INPUTS_COUNT] = {0};
 uint32_t inputRisingTick[INPUTS_COUNT] = {0};
@@ -15,17 +16,45 @@ uint32_t inputFallingTick[INPUTS_COUNT] = {0};
 void inputs_init(void)
 {
 	for (uint8_t i = 0; i < INPUTS_COUNT; i++) {
-    	pinMode(inputPins[i], INPUT_PULLUP);
+		switch(inputModes[i]) {
+		case N:
+			pinMode(inputPins[i], INPUT);
+			break;
+		case U:
+			pinMode(inputPins[i], INPUT_PULLUP);
+			break;
+		case A:
+			/* Analog pins are init in analogRead() */
+			break;
+		default:
+			log_error("Unkwnon input mode: %d", inputModes[i]);
+			break;
+		}
 	}
+}
+
+uint16_t input_analog_read(uint8_t i)
+{
+	// Integrity check
+	if ((inputModes[i] != A) || (i >= INPUTS_COUNT)) {
+		return 0xFFFF;
+	}
+
+	return (uint16_t) analogRead(inputPins[i]);
 }
 
 void inputs_main(void)
 {
 	for (uint8_t i = 0; i < INPUTS_COUNT; i++) {
+		// Do not read Analog pins
+		if (inputModes[i] == A) {
+			continue;
+		}
+
 		// Shift 1 bit
 		inputReads[i] <<= 1;
 
-		// Button is active on low
+		// Read input
 		if (digitalRead(inputPins[i])) {
 			inputReads[i] |= 1;
 		}
