@@ -267,7 +267,7 @@
         handle_color_slider_update();
       }
       cgi_request('/get_color', '', function(textReply) {
-        update_on_off_button(textReply);
+        update_color_slider(textReply);
       });
     }
     
