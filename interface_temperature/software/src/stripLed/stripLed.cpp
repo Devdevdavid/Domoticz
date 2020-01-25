@@ -3,8 +3,9 @@
 #include "global.hpp"
 #include "stripled.hpp"
 #include "io/inputs.hpp"
+#ifdef ESP32
 #include "ESP32_RMT_Driver.hpp"
-
+#endif
 #ifdef MODULE_STRIPLED
 
 // Get the tick from main
@@ -159,15 +160,19 @@ void brightness_table_init(void)
   STATUS_BRIGHT_LVL = 0;
 }
 
-// Custom show functions which will use the RMT hardware to drive the LEDs.
-// Need a separate function for each ws2812fx instance.
-void myCustomShow(void) {
+/**
+ * Custom show functions which will use the RMT hardware to drive the LEDs.
+ */
+#ifdef ESP32
+void stripled_rmt_show(void) 
+{
   uint8_t *pixels = ws2812fx.getPixels();
-  // numBytes is one more then the size of the ws2812fx's *pixels array.
+  // numBytes is one more than the size of the ws2812fx's *pixels array.
   // the extra byte is used by the driver to insert the LED reset pulse at the end.
   uint16_t numBytes = ws2812fx.getNumBytes() + 1;
-  rmt_write_sample(RMT_CHANNEL_0, pixels, numBytes, false); // channel 0
+  rmt_write_sample(RMT_CHANNEL_0, pixels, numBytes, false);
 }
+#endif
 
 /**
  * Init the strip led
@@ -178,7 +183,6 @@ void stripled_init(void)
 
   // Read data written in EEPROM
   STATUS_NB_LED = EEPROM.read(EEPROM_NB_LED_ADDRESS);
-  STATUS_NB_LED = 150;
   STATUS_COLOR_R = EEPROM.read(EEPROM_COLOR_R_ADDRESS);
   STATUS_COLOR_G = EEPROM.read(EEPROM_COLOR_G_ADDRESS);
   STATUS_COLOR_B = EEPROM.read(EEPROM_COLOR_B_ADDRESS);
@@ -198,8 +202,11 @@ void stripled_init(void)
   /** Init the led driver */
   ws2812fx.init();
   ws2812fx.setSpeed(500);
+  // When working with ESP32, use the available hardware to get better performances
+#ifdef ESP32
   rmt_tx_int(RMT_CHANNEL_0, ws2812fx.getPin()); // assign ws2812fx1 to RMT channel 0
-  ws2812fx.setCustomShow(myCustomShow); // set the custom show function to forgo the NeoPixel
+  ws2812fx.setCustomShow(stripled_rmt_show); // set the custom show function to overwrite the NeoPixel's
+#endif
   ws2812fx.setColor(STATUS_COLOR_R, STATUS_COLOR_G, STATUS_COLOR_B);
   ws2812fx.setLength(STATUS_NB_LED);
   ws2812fx.setBrightness(STATUS_BRIGHTNESS);

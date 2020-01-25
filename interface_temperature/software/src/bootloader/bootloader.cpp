@@ -27,10 +27,11 @@ void bootloader_init(void)
   WiFi.mode(WIFI_AP);
 
   if (WiFi.softAP(WIFI_SSID, WIFI_PWD, WIFI_AP_CHANNEL, WIFI_AP_HIDDEN, WIFI_AP_MAX_CO)) {
-    log_info("Access point is now available at %s", WIFI_AP_SSID);
+    log_info("Access point is now available at %s", WIFI_SSID);
   } else {
     log_error("Failed to launch Access Point");
   }
+  /** This line does magic, keep it here */
   WiFi.persistent(false);
   WiFi.softAPConfig(localIp, gateway, subnet);
   log_info("AP IP address: %s", WiFi.softAPIP().toString().c_str());

@@ -72,6 +72,7 @@
 /* MODULE_INPUTS */
 #define INPUTS_COUNT                           1                     /** Number of inputs managed by the module */
 #define INPUTS_PINS                            {0}                   /** Define the pin of the input with following format: {x, y, z} */
+#define INPUTS_MODES                           {U}                   /** Define the init mode of the input pin (N, U or A) */
 #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
 // Aliases
 #define INPUTS_OPT_RELAY_IMPULSION_MODE        0                     /** Option jumper JP1 is set as the first button in the module */
@@ -152,7 +153,7 @@
 /* MODULE_INPUTS */
 #define INPUTS_COUNT                           4                     /** Number of inputs managed by the module */
 #define INPUTS_PINS                            {26, 4, 25, 32}       /** Define the pin of the input with following format: {x, y, z} */
-#define INPUTS_MODES                           { N, N,  N,  A}       /** Define the init mode of the input pin (U or A) */
+#define INPUTS_MODES                           { N, N,  N,  A}       /** Define the init mode of the input pin (N, U or A) */
 #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
 // Aliases
 #define INPUTS_OPT_WEB_SERVER_DISPLAY          0                     /** Option jumper JP1 is set as the first button in the module */
@@ -191,6 +192,15 @@
 #define MODULE_WEBSERVER        
 #define MODULE_STRIPLED         
 #undef MODULE_CMD_SERIAL           
+
+/** MODULE WIFI (Always ON) */
+#define WIFI_SSID                               "Led_RGB"             /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                "tours2017"           /** Password of the Access point/network to connect */
+#define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
+// WIFI configuration for AP Mode
+#define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
+#define WIFI_AP_GATEWAY                         192,168,4,254         /** IP Address of the Gateway */
+#define WIFI_AP_SUBNET                          255,255,255,0         /** IP Mask */
 
 /* MODULE_STRIPLED */
 #define STRIPLED_PIN                            2                     /** Output pin for the strip command */
@@ -268,6 +278,7 @@
 /* MODULE_INPUTS */
 #define INPUTS_COUNT                           2                     /** Number of inputs managed by the module */
 #define INPUTS_PINS                            {0}                   /** Define the pin of the input with following format: {x, y, z} */
+#define INPUTS_MODES                           {U}                   /** Define the init mode of the input pin (N, U or A) */
 #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
 // Aliases
 #define INPUTS_OPT_RELAY_IMPULSION_MODE        0                     /** Option jumper JP1 is set as the first button in the module */
@@ -275,7 +286,6 @@
 /* MODULE_OUTPUTS */
 #define OUTPUTS_COUNT                          2                    /** Number of outputs managed by the module */
 #define OUTPUTS_PINS                           {12}                 /** Define the pin of the output with following format: {x, y, z} */
-#define INPUTS_MODES                           {U}                  /** Define the init mode of the input pin (U or A) */
 
 /* MODULE_RELAY */
 #define RELAY_FEEDBACK_PIN                      0                     /** Define the input to use to get the feedback information */
