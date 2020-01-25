@@ -3,11 +3,12 @@
 #include "tools/log.hpp"
 #include "status.hpp"
 
-#define LIGHTKIT_VERSION      "LightKit v1.7.0"
+#define LIGHTKIT_VERSION      "LightKit v1.8.0"
 
 /**
- * This is the configuration for the board all the boards before RING
- * This exists for compatibility reasons
+ * This is the configuration for the board 
+ * TEMP_DOMOTICZ
+ * with temperature, domoticz, some inputs, and a relay
  */
 #ifdef BOARD_TEMP_DOMOTICZ
 
@@ -15,6 +16,8 @@
 #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - TEMP. DOMOTICZ RELAY"
 #elif defined(BOARD_TEMP_DOMOTICZ_BUZZER)
 #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - TEMP. DOMOTICZ BUZZER"
+#else
+#define FIRMWARE_VERSION      LIGHTKIT_VERSION" - TEMP. DOMOTICZ"
 #endif
 
 /* MODULE DEFINITION (Use #define or #undef) */
@@ -22,7 +25,7 @@
 #define MODULE_DOMOTICZ   
 #define MODULE_STATUS_LED       
 #define MODULE_INPUTS
-// 2 version of this BOARD_TEMP_DOMOTICZ
+// 2 versions of this BOARD_TEMP_DOMOTICZ
 // One with a buzzer
 #ifdef BOARD_TEMP_DOMOTICZ_BUZZER     
     #define MODULE_OUTPUTS
@@ -37,7 +40,12 @@
 #endif
 #undef MODULE_WEBSERVER        
 #undef MODULE_STRIPLED         
-#undef MODULE_CMD_SERIAL           
+#undef MODULE_CMD_SERIAL    
+
+/** MODULE WIFI (Always ON) */
+#define WIFI_SSID                               "BOX_SSID"            /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                "BOX_PWD"             /** Password of the Access point/network to connect */
+#undef  WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 
 /* MODULE TEMPERATURE */
 #define TEMP_1_WIRE_PIN                         2
@@ -93,9 +101,6 @@
 #define SCRIPT_RELAY_IMPULSION_DURATION         3*1000                /** Duration of the impulsion when the alert is triggered */
 #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    2*1000                /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
 
-/** CUSTOM DEFINE for this board */
-#undef IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
-
 /** Compilation checks */
 #if defined(BOARD_TEMP_DOMOTICZ_RELAIS) && defined(BOARD_TEMP_DOMOTICZ_BUZZER)
     #error BOARD_TEMP_DOMOTICZ_RELAIS cannot be defined with BOARD_TEMP_DOMOTICZ_BUZZER
@@ -121,7 +126,16 @@
 #undef MODULE_RELAY            
 #define MODULE_WEBSERVER        
 #define MODULE_STRIPLED         
-#undef MODULE_CMD_SERIAL           
+#undef MODULE_CMD_SERIAL 
+
+/** MODULE WIFI (Always ON) */
+#define WIFI_SSID                               "RubanLed"            /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                "pascal2019"          /** Password of the Access point/network to connect */
+#define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
+// WIFI configuration for AP Mode
+#define WIFI_AP_LOCAL_IP                        192,168,1,1           /** IP Address of the board */
+#define WIFI_AP_GATEWAY                         192,168,1,254         /** IP Address of the Gateway */
+#define WIFI_AP_SUBNET                          255,255,255,0         /** IP Mask */
 
 /* MODULE_STRIPLED */
 #define STRIPLED_PIN                            2                     /** Output pin for the strip command */
@@ -147,7 +161,7 @@
 #define INPUTS_PIR_DETECTOR_DELAY              3                     /** Analog input to set the detector duration */
 
 /** CUSTOM DEFINE for this board */
-#define IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
+#define WIFI_IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
 #define DETECTOR_MAX_DURATION_MIN              20                    /** Maximum duration of the ON State after detector found someone (in minute) */
 #define DETECTOR_INVERSE_POLARITY              0                     /** Inverse the polarity of the detector input: 0 -> goes HIGH on trigger, 1 -> goes LOW on trigger */                   
 
@@ -175,7 +189,16 @@
 #undef MODULE_RELAY            
 #undef MODULE_WEBSERVER        
 #undef MODULE_STRIPLED         
-#define MODULE_CMD_SERIAL           
+#define MODULE_CMD_SERIAL    
+
+/** MODULE WIFI (Always ON) */
+#define WIFI_SSID                               "RubanLed"            /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                "pascal2019"          /** Password of the Access point/network to connect */
+#define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
+// WIFI configuration for AP Mode
+#define WIFI_AP_LOCAL_IP                        192,168,1,1           /** IP Address of the board */
+#define WIFI_AP_GATEWAY                         192,168,1,254         /** IP Address of the Gateway */
+#define WIFI_AP_SUBNET                          255,255,255,0         /** IP Mask */
 
 /* MODULE TEMPERATURE */
 #define TEMP_1_WIRE_PIN                         2
@@ -255,7 +278,7 @@
 #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    2*1000                /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
 
 /** CUSTOM DEFINE for this board */
-#undef IS_IN_AP_MODE                                                  /** Define wether the ESP is in Access point or in connected to a network */
+#undef WIFI_IS_IN_AP_MODE                                                  /** Define wether the ESP is in Access point or in connected to a network */
 
 #endif /* BOARD_ANY */
 

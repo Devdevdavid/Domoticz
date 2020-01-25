@@ -19,14 +19,14 @@ void bootloader_init(void)
 {
   log_info("Starting %s", BOOTLOADER_VERSION);
 
-#ifdef IS_IN_AP_MODE
+#ifdef WIFI_IS_IN_AP_MODE
   IPAddress localIp(WIFI_AP_LOCAL_IP);
   IPAddress gateway(WIFI_AP_GATEWAY);
   IPAddress subnet(WIFI_AP_SUBNET);
 
   WiFi.mode(WIFI_AP);
 
-  if (WiFi.softAP(WIFI_AP_SSID, WIFI_AP_PWD, WIFI_AP_CHANNEL, WIFI_AP_HIDDEN, WIFI_AP_MAX_CO)) {
+  if (WiFi.softAP(WIFI_SSID, WIFI_PWD, WIFI_AP_CHANNEL, WIFI_AP_HIDDEN, WIFI_AP_MAX_CO)) {
     log_info("Access point is now available at %s", WIFI_AP_SSID);
   } else {
     log_error("Failed to launch Access Point");
@@ -95,7 +95,7 @@ void bootloader_main(void)
   // Periodically check wifi status
   if (tick > bootloaderTick) {
     bootloaderTick = tick + BOOTLOADER_CHECK_PERIOD;
-#ifdef IS_IN_AP_MODE
+#ifdef WIFI_IS_IN_AP_MODE
     if (WiFi.softAPgetStationNum() <= 0) {
       _unset(STATUS_WIFI, STATUS_WIFI_DEVICE_CO);
     } else {
