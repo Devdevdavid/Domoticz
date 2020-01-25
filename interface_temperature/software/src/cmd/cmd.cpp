@@ -68,7 +68,7 @@ void cmd_set_brightness_auto(bool newValue)
 #ifdef MODULE_STRIPLED
 void cmd_set_brightness(uint8_t newValue)
 {
-  if (newValue >= 0 && newValue <= 10) {
+  if (newValue >= 0 && newValue <= 100) {
     brightness_set(((uint16_t) (newValue * 255)) / 100);
     cmd_set_brightness_auto(false);
   }
