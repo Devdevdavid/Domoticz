@@ -21,6 +21,7 @@
 #endif
 
 /* MODULE DEFINITION (Use #define or #undef) */
+#define MODULE_FLASH
 #define MODULE_TEMPERATURE   
 #define MODULE_DOMOTICZ   
 #define MODULE_STATUS_LED       
@@ -119,6 +120,7 @@
 #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - RING"
 
 /* MODULE DEFINITION (Use #define or #undef) */
+#define MODULE_FLASH
 #undef MODULE_TEMPERATURE   
 #undef MODULE_DOMOTICZ   
 #undef MODULE_STATUS_LED       
@@ -183,6 +185,7 @@
 #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - NEOPIXEL_WEB_THIERRY"
 
 /* MODULE DEFINITION (Use #define or #undef) */
+#define MODULE_FLASH
 #undef MODULE_TEMPERATURE   
 #undef MODULE_DOMOTICZ   
 #undef MODULE_STATUS_LED       
@@ -228,7 +231,8 @@
 #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - ANY"
 
 /* MODULE DEFINITION (Use #define or #undef) */
-#define MODULE_TEMPERATURE   
+#define MODULE_FLASH
+#define MODULE_TEMPERATURE
 #undef MODULE_DOMOTICZ   
 #define MODULE_STATUS_LED       
 #define MODULE_INPUTS  
@@ -324,9 +328,6 @@
 #define SCRIPT_RELAY_IMPULSION_DURATION         3*1000                /** Duration of the impulsion when the alert is triggered */
 #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    2*1000                /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
 
-/** CUSTOM DEFINE for this board */
-#undef WIFI_IS_IN_AP_MODE                                                  /** Define wether the ESP is in Access point or in connected to a network */
-
 #endif /* BOARD_ANY */
 
 /* 
@@ -346,11 +347,3 @@
 #define N                                       0                       /** Input no-pull-up */
 #define U                                       1                       /** Input pull-up */
 #define A                                       2                       /** Input analog */
-
-/** EEPROM used size in bytes */
-#define EEPROM_USED_SIZE                        5
-#define EEPROM_NB_LED_ADDRESS                   0
-#define EEPROM_COLOR_R_ADDRESS                  1
-#define EEPROM_COLOR_G_ADDRESS                  2
-#define EEPROM_COLOR_B_ADDRESS                  3
-#define EEPROM_BRIGHTNESS_ADDRESS               4

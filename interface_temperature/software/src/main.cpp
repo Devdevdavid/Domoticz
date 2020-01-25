@@ -1,7 +1,7 @@
 #define MAIN_C
 
-#include <EEPROM.h>
 #include "global.hpp"
+#include "flash/flash.hpp"
 #include "bootloader/bootloader.hpp"
 #include "bootloader/file_sys.hpp"
 #include "temp/temp.hpp"
@@ -20,10 +20,12 @@ void setup()
 {
 	Serial.begin(115200);
 	Serial.print("\n\r\n\r"); // Jump some lines after internal firmware stuff
-	EEPROM.begin(EEPROM_USED_SIZE);
 	log_info("Starting %s", FIRMWARE_VERSION);
 
 	status_init();
+#ifdef MODULE_FLASH
+	flash_init();
+#endif
 	file_sys_init();
 #ifdef MODULE_INPUTS
 	inputs_init();

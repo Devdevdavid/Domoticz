@@ -18,10 +18,10 @@ extern uint8_t boardStatus[NB_STATUS];
 #define STATUS_BRIGHT_LVL               boardStatus[3]  /** Level of brightness currently set */
 #define STATUS_ANIM                     boardStatus[4]  /** ID of the anim currently used */
 #define STATUS_SCRIPT                   boardStatus[5]  /** Script values */
-#define STATUS_NB_LED                   boardStatus[6]  /** RAM copy of EEPROM_NB_LED_ADDRESS */
-#define STATUS_COLOR_R                  boardStatus[7]  /** RAM copy of EEPROM_NB_COLOR_R */
-#define STATUS_COLOR_G                  boardStatus[8]  /** RAM copy of EEPROM_NB_COLOR_G */
-#define STATUS_COLOR_B                  boardStatus[9] /** RAM copy of EEPROM_NB_COLOR_B */
+#define STATUS_NB_LED                   boardStatus[6]  /** Number of LED on the ledstrip */
+#define STATUS_COLOR_R                  boardStatus[7]  /** Default animation color (red) */
+#define STATUS_COLOR_G                  boardStatus[8]  /** Default animation color (green) */
+#define STATUS_COLOR_B                  boardStatus[9]  /** Default animation color (blue) */
 
 /* STATUS_APPLI */
 #define STATUS_APPLI_STATUS_LED         0x01

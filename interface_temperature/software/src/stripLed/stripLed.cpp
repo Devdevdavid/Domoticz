@@ -1,7 +1,7 @@
-#include <EEPROM.h>
 #include <WS2812FX.h>
 #include "global.hpp"
 #include "stripled.hpp"
+#include "flash/flash.hpp"
 #include "io/inputs.hpp"
 #ifdef ESP32
 #include "ESP32_RMT_Driver.hpp"
@@ -28,24 +28,27 @@ uint32_t autoBrightTick;
 void brightness_set(uint8_t brightness)
 {
   STATUS_BRIGHTNESS = brightness;
-  EEPROM.write(EEPROM_BRIGHTNESS_ADDRESS, STATUS_BRIGHTNESS);
-  EEPROM.commit();
-
+  
   // Apply new value
   ws2812fx.setBrightness(brightness);
+
+  // Save settings in flash
+  flash_write();
 }
 
 void nb_led_set(uint8_t nbLed)
 {
   STATUS_NB_LED = nbLed;
-  EEPROM.write(EEPROM_NB_LED_ADDRESS, STATUS_NB_LED);
-  EEPROM.commit();
+
 
   // Clear all the pixel before changing length
   ws2812fx.strip_off();
 
   // Apply new value
   ws2812fx.setLength(STATUS_NB_LED);
+
+  // Save settings in flash
+  flash_write();
 }
 
 void color_set(uint32_t color)
@@ -56,13 +59,11 @@ void color_set(uint32_t color)
 
   log_info("Setting color to %02X - %02X - %02X", STATUS_COLOR_R, STATUS_COLOR_G, STATUS_COLOR_B);
 
-  EEPROM.write(EEPROM_COLOR_R_ADDRESS, STATUS_COLOR_R);
-  EEPROM.write(EEPROM_COLOR_G_ADDRESS, STATUS_COLOR_G);
-  EEPROM.write(EEPROM_COLOR_B_ADDRESS, STATUS_COLOR_B);
-  EEPROM.commit();
-
   // Apply new value
   ws2812fx.setColor(color);
+
+  // Save settings in flash
+  flash_write();
 }
 
 #if (LIGHT_SENSOR_PIN != -1)
@@ -180,24 +181,6 @@ void stripled_rmt_show(void)
 void stripled_init(void)
 {
   brightness_table_init();
-
-  // Read data written in EEPROM
-  STATUS_NB_LED = EEPROM.read(EEPROM_NB_LED_ADDRESS);
-  STATUS_COLOR_R = EEPROM.read(EEPROM_COLOR_R_ADDRESS);
-  STATUS_COLOR_G = EEPROM.read(EEPROM_COLOR_G_ADDRESS);
-  STATUS_COLOR_B = EEPROM.read(EEPROM_COLOR_B_ADDRESS);
-  STATUS_BRIGHTNESS = EEPROM.read(EEPROM_BRIGHTNESS_ADDRESS);
-
-  /** Sanity check */
-  if (STATUS_BRIGHTNESS == 0) {
-    STATUS_BRIGHTNESS = STRIPLED_DEFAULT_BRIGHTNESS_VALUE;
-  }
-  if (STATUS_NB_LED == 0) {
-    STATUS_NB_LED = 5;
-  }
-  if ((STATUS_COLOR_R == 0) && (STATUS_COLOR_G == 0) && (STATUS_COLOR_B == 0)) {
-    STATUS_COLOR_R = 100;
-  }
 
   /** Init the led driver */
   ws2812fx.init();

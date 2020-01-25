@@ -63,12 +63,12 @@ void cmd_set_brightness_auto(bool newValue)
 /**
  * Set the output brightness value and
  * disable auto bright if set
- * @param newValue [0-100]
+ * @param newValue ]0-100]
  */
 #ifdef MODULE_STRIPLED
 void cmd_set_brightness(uint8_t newValue)
 {
-  if (newValue >= 0 && newValue <= 100) {
+  if (newValue > 0 && newValue <= 100) {
     brightness_set(((uint16_t) (newValue * 255)) / 100);
     cmd_set_brightness_auto(false);
   }
@@ -112,12 +112,12 @@ uint8_t cmd_get_nb_led(void)
 
 /**
  * Set the color for some LED animations
- * @param newValue [0x0; 0xFFFFFF]
+ * @param newValue ]0x0; 0xFFFFFF]
  */
 #ifdef MODULE_STRIPLED
 void cmd_set_color(uint32_t newValue)
 {
-  if (newValue >= 0 && newValue <= 0xFFFFFF) {
+  if (newValue > 0 && newValue <= 0xFFFFFF) {
     color_set(newValue);
     cmd_set_state(true);
     cmd_set_demo_mode(false);
