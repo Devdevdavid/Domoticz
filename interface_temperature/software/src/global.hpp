@@ -223,6 +223,53 @@
 #endif /* BOARD_NEOPIXEL_WEB_THIERRY */
 
 /**
+ * This is the configuration for the board 
+ * NEOPIXEL_WEB_GENERIC
+ * with neopixel support
+ */
+#ifdef BOARD_NEOPIXEL_WEB
+
+#define FIRMWARE_VERSION      LIGHTKIT_VERSION" - NEOPIXEL_WEB"
+
+/* MODULE DEFINITION (Use #define or #undef) */
+#define MODULE_FLASH
+#undef MODULE_TEMPERATURE   
+#undef MODULE_DOMOTICZ   
+#undef MODULE_STATUS_LED       
+#undef MODULE_INPUTS
+#undef MODULE_OUTPUTS
+#undef MODULE_RELAY            
+#define MODULE_WEBSERVER        
+#define MODULE_STRIPLED         
+#undef MODULE_CMD_SERIAL           
+
+/** MODULE WIFI (Always ON) */
+#define WIFI_SSID                               "LampeIkea"             /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                "Tours2020"           /** Password of the Access point/network to connect */
+#define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
+// WIFI configuration for AP Mode
+#define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
+#define WIFI_AP_GATEWAY                         192,168,4,254         /** IP Address of the Gateway */
+#define WIFI_AP_SUBNET                          255,255,255,0         /** IP Mask */
+
+/* MODULE_STRIPLED */
+#define STRIPLED_PIN                            2                     /** Output pin for the strip command */
+#define STRIPLED_NB_PIXELS                      140                   /** Number of Pixel on the strip */
+#define STRIPLED_NB_BRIGHT_LEVEL                10                    /** Number of level in the brightness table */
+#define STRIPLED_BRIGHT_HYSTERESIS              10                    /** Hysteresis value between two levels (Base 1023) */
+#define STRIPLED_AUTO_BRIGHT_UPDATE_PERIOD      2000                  /** Period of update of the auto brightness (in ms) */
+#define STRIPLED_DEFAULT_BRIGHTNESS_VALUE       32                    /** Brightness level used at startup [0-255] */
+#define STRIPLED_DEFAULT_ANIMATION_ID           10                    /** ID of the animation used at startup */
+#define STRIPLED_DEMO_MODE_PERIOD               5000                  /** Delay betwwen two animation in demo mode (in ms) */
+#define STRIPLED_MAX_NB_PIXELS                  140                   /** Maximum number of LED that can be supported */
+#define LIGHT_SENSOR_PIN                        -1                    /** Pin for Light sensor used to ajust output light level (-1 if not used) */
+
+/** CUSTOM DEFINE for this board */
+#define IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
+
+#endif /* BOARD_NEOPIXEL_WEB */
+
+/**
  * This is the configuration for the board all the boards before RING
  * This exists for compatibility reasons
  */
