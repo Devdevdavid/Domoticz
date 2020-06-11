@@ -1,6 +1,10 @@
 # *************************************************
 #
 # Logiciel pupitre muulimedia ACHDR
+# === Version 1.6 9/01/20 - DD
+# Correction du retour à home par appuis sur les deux boutons extremes
+# Ajout d'un manuel après appuis sur B1 & B2
+# Disparition du curseur sur les ODP
 # === Version 1.5 5/12/19 - DD
 # Ajout du tempoSuspendCheckProcess pour palier à un check
 # de process durant le demarrage du media
@@ -78,12 +82,17 @@ MOUNT_PATH = "/media/pi/"
 USB_KEY_PATH = MOUNT_PATH + "VIDEO_ACHDR/"
 IMAGE_HOME = USB_KEY_PATH + "Image/achdr.jpg"
 IMAGE_LOADING = USB_KEY_PATH + "Image/loading.jpg"
+IMAGE_MANUAL = USB_KEY_PATH + "Image/manual.jpg"
 VIDEO_NONE = ""
 VIDEO_HOME = "achdr"
 
 currentlyPlaying = VIDEO_NONE
 
-buttonStateOld = [0, 0, 0, 0]
+# Init those variable
+buttonStateOld = [0] * len(buttonPins)
+buttonRising = [0] * len(buttonPins)
+buttonFalling = [0] * len(buttonPins)
+buttonLongPress = [0] * len(buttonPins)
 
 
 #-------------------FONCTIONS-----------------------
@@ -157,7 +166,7 @@ def kill_media():
 	currentlyPlaying = VIDEO_NONE
 
 def check_media_running():
-	# Cherche le processus omxplayer
+	# Cherche les processus concerné par l'affichage
 	for proc in psutil.process_iter():
 		if (proc.name() == "omxplayer.bin"):
 			return True # Found it !
@@ -168,22 +177,30 @@ def check_media_running():
 
 def read_video_buttons():
 	global buttonStateOld
-
-	# Init those variable
-	buttonRising = [0] * len(buttonPins)
-	buttonFalling = [0] * len(buttonPins)
-	buttonLongPress = [0] * len(buttonPins)
+	global buttonRising
+	global buttonFalling
+	global buttonLongPress
 
 	# Read each buttons
 	for buttonIndex, buttonPin in enumerate(buttonPins):
-		buttonState = GPIO.input(buttonPin)
+		buttonState = not GPIO.input(buttonPin)
 
 		# Edge detection
 		if (buttonState != buttonStateOld[buttonIndex]):
+			# What edge is that ?
 			if buttonState:
-				buttonFalling[buttonIndex] = 1
-			else:
+				print("Rising ", buttonIndex)
+				# Rising edge
 				buttonRising[buttonIndex] = 1
+			else:
+				print("Falling ", buttonIndex)
+				# Falling edge
+				# Can be prevented due to the multiple button action (see below)
+				if buttonFalling[buttonIndex] == -1:
+					print("prevented")
+					buttonFalling[buttonIndex] = 0
+				else:
+					buttonFalling[buttonIndex] = 1
 
 		# Long press
 		if buttonState:
@@ -195,26 +212,49 @@ def read_video_buttons():
 		buttonStateOld[buttonIndex] = buttonState
 
 	# Kill video if extrem buttons are pressed
-	if buttonRising[0] and buttonRising[3]:
+	if (buttonRising[0] == 1) and (buttonRising[3] == 1):
+		# Consume the button rising edge
+		buttonRising[0] = 0
+		buttonRising[3] = 0
+
+		# Prevent falling action on both buttons
+		buttonFalling[0] = -1;
+		buttonFalling[3] = -1;
+
+		# Go back to home by killing current media
 		kill_media()
+	elif (buttonRising[0] == 1) and (buttonRising[1] == 1):
+		# Consume the button rising edge
+		buttonRising[0] = 0
+		buttonRising[1] = 0
+
+		# Prevent falling action on both buttons
+		buttonFalling[0] = -1;
+		buttonFalling[1] = -1;
+
+		# Show manual
+		update_home_image(IMAGE_MANUAL)
 	else:
 		# Launch video of the selected button
-		for buttonRisingIndex, buttonRisingState in enumerate(buttonRising):
-			if buttonRisingState:
+		for buttonFallingIndex, buttonFallingValue in enumerate(buttonFalling):
+			if buttonFallingValue > 0:
 				# Launch corresponding video
-				launch_media(str(buttonRisingIndex + 1)) # (+1: Demarre a 1)
+				launch_media(str(buttonFallingIndex + 1)) # (+1: Demarre a 1)
+
+				# Consume the rising edge
+				buttonFalling[buttonFallingIndex] = 0
+				buttonRising[buttonFallingIndex] = 0
 				break
 
 def update_home_image(imgName):
-	global labelImage
-	img = ImageTk.PhotoImage(Image.open(imgName))
-	labelImage.configure(image=img)
-	labelImage.image = img
+	subprocess.call(['killall', 'feh'], stdout=DEVNULL, stderr=STDOUT)
+	if imgName != "":
+		subprocess.Popen(['feh', '-Y', '-B', 'black', '-F', '-Z', imgName], stdout=DEVNULL, stderr=STDOUT)
 
 def exit_handler(sig, frame):
-	global root
 	kill_media()
-	root.quit()
+	# Kill home image previewer
+	update_home_image("")
 	GPIO.cleanup()
 	# Restore terminal settings (Popen change them and messep up with new lines)
 	subprocess.call(['stty', 'sane'], stdout=DEVNULL, stderr=STDOUT)
@@ -227,16 +267,7 @@ print("=== Starting LoopVideoIO.py ===")
 
 signal.signal(signal.SIGINT, exit_handler)
 
-### Création de la fenetre principale
-root = Tk()
-# En plein ecran et cache le cursor
-root.attributes('-fullscreen', 1)
-root.config(cursor="none")
-# Creation d'un label pour afficher la photo
-labelImage = Label(root)
-# "Expand" pour prendre la taille de la fenetre donc de l'ecran
-labelImage.pack(fill=BOTH, expand=YES)
-# Creation d'un objet PhotoImage pour afficher le fond
+# montre l'image d'acceuil
 update_home_image(IMAGE_HOME)
 
 ### Init des GPIO
@@ -295,8 +326,6 @@ else:
 
 #-------------------BOUCLE PRINCIPALE--------------------
 while True:
-	#update de la fenetre graphique
-	root.update()
 	# tempo de la boucle principale
 	time.sleep(0.100)
 
