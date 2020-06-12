@@ -1,18 +1,27 @@
 #!/bin/bash
 
-CONFIG_FILE_NAME="achdr_soft.config"
+# Do not execute commands on MacOS
+# And change paths
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	DEBUG=1
+else
+	DEBUG=0
+fi
+
+CONFIG_FILE_NAME=achdr_soft.config
+INSTALL_PATH=/home/pi/Scripts
+[[ DEBUG -eq 1 ]] && INSTALL_PATH=./Scripts
+SERVICE_PATH=/etc/systemd/system
 
 # Get the path of the current file
 # https://stackoverflow.com/a/4774063
 UPDATER_SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 # Build paths
-INSTALLED_CONFIG_FILE_PATH=/home/pi/$CONFIG_FILE_NAME
-INSTALLED_CONFIG_FILE_PATH=../$CONFIG_FILE_NAME
-USBKEY_CONFIG_FILE_PATH=$UPDATER_SCRIPT_PATH/$CONFIG_FILE_NAME
-
-# Move to the updater script
-cd $UPDATER_SCRIPT_PATH
+INSTALLED_CONFIG_FILE_PATH=$INSTALL_PATH/$CONFIG_FILE_NAME
+USBKEY_PACK_PATH=$UPDATER_SCRIPT_PATH/pack
+[[ DEBUG -eq 1 ]] && USBKEY_PACK_PATH=$UPDATER_SCRIPT_PATH
+USBKEY_CONFIG_FILE_PATH=$USBKEY_PACK_PATH/$CONFIG_FILE_NAME
 
 is_arg_a_number() {
 	regex='^[0-9]+$'
@@ -102,6 +111,24 @@ compare_version() {
 	return 2			# Available is depreciated
 }
 
+# =====================
+# MAIN
+# =====================
+
+# Check for root privileges
+if [[ ("$EUID" -ne 0) && ("$DEBUG" -ne 1) ]]; then
+	echo "[I] Please run as root"
+  	exit 1
+fi
+
+# Move to the updater script
+cd $UPDATER_SCRIPT_PATH
+
+# Create the install directory if not existing
+if [[ ! -d $INSTALL_PATH ]]; then
+	mkdir -p $INSTALL_PATH
+fi
+
 # Read usbkey file
 read_config $USBKEY_CONFIG_FILE_PATH
 if [[ $? -ne 0 ]]; then
@@ -146,7 +173,109 @@ fi
 
 echo "[I] Update is starting..."
 
+# Install a service file on the system
+install_service() {
+	SERVICE_NAME=$1
 
-echo "[I] Update done !"
+	[[ DEBUG -eq 1 ]] && echo "[D] Skipping install_service()" & return 0
+
+	# Copy the service
+	cp $USBKEY_PACK_PATH/$SERVICE_NAME.service $SERVICE_PATH/$SERVICE_NAME.service
+	if [[ $? -ne 0 ]]; then
+		echo "[E] Failed to copy $SERVICE_NAME.service"
+		return 1
+	fi
+
+	# Enable the service
+	systemctl enable $SERVICE_PATH/$SERVICE_NAME.service
+	if [[ $? -ne 0 ]]; then
+		echo "[E] Failed to enable $SERVICE_NAME.service"
+		return 1
+	fi
+
+	# Start the service
+	systemctl start $SERVICE_NAME
+	if [[ $? -ne 0 ]]; then
+		echo "[E] Failed to start $SERVICE_NAME"
+		return 1
+	fi
+
+	return 0
+}
+
+install_pack() {
+	# =====================
+	# UPDATER
+	# =====================
+
+	install_service ACHDRUpdater
+	if [[ $? -ne 0 ]]; then
+		return 1
+	fi
+
+	# =====================
+	# MAIN APPLICATION
+	# =====================
+
+	# Copy the main application
+	cp $USBKEY_PACK_PATH/LoopVideoIO.py $INSTALL_PATH/
+	if [[ $? -ne 0 ]]; then
+		echo "[E] Failed to copy LoopVideoIO.py"
+		return 1
+	fi
+
+	install_service ACHDRScript
+	if [[ $? -ne 0 ]]; then
+		return 1
+	fi
+
+	# =====================
+	# SHUTDOWN BUTTON
+	# =====================
+
+	cp $USBKEY_PACK_PATH/shutdown_button.sh $INSTALL_PATH/
+	if [[ $? -ne 0 ]]; then
+		echo "[E] Failed to copy shutdown_button.sh"
+		return 1
+	fi
+
+	chmod 755 $INSTALL_PATH/shutdown_button.sh
+
+	install_service ACHDRShutdownBtn
+	if [[ $? -ne 0 ]]; then
+		return 1
+	fi
+
+	# =====================
+	# HIDE CURSOR
+	# =====================
+
+	install_service ACHDRHideCursor
+	if [[ $? -ne 0 ]]; then
+		return 1
+	fi
+
+	# =====================
+	# CONFIG FILE
+	# =====================
+
+	# Update is doing well, copy the config file
+	# to take the update into account
+	cp $USBKEY_CONFIG_FILE_PATH $INSTALL_PATH/
+	if [[ $? -ne 0 ]]; then
+		echo "[E] Failed to copy $CONFIG_FILE_NAME"
+		return 1
+	fi
+
+	return 0
+}
+
+install_pack
+if [[ $? -ne 0 ]]; then
+	echo "[E] --- Update failed ---"
+	exit 1
+fi
+
+echo "[I] --- Update done ! ---"
 
 exit 0

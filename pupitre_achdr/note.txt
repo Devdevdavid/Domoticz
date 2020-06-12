@@ -1,4 +1,0 @@
-nano /etc/systemd/system/ACHDRScript.service
-
-Note à Future Dave:
-- Lorsque l'on est en option (Lancement de la video à Home) alors le mode d'emplois n'est pas lisible car caché par cette vidéo
