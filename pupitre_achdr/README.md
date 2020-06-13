@@ -37,9 +37,15 @@ Ce projet nécéssite quelques dépendances pour fonctionner correctement.
 - `omxplayer` permet de lire les vidéos
 - `libreoffice` permet de lire les présentations `.ODT`
 - `feh` permet d'afficher des images en plein écran
+- `python3-tk` permet de créer des interfaces graphiques
 
 ```bash
-sudo apt install python unclutter wiringpi omxplayer libreoffice feh
+sudo apt install python unclutter wiringpi omxplayer libreoffice feh python3-tk
+```
+
+Il faut aussi installer quelques librairies pythons:
+```bash
+pip3 install RPi.GPIO psutil Pillow
 ```
 
 # Note à Futur Dave

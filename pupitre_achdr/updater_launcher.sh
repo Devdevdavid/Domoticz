@@ -10,7 +10,7 @@
 # =================================
 
 # Parameters
-USB_KEY_PATH=/media/pi/VIDEO_ACHDR
+USB_KEY_PATH=/media/pi/VIDEO_ACHDR/pack
 
 UPDATER_SCRIPT_NAME="achdr_updater_script.sh"
 
@@ -39,11 +39,13 @@ fi
 # Calling the updater and returning the error code
 echo "[I] Launching updater script..."
 
+# Append the date to the log file
+echo "==============================" >> $UPDATER_LOG_FILE
+date >> $UPDATER_LOG_FILE
+echo "==============================" >> $UPDATER_LOG_FILE
+
 # Configure the log file
 chmod 666 $UPDATER_LOG_FILE
-
-# Append the date to the log file
-date >> $UPDATER_LOG_FILE
 
 # Explained:
 # ---------------

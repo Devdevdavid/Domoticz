@@ -158,7 +158,7 @@ install_service() {
 	fi
 
 	# Enable the service
-	systemctl enable $SERVICE_NAME > /dev/null
+	systemctl --quiet enable $SERVICE_NAME 2>&1 > /dev/null
 	if [[ $? -ne 0 ]]; then
 		echo "[E] Failed to enable $SERVICE_NAME.service"
 		return 1
@@ -166,7 +166,7 @@ install_service() {
 
 	# Start the service
 	if [[ "$NO_START" != "nostart" ]]; then
-		systemctl start $SERVICE_NAME > /dev/null
+		systemctl --quiet start $SERVICE_NAME 2>&1 > /dev/null
 		if [[ $? -ne 0 ]]; then
 			echo "[E] Failed to start $SERVICE_NAME"
 			return 1
@@ -184,9 +184,27 @@ install_pack() {
 	# UPDATER
 	# =====================
 
+	# We copy the updater to be able to uninstall later
+	cp $USBKEY_PACK_PATH/updater_launcher.sh $INSTALL_PATH/
+	if [[ $? -ne 0 ]]; then
+		echo "[E] Failed to copy updater_launcher.sh"
+		return 1
+	else
+		echo "[I] updater_launcher.sh copied"
+	fi
+
 	install_service ACHDRUpdater nostart
 	if [[ $? -ne 0 ]]; then
 		return 1
+	fi
+
+	# We copy the updater to be able to uninstall later
+	cp $USBKEY_PACK_PATH/achdr_updater_script.sh $INSTALL_PATH/
+	if [[ $? -ne 0 ]]; then
+		echo "[E] Failed to copy achdr_updater_script.sh"
+		return 1
+	else
+		echo "[I] achdr_updater_script.sh copied"
 	fi
 
 	# =====================
@@ -194,15 +212,15 @@ install_pack() {
 	# =====================
 
 	# Copy the main application
-	cp $USBKEY_PACK_PATH/LoopVideoIO.py $INSTALL_PATH/
+	cp $USBKEY_PACK_PATH/achdr_main_app.py $INSTALL_PATH/
 	if [[ $? -ne 0 ]]; then
-		echo "[E] Failed to copy LoopVideoIO.py"
+		echo "[E] Failed to copy achdr_main_app.py"
 		return 1
 	else
-		echo "[I] LoopVideoIO.py installed"
+		echo "[I] achdr_main_app.py installed"
 	fi
 
-	install_service ACHDRScript
+	install_service ACHDRMainApp
 	if [[ $? -ne 0 ]]; then
 		return 1
 	fi
@@ -219,7 +237,7 @@ install_pack() {
 
 	chmod 755 $INSTALL_PATH/shutdown_button.sh
 
-	install_service ACHDRShutdownBtn
+	install_service ACHDRShutdownButton
 	if [[ $? -ne 0 ]]; then
 		return 1
 	fi
@@ -256,13 +274,13 @@ uninstall_service() {
 	[[ DEBUG -eq 1 ]] && echo "[D] Skipping uninstall_service()" && return 0
 
 	# Stop the service
-	systemctl stop $SERVICE_NAME >/dev/null 2>&1
+	systemctl --quiet stop $SERVICE_NAME 2>&1 > /dev/null
 	if [[ $? -ne 0 ]]; then
 		echo "[W] Failed to stop $SERVICE_NAME, continuing..."
 	fi
 
 	# Disable the service
-	systemctl disable $SERVICE_NAME >/dev/null 2>&1
+	systemctl --quiet disable $SERVICE_NAME 2>&1 > /dev/null
 	if [[ $? -ne 0 ]]; then
 		echo "[W] Failed to disable $SERVICE_NAME.service, continuing..."
 	fi
@@ -285,22 +303,32 @@ uninstall_pack() {
 	# UPDATER
 	# =====================
 
-	# Do not unistall updater !
+	# We do not want to remove the launcher to be
+	# able to install futur version with USB
+
+	# Remove the updater
+	if [[ -f $INSTALL_PATH/achdr_updater_script.sh ]]; then
+		rm $INSTALL_PATH/achdr_updater_script.sh
+		if [[ $? -ne 0 ]]; then
+			echo "[E] Failed to remove achdr_updater_script.sh"
+			return 1
+		fi
+	fi
 
 	# =====================
 	# MAIN APPLICATION
 	# =====================
 
-	uninstall_service ACHDRScript
+	uninstall_service ACHDRMainApp
 	if [[ $? -ne 0 ]]; then
 		return 1
 	fi
 
 	# Remove the main application
-	if [[ -f $INSTALL_PATH/LoopVideoIO.py ]]; then
-		rm $INSTALL_PATH/LoopVideoIO.py
+	if [[ -f $INSTALL_PATH/achdr_main_app.py ]]; then
+		rm $INSTALL_PATH/achdr_main_app.py
 		if [[ $? -ne 0 ]]; then
-			echo "[E] Failed to remove LoopVideoIO.py"
+			echo "[E] Failed to remove achdr_main_app.py"
 			return 1
 		fi
 	fi
@@ -309,7 +337,7 @@ uninstall_pack() {
 	# SHUTDOWN BUTTON
 	# =====================
 
-	uninstall_service ACHDRShutdownBtn
+	uninstall_service ACHDRShutdownButton
 	if [[ $? -ne 0 ]]; then
 		return 1
 	fi
@@ -432,14 +460,24 @@ if [[ "$CMD" == "install" ]]; then
 		exit 1
 	fi
 
-	echo "[I] Update is starting..."
-
 	check_requirements
 	if [[ $? -ne 0 ]]; then
 		echo "[E] --- Update failed ---"
 		exit 1
 	fi
 
+	# First uninstall current version if any with the updater
+	# located on the system
+	if [[ -f $INSTALL_PATH/achdr_updater_script.sh ]]; then
+		echo "[I] Using system updater to uninstall current version..."
+		bash $INSTALL_PATH/achdr_updater_script.sh -u
+	else
+		echo "[I] No updater found to uninstall current version."
+	fi
+
+	# Then install the new version with this current updater
+	# located in the USB key
+	echo "[I] Installing USB key version..."
 	install_pack
 	if [[ $? -ne 0 ]]; then
 		echo "[E] --- Update failed ---"

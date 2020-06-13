@@ -1,6 +1,16 @@
+# =================================
+# Date		: 9 Janvier 2020
+# Authors	: P.Rondane
+# 			  B.Bourchardon
+# 			  D.Devant
+# File		: achdr_main_app.py
+# Version	: See Changelog
+# Desc.		: Logiciel pupitre
+# 			  mulimedia ACHDR
+# =================================
+
 # *************************************************
 #
-# Logiciel pupitre muulimedia ACHDR
 # === Version 1.6 9/01/20 - DD
 # Correction du retour à home par appuis sur les deux boutons extremes
 # Ajout d'un manuel après appuis sur B1 & B2
@@ -17,9 +27,6 @@
 # Modification des E/S/ Ajout clef USB
 # Ajout de la gestion du ventilateur
 # Ajout d'un test au demarrage pour eviter les problemes sur l'USB
-#
-#
-# P.Rondane / B.Bourchardon / D.Devant
 #
 # *************************************************
 

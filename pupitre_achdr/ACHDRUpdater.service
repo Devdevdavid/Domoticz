@@ -1,10 +1,10 @@
 [Unit]
 Description=ACHDR Updater
-Requires=media-VIDEO_ACHDR.mount
-After=media-VIDEO_ACHDR.mount
+Requires=media-pi-VIDEO_ACHDR.mount
+After=media-pi-VIDEO_ACHDR.mount
 
 [Service]
-ExecStart=/home/pi/Scripts/updater_launcher.sh
+ExecStart=/home/pi/Scripts/updater_launcher.sh -i
 
 [Install]
-WantedBy=media-VIDEO_ACHDR.mount
+WantedBy=media-pi-VIDEO_ACHDR.mount
