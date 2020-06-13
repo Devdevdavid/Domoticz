@@ -19,6 +19,12 @@ UPDATER_SCRIPT_NAME="achdr_updater_script.sh"
 UPDATER_SCRIPT_PATH=$USB_KEY_PATH/$UPDATER_SCRIPT_NAME
 UPDATER_LOG_FILE=$USB_KEY_PATH/achdr_updater.log
 
+# Check for root privileges
+if [[ ("$EUID" -ne 0) && ("$DEBUG" -ne 1) ]]; then
+	echo "[I] Please run as root"
+  	exit 1
+fi
+
 # Check if USB key is accessible
 if [[ ! -d "$USB_KEY_PATH" ]]; then
     echo "[E] $USB_KEY_PATH : no such directory"
@@ -33,6 +39,9 @@ fi
 
 # Calling the updater and returning the error code
 echo "[I] Launching updater script..."
+
+# Configure the log file
+chmod 666 $UPDATER_LOG_FILE
 
 # Append the date to the log file
 date >> $UPDATER_LOG_FILE

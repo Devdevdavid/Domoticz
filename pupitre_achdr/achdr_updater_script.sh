@@ -115,11 +115,18 @@ compare_version() {
 check_requirement_program() {
 	PROG=$1
 	NAME=$2
+	OPTIONAL=$3
+
 	command -v $PROG > /dev/null
 	if [[ $? -ne 0 ]]; then
-		echo "[E] \"$NAME\" is not installed on the system"
+		# Define de gravity of the message
+		if [[ "$OPTIONAL" == "true" ]]; then GRAVITY=W; else GRAVITY=E; fi
+
+		echo "[$GRAVITY] \"$NAME\" is not installed on the system"
 		echo "[I] Use \"sudo apt install $NAME\" to resolve this"
-		return 1
+
+		# Return an error only if program is not an option
+		[[ "$OPTIONAL" == "true" ]] || return 1
 	fi
 	return 0
 }
@@ -130,7 +137,7 @@ check_requirements() {
 	check_requirement_program gpio wiringpi || return 1
 	check_requirement_program unclutter unclutter || return 1
 	check_requirement_program omxplayer.bin omxplayer || return 1
-	check_requirement_program soffice.bin libreoffice || return 1
+	check_requirement_program soffice.bin libreoffice true || return 1
 	check_requirement_program feh feh || return 1
 
 	return 0
