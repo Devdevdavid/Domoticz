@@ -19,9 +19,10 @@ UPDATER_SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 # Build paths
 INSTALLED_CONFIG_FILE_PATH=$INSTALL_PATH/$CONFIG_FILE_NAME
-USBKEY_PACK_PATH=$UPDATER_SCRIPT_PATH/pack
-[[ DEBUG -eq 1 ]] && USBKEY_PACK_PATH=$UPDATER_SCRIPT_PATH
+USBKEY_PACK_PATH=$UPDATER_SCRIPT_PATH
 USBKEY_CONFIG_FILE_PATH=$USBKEY_PACK_PATH/$CONFIG_FILE_NAME
+
+# Macro
 
 is_arg_a_number() {
 	regex='^[0-9]+$'
@@ -111,73 +112,24 @@ compare_version() {
 	return 2			# Available is depreciated
 }
 
-# =====================
-# MAIN
-# =====================
+check_requirements() {
+	# Test if program is installed
+	command -v unclutter > /dev/null
+	if [[ $? -ne 0 ]]; then
+		echo "[E] \"unclutter\" is not installed on the system"
+		echo "[I] Use \"sudo apt install unclutter\" to resolve this"
+		return 1
+	fi
 
-# Check for root privileges
-if [[ ("$EUID" -ne 0) && ("$DEBUG" -ne 1) ]]; then
-	echo "[I] Please run as root"
-  	exit 1
-fi
-
-# Move to the updater script
-cd $UPDATER_SCRIPT_PATH
-
-# Create the install directory if not existing
-if [[ ! -d $INSTALL_PATH ]]; then
-	mkdir -p $INSTALL_PATH
-fi
-
-# Read usbkey file
-read_config $USBKEY_CONFIG_FILE_PATH
-if [[ $? -ne 0 ]]; then
-	echo "[E] USBKEY config file is corrupted"
-	exit 0
-else
-	# Save the value
-	USBKEY_VMAJOR=$VERSION_MAJOR
-	USBKEY_VMINOR=$VERSION_MINOR
-fi
-
-# Read installed file
-read_config $INSTALLED_CONFIG_FILE_PATH
-if [[ $? -ne 0 ]]; then
-	echo "[W] Unable to read installed config file due to previous error"
-
-	# Config read failed, continue update
-	INSTALLED_VMAJOR=0
-	INSTALLED_VMINOR=0
-else
-	# Save the value
-	INSTALLED_VMAJOR=$VERSION_MAJOR
-	INSTALLED_VMINOR=$VERSION_MINOR
-fi
-
-# Test the version
-compare_version $INSTALLED_VMAJOR $INSTALLED_VMINOR $USBKEY_VMAJOR $USBKEY_VMINOR
-ret=$?
-if [[ "$ret" -eq 2 ]]; then
-	echo "[E] The USB key version is depreciated !"
-	echo "[E] Installed: v$INSTALLED_VMAJOR.$INSTALLED_VMINOR - USB key: v$USBKEY_VMAJOR.$USBKEY_VMINOR"
-	exit 1
-elif [[ "$ret" -eq 0 ]]; then
-	echo "[I] Installed version is up to date : v$INSTALLED_VMAJOR.$INSTALLED_VMINOR"
-	exit 0
-elif [[ "$ret" -eq 1 ]]; then
-	echo "[I] Update available : v$INSTALLED_VMAJOR.$INSTALLED_VMINOR -> v$USBKEY_VMAJOR.$USBKEY_VMINOR"
-else
-	echo "[E] compare_version() failed"
-	exit 1
-fi
-
-echo "[I] Update is starting..."
+	return 0
+}
 
 # Install a service file on the system
 install_service() {
 	SERVICE_NAME=$1
+	NO_START=$2 # start or nostart
 
-	[[ DEBUG -eq 1 ]] && echo "[D] Skipping install_service()" & return 0
+	[[ DEBUG -eq 1 ]] && echo "[D] Skipping install_service()" && return 0
 
 	# Copy the service
 	cp $USBKEY_PACK_PATH/$SERVICE_NAME.service $SERVICE_PATH/$SERVICE_NAME.service
@@ -187,18 +139,22 @@ install_service() {
 	fi
 
 	# Enable the service
-	systemctl enable $SERVICE_PATH/$SERVICE_NAME.service
+	systemctl enable $SERVICE_NAME > /dev/null
 	if [[ $? -ne 0 ]]; then
 		echo "[E] Failed to enable $SERVICE_NAME.service"
 		return 1
 	fi
 
 	# Start the service
-	systemctl start $SERVICE_NAME
-	if [[ $? -ne 0 ]]; then
-		echo "[E] Failed to start $SERVICE_NAME"
-		return 1
+	if [[ "$NO_START" != "nostart" ]]; then
+		systemctl start $SERVICE_NAME > /dev/null
+		if [[ $? -ne 0 ]]; then
+			echo "[E] Failed to start $SERVICE_NAME"
+			return 1
+		fi
 	fi
+
+	echo "[I] $SERVICE_NAME.service installed"
 
 	return 0
 }
@@ -208,7 +164,7 @@ install_pack() {
 	# UPDATER
 	# =====================
 
-	install_service ACHDRUpdater
+	install_service ACHDRUpdater nostart
 	if [[ $? -ne 0 ]]; then
 		return 1
 	fi
@@ -270,12 +226,223 @@ install_pack() {
 	return 0
 }
 
-install_pack
-if [[ $? -ne 0 ]]; then
-	echo "[E] --- Update failed ---"
-	exit 1
+uninstall_service() {
+	SERVICE_NAME=$1
+
+	[[ DEBUG -eq 1 ]] && echo "[D] Skipping uninstall_service()" && return 0
+
+	# Stop the service
+	systemctl stop $SERVICE_NAME >/dev/null 2>&1
+	if [[ $? -ne 0 ]]; then
+		echo "[W] Failed to stop $SERVICE_NAME, continuing..."
+	fi
+
+	# Disable the service
+	systemctl disable $SERVICE_NAME >/dev/null 2>&1
+	if [[ $? -ne 0 ]]; then
+		echo "[W] Failed to disable $SERVICE_NAME.service, continuing..."
+	fi
+
+	# Remove the service
+	if [[ -f $SERVICE_PATH/$SERVICE_NAME.service ]]; then
+		rm $SERVICE_PATH/$SERVICE_NAME.service
+		if [[ $? -ne 0 ]]; then
+			echo "[E] Failed to remove $SERVICE_NAME.service"
+			return 1
+		fi
+	fi
+
+	echo "[I] $SERVICE_NAME.service removed"
+	return 0
+}
+
+uninstall_pack() {
+	# =====================
+	# UPDATER
+	# =====================
+
+	# Do not unistall updater !
+
+	# =====================
+	# MAIN APPLICATION
+	# =====================
+
+	uninstall_service ACHDRScript
+	if [[ $? -ne 0 ]]; then
+		return 1
+	fi
+
+	# Remove the main application
+	if [[ -f $INSTALL_PATH/LoopVideoIO.py ]]; then
+		rm $INSTALL_PATH/LoopVideoIO.py
+		if [[ $? -ne 0 ]]; then
+			echo "[E] Failed to remove LoopVideoIO.py"
+			return 1
+		fi
+	fi
+
+	# =====================
+	# SHUTDOWN BUTTON
+	# =====================
+
+	uninstall_service ACHDRShutdownBtn
+	if [[ $? -ne 0 ]]; then
+		return 1
+	fi
+
+	if [[ -f $INSTALL_PATH/shutdown_button.sh ]]; then
+		rm $INSTALL_PATH/shutdown_button.sh
+		if [[ $? -ne 0 ]]; then
+			echo "[E] Failed to remove shutdown_button.sh"
+			return 1
+		fi
+	fi
+
+	# =====================
+	# HIDE CURSOR
+	# =====================
+
+	uninstall_service ACHDRHideCursor
+	if [[ $? -ne 0 ]]; then
+		return 1
+	fi
+
+	# =====================
+	# CONFIG FILE
+	# =====================
+
+	# Remove the configuration file
+	if [[ -f $INSTALL_PATH/$CONFIG_FILE_NAME ]]; then
+		rm $INSTALL_PATH/$CONFIG_FILE_NAME
+		if [[ $? -ne 0 ]]; then
+			echo "[E] Failed to remove $CONFIG_FILE_NAME"
+			return 1
+		fi
+	fi
+
+	return 0
+}
+
+# =====================
+# MAIN
+# =====================
+
+# Check for root privileges
+if [[ ("$EUID" -ne 0) && ("$DEBUG" -ne 1) ]]; then
+	echo "[I] Please run as root"
+  	exit 1
 fi
 
-echo "[I] --- Update done ! ---"
+# Move to the updater script
+cd $UPDATER_SCRIPT_PATH
+
+# Create the install directory if not existing
+if [[ ! -d $INSTALL_PATH ]]; then
+	mkdir -p $INSTALL_PATH
+fi
+
+# Default params value
+CMD="install"
+
+# Check script params
+# See https://linuxhint.com/bash_getopts_example/
+while getopts "iu" option; do
+	case ${option} in
+	i )
+		CMD="install"
+		;;
+	u )
+		CMD="uninstall"
+		;;
+	\? )
+		echo "usage: achdr_updater_script.sh [-ui]"
+		exit 1
+		;;
+	esac
+done
+
+# =====================
+# INSTALLATION
+# =====================
+if [[ "$CMD" == "install" ]]; then
+
+	# Read usbkey file
+	read_config $USBKEY_CONFIG_FILE_PATH
+	if [[ $? -ne 0 ]]; then
+		echo "[E] USBKEY config file is corrupted"
+		exit 0
+	else
+		# Save the value
+		USBKEY_VMAJOR=$VERSION_MAJOR
+		USBKEY_VMINOR=$VERSION_MINOR
+	fi
+
+	# Read installed file
+	read_config $INSTALLED_CONFIG_FILE_PATH
+	if [[ $? -ne 0 ]]; then
+		echo "[W] Unable to read installed config file due to previous error"
+
+		# Config read failed, continue update
+		INSTALLED_VMAJOR=0
+		INSTALLED_VMINOR=0
+	else
+		# Save the value
+		INSTALLED_VMAJOR=$VERSION_MAJOR
+		INSTALLED_VMINOR=$VERSION_MINOR
+	fi
+
+	# Test the version
+	compare_version $INSTALLED_VMAJOR $INSTALLED_VMINOR $USBKEY_VMAJOR $USBKEY_VMINOR
+	ret=$?
+	if [[ "$ret" -eq 2 ]]; then
+		echo "[E] The USB key version is depreciated !"
+		echo "[E] Installed: v$INSTALLED_VMAJOR.$INSTALLED_VMINOR - USB key: v$USBKEY_VMAJOR.$USBKEY_VMINOR"
+		exit 1
+	elif [[ "$ret" -eq 0 ]]; then
+		echo "[I] Installed version is up to date : v$INSTALLED_VMAJOR.$INSTALLED_VMINOR"
+		exit 0
+	elif [[ "$ret" -eq 1 ]]; then
+		echo "[I] Update available : v$INSTALLED_VMAJOR.$INSTALLED_VMINOR -> v$USBKEY_VMAJOR.$USBKEY_VMINOR"
+	else
+		echo "[E] compare_version() failed"
+		exit 1
+	fi
+
+	echo "[I] Update is starting..."
+
+	check_requirements
+	if [[ $? -ne 0 ]]; then
+		echo "[E] --- Update failed ---"
+		exit 1
+	fi
+
+	install_pack
+	if [[ $? -ne 0 ]]; then
+		echo "[E] --- Update failed ---"
+		exit 1
+	fi
+
+	echo "[I] --- Update done ! ---"
+
+
+# =====================
+# UNINSTALLATION
+# =====================
+elif [[ "$CMD" == "uninstall" ]]; then
+
+	uninstall_pack
+	if [[ $? -ne 0 ]]; then
+		echo "[E] --- Uninstallation failed ---"
+		exit 1
+	fi
+
+	echo "[I] --- Uninstallation done ! ---"
+
+# =====================
+# OTHERS
+# =====================
+else
+	exit 1
+fi
 
 exit 0

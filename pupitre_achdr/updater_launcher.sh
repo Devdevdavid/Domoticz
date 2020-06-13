@@ -2,7 +2,7 @@
 
 # Parameters
 USB_KEY_PATH=/media/VIDEO_ACHDR
-USB_KEY_PATH=./VIDEO_ACHDR
+USB_KEY_PATH=./VIDEO_ACHDR/pack
 
 UPDATER_SCRIPT_NAME="achdr_updater_script.sh"
 
@@ -23,5 +23,5 @@ fi
 
 # Calling the updater and returning the error code
 echo "[I] Launching updater script..."
-bash "$UPDATER_SCRIPT_PATH"
+bash "$UPDATER_SCRIPT_PATH" $@
 exit $?

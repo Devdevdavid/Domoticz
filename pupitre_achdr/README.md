@@ -25,5 +25,14 @@ sudo systemctl start ACHDRUpdater
 
 A partir de ce moment, dès que la clé VIDEO_ACHDR sera montée, le launcher s'exécutera. Si il est capable de trouver le launcher sur la clé, il l'exécutera
 
+# Dépendances
+
+Ce projet nécéssite quelques dépendances pour fonctionner correctement.
+
+unclutter permet de cacher le curseur lorsque l'on utilise l'affichage de présentation libre office
+```bash
+sudo apt install unclutter
+```
+
 # Note à Futur Dave
 Lorsque l'on est en option (Lancement de la video à Home) alors le mode d'emplois n'est pas lisible car caché par cette vidéo
