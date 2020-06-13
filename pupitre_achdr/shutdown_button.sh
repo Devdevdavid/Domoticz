@@ -41,7 +41,7 @@ sleep 1
 gpio write $PIN_RED_LED 1
 
 # umount all USB drives
-umount /media/pi/*
+umount -q /media/pi/*
 
 # Shutdown
-# shutdown now
+shutdown now

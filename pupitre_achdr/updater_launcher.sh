@@ -10,8 +10,7 @@
 # =================================
 
 # Parameters
-USB_KEY_PATH=/media/VIDEO_ACHDR
-USB_KEY_PATH=./VIDEO_ACHDR/pack
+USB_KEY_PATH=/media/pi/VIDEO_ACHDR
 
 UPDATER_SCRIPT_NAME="achdr_updater_script.sh"
 
