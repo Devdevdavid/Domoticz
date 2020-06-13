@@ -112,14 +112,26 @@ compare_version() {
 	return 2			# Available is depreciated
 }
 
-check_requirements() {
-	# Test if program is installed
-	command -v unclutter > /dev/null
+check_requirement_program() {
+	PROG=$1
+	NAME=$2
+	command -v $PROG > /dev/null
 	if [[ $? -ne 0 ]]; then
-		echo "[E] \"unclutter\" is not installed on the system"
-		echo "[I] Use \"sudo apt install unclutter\" to resolve this"
+		echo "[E] \"$NAME\" is not installed on the system"
+		echo "[I] Use \"sudo apt install $NAME\" to resolve this"
 		return 1
 	fi
+	return 0
+}
+
+check_requirements() {
+	# Test if programs are installed
+	check_requirement_program python python || return 1
+	check_requirement_program gpio wiringpi || return 1
+	check_requirement_program unclutter unclutter || return 1
+	check_requirement_program omxplayer.bin omxplayer || return 1
+	check_requirement_program soffice.bin libreoffice || return 1
+	check_requirement_program feh feh || return 1
 
 	return 0
 }
@@ -159,6 +171,7 @@ install_service() {
 	return 0
 }
 
+# Install the pack from the usb key
 install_pack() {
 	# =====================
 	# UPDATER
@@ -178,6 +191,8 @@ install_pack() {
 	if [[ $? -ne 0 ]]; then
 		echo "[E] Failed to copy LoopVideoIO.py"
 		return 1
+	else
+		echo "[I] LoopVideoIO.py installed"
 	fi
 
 	install_service ACHDRScript
@@ -221,6 +236,8 @@ install_pack() {
 	if [[ $? -ne 0 ]]; then
 		echo "[E] Failed to copy $CONFIG_FILE_NAME"
 		return 1
+	else
+		echo "[I] $CONFIG_FILE_NAME updated"
 	fi
 
 	return 0

@@ -29,9 +29,15 @@ A partir de ce moment, dès que la clé VIDEO_ACHDR sera montée, le launcher s'
 
 Ce projet nécéssite quelques dépendances pour fonctionner correctement.
 
-unclutter permet de cacher le curseur lorsque l'on utilise l'affichage de présentation libre office
+- `python` permet de lancer l'application principale
+- `unclutter` permet de cacher le curseur lorsque l'on utilise l'affichage de présentation libre office
+- `wiringpi` permet de lire les boutons et d'allumer les leds
+- `omxplayer` permet de lire les vidéos
+- `libreoffice` permet de lire les présentations .ODT
+- `feh` permet d'afficher des images en plein écran
+
 ```bash
-sudo apt install unclutter
+sudo apt install python unclutter wiringpi omxplayer libreoffice feh
 ```
 
 # Note à Futur Dave
