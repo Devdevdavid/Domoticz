@@ -134,17 +134,41 @@ check_requirements() {
 	return 0
 }
 
+# Copy a file with checks and log messages
+# Also set file permission
+copy_file() {
+	SRC_FILE_PATH=$1
+	DEST_FILE_PATH=$2
+	DEST_FILE_PERM=$3
+
+	FILE_NAME=$(basename $SRC_FILE_PATH)
+
+	cp $SRC_FILE_PATH $DEST_FILE_PATH
+	if [[ $? -ne 0 ]]; then
+		echo "[E] Failed to copy $FILE_NAME"
+		return 1
+	else
+		echo "[I] $FILE_NAME copied"
+	fi
+
+	chmod $DEST_FILE_PERM $DEST_FILE_PATH/$FILE_NAME
+	if [[ $? -ne 0 ]]; then
+		echo "[E] Failed to set permission of $FILE_NAME to $DEST_FILE_PERM"
+		return 1
+	else
+		echo "[I] Permission of $FILE_NAME set"
+	fi
+
+	return 0
+}
+
 # Install a service file on the system
 install_service() {
 	SERVICE_NAME=$1
 	NO_START=$2 # start or nostart
 
 	# Copy the service
-	cp $USBKEY_PACK_PATH/$SERVICE_NAME.service $SERVICE_PATH/$SERVICE_NAME.service
-	if [[ $? -ne 0 ]]; then
-		echo "[E] Failed to copy $SERVICE_NAME.service"
-		return 1
-	fi
+	copy_file $USBKEY_PACK_PATH/$SERVICE_NAME.service $SERVICE_PATH/ 644 || return 1
 
 	# Enable the service
 	systemctl --quiet enable $SERVICE_NAME 2>&1 > /dev/null
@@ -174,71 +198,32 @@ install_pack() {
 	# =====================
 
 	# We copy the updater to be able to uninstall later
-	cp $USBKEY_PACK_PATH/updater_launcher.sh $INSTALL_PATH/
-	if [[ $? -ne 0 ]]; then
-		echo "[E] Failed to copy updater_launcher.sh"
-		return 1
-	else
-		echo "[I] updater_launcher.sh copied"
-	fi
-
-	install_service ACHDRUpdater nostart
-	if [[ $? -ne 0 ]]; then
-		return 1
-	fi
+	copy_file $USBKEY_PACK_PATH/updater_launcher.sh $INSTALL_PATH/ 755 || return 1
+	install_service ACHDRUpdater nostart || return 1
 
 	# We copy the updater to be able to uninstall later
-	cp $USBKEY_PACK_PATH/achdr_updater_script.sh $INSTALL_PATH/
-	if [[ $? -ne 0 ]]; then
-		echo "[E] Failed to copy achdr_updater_script.sh"
-		return 1
-	else
-		echo "[I] achdr_updater_script.sh copied"
-	fi
+	copy_file $USBKEY_PACK_PATH/achdr_updater_script.sh $INSTALL_PATH/ 755 || return 1
 
 	# =====================
 	# MAIN APPLICATION
 	# =====================
 
 	# Copy the main application
-	cp $USBKEY_PACK_PATH/achdr_main_app.py $INSTALL_PATH/
-	if [[ $? -ne 0 ]]; then
-		echo "[E] Failed to copy achdr_main_app.py"
-		return 1
-	else
-		echo "[I] achdr_main_app.py installed"
-	fi
-
-	install_service ACHDRMainApp
-	if [[ $? -ne 0 ]]; then
-		return 1
-	fi
+	copy_file $USBKEY_PACK_PATH/achdr_main_app.py $INSTALL_PATH/ 644 || return 1
+	install_service ACHDRMainApp || return 1
 
 	# =====================
 	# SHUTDOWN BUTTON
 	# =====================
 
-	cp $USBKEY_PACK_PATH/shutdown_button.sh $INSTALL_PATH/
-	if [[ $? -ne 0 ]]; then
-		echo "[E] Failed to copy shutdown_button.sh"
-		return 1
-	fi
-
-	chmod 755 $INSTALL_PATH/shutdown_button.sh
-
-	install_service ACHDRShutdownButton
-	if [[ $? -ne 0 ]]; then
-		return 1
-	fi
+	copy_file $USBKEY_PACK_PATH/shutdown_button.sh $INSTALL_PATH/ 755 || return 1
+	install_service ACHDRShutdownButton || return 1
 
 	# =====================
 	# HIDE CURSOR
 	# =====================
 
-	install_service ACHDRHideCursor
-	if [[ $? -ne 0 ]]; then
-		return 1
-	fi
+	install_service ACHDRHideCursor || return 1
 
 	# =====================
 	# CONFIG FILE
@@ -246,12 +231,27 @@ install_pack() {
 
 	# Update is doing well, copy the config file
 	# to take the update into account
-	cp $USBKEY_CONFIG_FILE_PATH $INSTALL_PATH/
-	if [[ $? -ne 0 ]]; then
-		echo "[E] Failed to copy $CONFIG_FILE_NAME"
-		return 1
+	copy_file $USBKEY_PACK_PATH/$CONFIG_FILE_NAME $INSTALL_PATH/ 644 || return 1
+
+	return 0
+}
+
+# Remove a file with checks and log messages
+remove_file() {
+	FILE_PATH=$1
+
+	FILE_NAME=$(basename $FILE_PATH)
+
+	if [[ -f $FILE_PATH ]]; then
+		rm $FILE_PATH
+		if [[ $? -ne 0 ]]; then
+			echo "[E] Failed to remove $FILE_NAME"
+			return 1
+		else
+			echo "[I] $FILE_NAME removed"
+		fi
 	else
-		echo "[I] $CONFIG_FILE_NAME updated"
+		echo "[I] No $FILE_NAME to remove"
 	fi
 
 	return 0
@@ -273,19 +273,40 @@ uninstall_service() {
 	fi
 
 	# Remove the service
-	if [[ -f $SERVICE_PATH/$SERVICE_NAME.service ]]; then
-		rm $SERVICE_PATH/$SERVICE_NAME.service
-		if [[ $? -ne 0 ]]; then
-			echo "[E] Failed to remove $SERVICE_NAME.service"
-			return 1
-		fi
-	fi
+	remove_file $SERVICE_PATH/$SERVICE_NAME.service || return 1
 
 	echo "[I] $SERVICE_NAME.service removed"
 	return 0
 }
 
 uninstall_pack() {
+	# =====================
+	# MAIN APPLICATION
+	# =====================
+
+	uninstall_service ACHDRMainApp || return 1
+	remove_file $INSTALL_PATH/achdr_main_app.py || return 1
+
+	# =====================
+	# SHUTDOWN BUTTON
+	# =====================
+
+	uninstall_service ACHDRShutdownButton || return 1
+	remove_file $INSTALL_PATH/shutdown_button.sh || return 1
+
+	# =====================
+	# HIDE CURSOR
+	# =====================
+
+	uninstall_service ACHDRHideCursor || return 1
+
+	# =====================
+	# CONFIG FILE
+	# =====================
+
+	# Remove the configuration file
+	remove_file $INSTALL_PATH/$CONFIG_FILE_NAME || return 1
+
 	# =====================
 	# UPDATER
 	# =====================
@@ -294,70 +315,7 @@ uninstall_pack() {
 	# able to install futur version with USB
 
 	# Remove the updater
-	if [[ -f $INSTALL_PATH/achdr_updater_script.sh ]]; then
-		rm $INSTALL_PATH/achdr_updater_script.sh
-		if [[ $? -ne 0 ]]; then
-			echo "[E] Failed to remove achdr_updater_script.sh"
-			return 1
-		fi
-	fi
-
-	# =====================
-	# MAIN APPLICATION
-	# =====================
-
-	uninstall_service ACHDRMainApp
-	if [[ $? -ne 0 ]]; then
-		return 1
-	fi
-
-	# Remove the main application
-	if [[ -f $INSTALL_PATH/achdr_main_app.py ]]; then
-		rm $INSTALL_PATH/achdr_main_app.py
-		if [[ $? -ne 0 ]]; then
-			echo "[E] Failed to remove achdr_main_app.py"
-			return 1
-		fi
-	fi
-
-	# =====================
-	# SHUTDOWN BUTTON
-	# =====================
-
-	uninstall_service ACHDRShutdownButton
-	if [[ $? -ne 0 ]]; then
-		return 1
-	fi
-
-	if [[ -f $INSTALL_PATH/shutdown_button.sh ]]; then
-		rm $INSTALL_PATH/shutdown_button.sh
-		if [[ $? -ne 0 ]]; then
-			echo "[E] Failed to remove shutdown_button.sh"
-			return 1
-		fi
-	fi
-
-	# =====================
-	# HIDE CURSOR
-	# =====================
-
-	uninstall_service ACHDRHideCursor
-	if [[ $? -ne 0 ]]; then
-		return 1
-	fi
-
-	# =====================
-	# CONFIG FILE
-	# =====================
-
-	# Remove the configuration file
-	if [[ -f $INSTALL_PATH/$CONFIG_FILE_NAME ]]; then
-		rm $INSTALL_PATH/$CONFIG_FILE_NAME
-		if [[ $? -ne 0 ]]; then
-			echo "[E] Failed to remove $CONFIG_FILE_NAME"
-			return 1
-		fi
-	fi
+	remove_file $INSTALL_PATH/achdr_updater_script.sh || return 1
 
 	return 0
 }
