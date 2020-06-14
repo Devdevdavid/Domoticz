@@ -1,16 +1,7 @@
 #!/bin/bash
 
-# Do not execute commands on MacOS
-# And change paths
-if [[ "$OSTYPE" == "darwin"* ]]; then
-	DEBUG=1
-else
-	DEBUG=0
-fi
-
 CONFIG_FILE_NAME=achdr_soft.config
 INSTALL_PATH=/home/pi/Scripts
-[[ DEBUG -eq 1 ]] && INSTALL_PATH=./Scripts
 SERVICE_PATH=/etc/systemd/system
 
 # Get the path of the current file
@@ -148,8 +139,6 @@ install_service() {
 	SERVICE_NAME=$1
 	NO_START=$2 # start or nostart
 
-	[[ DEBUG -eq 1 ]] && echo "[D] Skipping install_service()" && return 0
-
 	# Copy the service
 	cp $USBKEY_PACK_PATH/$SERVICE_NAME.service $SERVICE_PATH/$SERVICE_NAME.service
 	if [[ $? -ne 0 ]]; then
@@ -271,8 +260,6 @@ install_pack() {
 uninstall_service() {
 	SERVICE_NAME=$1
 
-	[[ DEBUG -eq 1 ]] && echo "[D] Skipping uninstall_service()" && return 0
-
 	# Stop the service
 	systemctl --quiet stop $SERVICE_NAME 2>&1 > /dev/null
 	if [[ $? -ne 0 ]]; then
@@ -380,7 +367,7 @@ uninstall_pack() {
 # =====================
 
 # Check for root privileges
-if [[ ("$EUID" -ne 0) && ("$DEBUG" -ne 1) ]]; then
+if [[ "$EUID" -ne 0 ]]; then
 	echo "[I] Please run as root"
   	exit 1
 fi

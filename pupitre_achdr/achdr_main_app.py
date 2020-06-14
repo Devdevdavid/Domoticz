@@ -49,36 +49,27 @@ from PIL import Image, ImageTk
 
 #--------------------VARIABLES------------------------
 
-#Variables bontons poussoir
+# Variables bontons poussoir
 buttonPins = [13, 15, 29, 31]
-#variable interrupteur option
+# variable interrupteur option
 OPTV1V2 = 33
-#Variable LEDs
+# Variable LEDs
 LEDS = [12, 16, 18, 22]
 LED_MAV = 32
 LED_MAR = 36
-#Variable ventilateur
+# Variable ventilateur
 VENTILATEUR = 3
-#temporisation clignotement LEDs
+# temporisation clignotement LEDs
 TEMPO_START = 1
-#temporisation animation fonctionnement normal
+# temporisation animation fonctionnement normal
 TEMPO_ANIM  = 500
 
 cmptAnim = 0
 flagAnimCli = False
 lastMillis = 0
 
-#Variables Boutons poussoir (bool)
-input_state1 = True
-input_state2 = True
-input_state3 = True
-input_state4 = True
-#Variables Bouton option
+# Variables Bouton option
 inputV1V2 = True
-
-quit_video = True
-
-timeout = 100
 
 tempoPrint = 0
 tempoCheckProcess = 0
@@ -196,15 +187,12 @@ def read_video_buttons():
 		if (buttonState != buttonStateOld[buttonIndex]):
 			# What edge is that ?
 			if buttonState:
-				print("Rising ", buttonIndex)
 				# Rising edge
 				buttonRising[buttonIndex] = 1
 			else:
-				print("Falling ", buttonIndex)
 				# Falling edge
 				# Can be prevented due to the multiple button action (see below)
 				if buttonFalling[buttonIndex] == -1:
-					print("prevented")
 					buttonFalling[buttonIndex] = 0
 				else:
 					buttonFalling[buttonIndex] = 1
@@ -268,6 +256,10 @@ def exit_handler(sig, frame):
 	print("Leaving gracefully...")
 	sys.exit(0)
 #--------------------DEMARRAGE--------------------------
+
+# Vérification des privilèges
+if os.geteuid() != 0:
+    exit("Please run as root")
 
 ### MOTD
 print("=== Starting LoopVideoIO.py ===")
