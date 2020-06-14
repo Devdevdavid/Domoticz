@@ -14,11 +14,10 @@ SERVICE_PATH=/etc/systemd/system
 
 # Get the path of the current file
 # https://stackoverflow.com/a/4774063
-UPDATER_SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+USBKEY_PACK_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 # Build paths
 INSTALLED_CONFIG_FILE_PATH=$INSTALL_PATH/$CONFIG_FILE_NAME
-USBKEY_PACK_PATH=$UPDATER_SCRIPT_PATH
 USBKEY_CONFIG_FILE_PATH=$USBKEY_PACK_PATH/$CONFIG_FILE_NAME
 
 # Macro
@@ -339,7 +338,7 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 # Move to the updater script
-cd $UPDATER_SCRIPT_PATH
+cd $USBKEY_PACK_PATH
 
 # Create the install directory if not existing
 if [[ ! -d $INSTALL_PATH ]]; then

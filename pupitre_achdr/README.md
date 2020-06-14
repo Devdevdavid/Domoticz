@@ -7,39 +7,71 @@ TODO
 - Mettre à jour le fichier `achdr_soft.config`
 - Mettre à jour le numéro de version dans le manuel: `Image/manual.jpg` [Utiliser PhotoFiltre 7](http://www.photofiltre-studio.com/pf7.htm)
 
+## Comment créer une clé USB compatible avec le logiciel du pupitre ACHDR ?
+
+- Vider le contenu de la clé USB
+- Renommer la clé en `VIDEO_ACHDR`
+- Copier le dossier `Image` du repository sur la clé. Il contient toutes les images par défaut (mire, loading, etc.)
+- Créer un dossier `pack` et copier l'ensemble des fichiers sources du repository (Tous les fichiers sauf le dossier `Image`)
+- Ajouter les vidéos, images et présentations à la racine de la clé avec comme nom le numéro du bouton associé (ex: 1.odt, 2.mp4, 3.jpg, 4.odt)
+- Enfin, si l'option est activée (Switch à l'arrière du pupitre) c'est le fichier "achdr" qui sera affiché lors du retour à l'acceuil. (ex: achdr.odt ou achdr.jpg)
+
+A la suite de ces étapes, la clé USB est prête à être utilisée avec le pupitre. Voici l'architecture finale obtenue:
+```
+VIDEO_ACHDR
+	├── pack
+	│   ├── ACHDRHideCursor.service
+	│   ├── ACHDRLauncher.service
+	│   ├── achdr_launcher.sh
+	│   ├── achdr_main_app.py
+	│   ├── ACHDRMainApp.service
+	│   ├── ACHDRShutdownButton.service
+	│   ├── achdr_soft.config
+	│   ├── achdr_updater.sh
+	│   └── shutdown_button.sh
+	├── Image
+	│   ├── achdr2.jpg
+	│   ├── achdr_backup.jpg
+	│   ├── achdr.jpg
+	│   ├── loading.jpg
+	│   └── manual.jpg
+	├── 1.mp4
+	├── 2.jpg
+	├── 3.odt
+	├── 4.mp4
+	└── achdr.mp4
+```
+
 # ACHDR Updater
 L'updater permet de mettre à jour un pupitre de manière automatique par clé USB.
 Le logiciel est capable de repérer le numéro de version installé sur le système et le compare à la version disponible sur la clé USB pour savoir si une mise à jour est nécessaire.
 
 L'updater est composé de plusieurs fichiers :
-- `achdr_launcher.sh` : Ce fichier doit être placé dans "/home/pi/Scripts". Il permet de lancer l'updater.
 - `ACHDRLauncher.service` : Ce service permet de lancer le launcher dès que la clé USB est montée par Rasbian
+- `achdr_launcher.sh` : Ce fichier doit être placé dans "/home/pi/Scripts". Il permet de lancer l'updater.
 - `achdr_updater.sh` : C'est le coeur de l'updater. Ce fichier est placé sur la clé USB et est exécuté par le launcher.
 - `achdr_soft.config` : Ce fichier de configuration contient le numéro de version du pack logiciel. Il y a de ce fait deux fichiers comme celui-ci : Le premier est placé dans "/home/pi/Scripts" et contient les informations liées au logiciel installé sur le système. Le second se situe sur la clé USB et contient les informations liées au logiciel disponible sur la clé.
 
 ## Installation
-Cette partie décrit l'installation de l'updater sur le système. Cette opération est nécessaire une première fois avant de pouvoir utiliser la mise à jour par clé USB.
+Avant de pouvoir profiter de la mise à jour automatique par clé USB, il est nécessaire d'effectuer quelques opérations sur la Raspberry.
 
-Copiez les fichiers sur le système:
+- Se connecter en SSH à la raspberry
+- Installer les dépendances (Voir plus bas)
+- Connecter la clé USB (Elle devrait être montée automatiquement par Raspbian)
+- Exécuter la commande suivante pour lancer le launcher depuis la clé USB
 ```bash
-sudo cp <chemin-source-du-service> /etc/systemd/system/ACHDRLauncher.service
-sudo cp <chemin-source-du-launcher> /home/pi/Scripts/achdr_launcher.sh
+sudo ./media/pi/VIDEO_ACHDR/pack/achdr_launcher.sh
 ```
 
-Activez le service et lancez-le:
-```bash
-sudo systemctl enable ACHDRLauncher
-sudo systemctl start ACHDRLauncher
-```
-
+Ceci va lancer la mise à jour du système de manière manuelle et de ce fait installer le launcher et le pack logiciel.
 À partir de ce moment, dès que la clé VIDEO_ACHDR sera montée, le launcher s'exécutera. S’il est capable de trouver le launcher sur la clé, il l'exécutera.
 
 ## Fonctionnement de l'Updater
 
 L'updater est un script bash placé sur la clé USB qui est exécuté par le launcher présent sur le système.
 Voici les étapes suivies par le script:
-- Lecture du fichier de configuration de la clé pour connaître la version logicielle disponible
-- Lecture du fichier de configuration du système pour connaître la version logicielle installée
+- Lecture du fichier de configuration (`achdr_soft.config`) de la clé pour connaître la version logicielle disponible
+- Lecture du fichier de configuration (`achdr_soft.config`) du système pour connaître la version logicielle installée
 - Comparaison des deux numéros de version. Si le logiciel n'est pas installé sur le système, le numéro de version est défini à v0.0.
 - Si le système est à jour ou si la version de la clé est obsolète, le script s'arrête
 - Si une mise à jour est disponible alors on commence la routine de mise à niveau.
@@ -53,7 +85,7 @@ Voici à présent le processus mis en place pour mettre le système à jour:
 - Les scripts sont copiés de la clé vers le système.
 - Les services sont installés et démarrés
 
-Les logs de l'Updater sont écrits sur la clé de façon à pouvoir les consulter sur un Mac/PC.
+Les logs de l'Updater sont écrits sur la clé de façon à pouvoir les consulter sur un Mac/PC. Le nom du fichier est `VIDEO_ACHDR/pack/achdr_updater.log`
 
 # Dépendances
 
