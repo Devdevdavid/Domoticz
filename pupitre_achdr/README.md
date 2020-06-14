@@ -1,11 +1,11 @@
 # ACHDR Appli
-TODO
+L'appli permet de piloter les pupitres ACHDR. Elle se base sur un script Python.
 
 ## Comment incrémenter le numéro de version de l'Appli ACHDR ?
 
 - Commencer par mettre à jour l'entête du fichier `achdr_main_app.py` en ajoutant une ligne dans le ChangeLog
 - Mettre à jour le fichier `achdr_soft.config`
-- Mettre à jour le numéro de version dans le manuel: `Image/manual.jpg` [Utiliser PhotoFiltre 7](http://www.photofiltre-studio.com/pf7.htm)
+- Mettre à jour le numéro de version dans le manuel: `Image/manual.jpg` ([Utiliser PhotoFiltre 7](http://www.photofiltre-studio.com/pf7.htm))
 
 ## Comment créer une clé USB compatible avec le logiciel du pupitre ACHDR ?
 
@@ -13,8 +13,8 @@ TODO
 - Renommer la clé en `VIDEO_ACHDR`
 - Copier le dossier `Image` du repository sur la clé. Il contient toutes les images par défaut (mire, loading, etc.)
 - Créer un dossier `pack` et copier l'ensemble des fichiers sources du repository (Tous les fichiers sauf le dossier `Image`)
-- Ajouter les vidéos, images et présentations à la racine de la clé avec comme nom le numéro du bouton associé (ex: 1.odt, 2.mp4, 3.jpg, 4.odt)
-- Enfin, si l'option est activée (Switch à l'arrière du pupitre) c'est le fichier "achdr" qui sera affiché lors du retour à l'acceuil. (ex: achdr.odt ou achdr.jpg)
+- Ajouter les vidéos, images et présentations à la racine de la clé avec comme nom le numéro du bouton associé (ex: 1.odp, 2.mp4, 3.jpg, 4.odp)
+- Enfin, si l'option est activée (Switch à l'arrière du pupitre) c'est le fichier "achdr" qui sera affiché lors du retour à l'acceuil. (ex: achdr.odp ou achdr.jpg)
 
 A la suite de ces étapes, la clé USB est prête à être utilisée avec le pupitre. Voici l'architecture finale obtenue:
 ```
@@ -37,7 +37,7 @@ VIDEO_ACHDR
 	│   └── manual.jpg
 	├── 1.mp4
 	├── 2.jpg
-	├── 3.odt
+	├── 3.odp
 	├── 4.mp4
 	└── achdr.mp4
 ```
@@ -95,7 +95,7 @@ Ce projet nécessite quelques dépendances pour fonctionner correctement.
 - `unclutter` permet de cacher le curseur lorsque l'on utilise l'affichage de présentation Libre Office
 - `wiringpi` permet de lire les boutons et d'allumer les leds
 - `omxplayer` permet de lire les vidéos
-- `libreoffice` permet de lire les présentations `.ODT`
+- `libreoffice` permet de lire les présentations `.odp`
 - `feh` permet d'afficher des images en plein écran
 - `python3-tk` permet de créer des interfaces graphiques
 - `python3-rpi.gpio` permet de contrôler les GPIO depuis Python
@@ -111,4 +111,4 @@ pip3 install RPi.GPIO psutil Pillow
 
 # Note à Futur Dave
 Lorsque l'on est en option (Lancement de la vidéo à Home) alors le mode d'emploi n'est pas lisible car caché par cette vidéo.
-Le Markdown c'est chouette: [Basic Syntax](https://www.markdownguide.org/basic-syntax)
+Le Markdown c'est chouette : [Basic Syntax](https://www.markdownguide.org/basic-syntax)
