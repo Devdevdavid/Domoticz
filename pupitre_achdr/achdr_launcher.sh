@@ -2,7 +2,7 @@
 # =================================
 # Date		: 13 June 2020
 # Author	: David DEVANT
-# File		: updater_launcher.sh
+# File		: achdr_launcher.sh
 # Version	: 1.0
 # Desc.		: Auto-launch of the
 #             updater when USB key
@@ -12,7 +12,7 @@
 # Parameters
 USB_KEY_PATH=/media/pi/VIDEO_ACHDR/pack
 
-UPDATER_SCRIPT_NAME="achdr_updater_script.sh"
+UPDATER_SCRIPT_NAME="achdr_updater.sh"
 
 # Build paths
 UPDATER_SCRIPT_PATH=$USB_KEY_PATH/$UPDATER_SCRIPT_NAME

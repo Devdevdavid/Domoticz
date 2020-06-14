@@ -1,4 +1,12 @@
 #!/bin/bash
+# =================================
+# Date		: 14 June 2020
+# Author	: David DEVANT
+# File		: achdr_updater.sh
+# Version	: 1.0
+# Desc.		: Updater for ACHDR
+# 			  Application
+# =================================
 
 CONFIG_FILE_NAME=achdr_soft.config
 INSTALL_PATH=/home/pi/Scripts
@@ -198,11 +206,11 @@ install_pack() {
 	# =====================
 
 	# We copy the updater to be able to uninstall later
-	copy_file $USBKEY_PACK_PATH/updater_launcher.sh $INSTALL_PATH/ 755 || return 1
-	install_service ACHDRUpdater nostart || return 1
+	copy_file $USBKEY_PACK_PATH/achdr_launcher.sh $INSTALL_PATH/ 755 || return 1
+	install_service ACHDRLauncher nostart || return 1
 
 	# We copy the updater to be able to uninstall later
-	copy_file $USBKEY_PACK_PATH/achdr_updater_script.sh $INSTALL_PATH/ 755 || return 1
+	copy_file $USBKEY_PACK_PATH/achdr_updater.sh $INSTALL_PATH/ 755 || return 1
 
 	# =====================
 	# MAIN APPLICATION
@@ -315,7 +323,7 @@ uninstall_pack() {
 	# able to install futur version with USB
 
 	# Remove the updater
-	remove_file $INSTALL_PATH/achdr_updater_script.sh || return 1
+	remove_file $INSTALL_PATH/achdr_updater.sh || return 1
 
 	return 0
 }
@@ -352,7 +360,7 @@ while getopts "iu" option; do
 		CMD="uninstall"
 		;;
 	\? )
-		echo "usage: achdr_updater_script.sh [-ui]"
+		echo "usage: achdr_updater.sh [-ui]"
 		exit 1
 		;;
 	esac
@@ -413,9 +421,9 @@ if [[ "$CMD" == "install" ]]; then
 
 	# First uninstall current version if any with the updater
 	# located on the system
-	if [[ -f $INSTALL_PATH/achdr_updater_script.sh ]]; then
+	if [[ -f $INSTALL_PATH/achdr_updater.sh ]]; then
 		echo "[I] Using system updater to uninstall current version..."
-		bash $INSTALL_PATH/achdr_updater_script.sh -u
+		bash $INSTALL_PATH/achdr_updater.sh -u
 	else
 		echo "[I] No updater found to uninstall current version."
 	fi
