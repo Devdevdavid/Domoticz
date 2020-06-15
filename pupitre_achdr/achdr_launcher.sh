@@ -19,7 +19,7 @@ UPDATER_SCRIPT_PATH=$USB_KEY_PATH/$UPDATER_SCRIPT_NAME
 UPDATER_LOG_FILE=$USB_KEY_PATH/achdr_updater.log
 
 # Check for root privileges
-if [[ ("$EUID" -ne 0) && ("$DEBUG" -ne 1) ]]; then
+if [[ "$EUID" -ne 0 ]]; then
 	echo "[I] Please run as root"
   	exit 1
 fi

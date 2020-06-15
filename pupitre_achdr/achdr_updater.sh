@@ -135,7 +135,7 @@ check_requirements() {
 	check_requirement_program gpio wiringpi || return 1
 	check_requirement_program unclutter unclutter || return 1
 	check_requirement_program omxplayer.bin omxplayer || return 1
-	check_requirement_program soffice.bin libreoffice true || return 1
+	check_requirement_program soffice libreoffice true || return 1
 	check_requirement_program feh feh || return 1
 
 	return 0
