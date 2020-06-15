@@ -11,6 +11,8 @@
 CONFIG_FILE_NAME=achdr_soft.config
 INSTALL_PATH=/home/pi/Scripts
 SERVICE_PATH=/etc/systemd/system
+PIN_RED_LED=27
+PIN_GREEN_LED=26
 
 # Get the path of the current file
 # https://stackoverflow.com/a/4774063
@@ -21,6 +23,29 @@ INSTALLED_CONFIG_FILE_PATH=$INSTALL_PATH/$CONFIG_FILE_NAME
 USBKEY_CONFIG_FILE_PATH=$USBKEY_PACK_PATH/$CONFIG_FILE_NAME
 
 # Macro
+
+# Configure and set LED to make
+# visual effect
+set_visual_effect()
+{
+	EFFECT_STATUS=$1
+
+	# Configure LED pins
+	gpio mode $PIN_RED_LED out
+	gpio mode $PIN_GREEN_LED out
+
+	# Animation
+	if [[ "$EFFECT_STATUS" == "working" ]]; then
+		gpio write $PIN_RED_LED 1
+		gpio write $PIN_GREEN_LED 1
+	elif [[ "$EFFECT_STATUS" == "failed" ]]; then
+		gpio write $PIN_RED_LED 1
+		gpio write $PIN_GREEN_LED 0
+	else # "off"
+		gpio write $PIN_RED_LED 0
+		gpio write $PIN_GREEN_LED 0
+	fi
+}
 
 is_arg_a_number() {
 	regex='^[0-9]+$'
@@ -427,11 +452,16 @@ if [[ "$CMD" == "install" ]]; then
 		echo "[I] No updater found to uninstall current version."
 	fi
 
+	# Turn on visual effect
+	set_visual_effect "working"
+
 	# Then install the new version with this current updater
 	# located in the USB key
 	echo "[I] Installing USB key version..."
 	install_pack
 	if [[ $? -ne 0 ]]; then
+		# Display Error
+		set_visual_effect "failed"
 		echo "[E] --- Update failed ---"
 		exit 1
 	fi
@@ -446,6 +476,8 @@ elif [[ "$CMD" == "uninstall" ]]; then
 
 	uninstall_pack
 	if [[ $? -ne 0 ]]; then
+		# Display Error
+		set_visual_effect "failed"
 		echo "[E] --- Uninstallation failed ---"
 		exit 1
 	fi
@@ -458,5 +490,8 @@ elif [[ "$CMD" == "uninstall" ]]; then
 else
 	exit 1
 fi
+
+# Turn off effect
+set_visual_effect "off"
 
 exit 0
