@@ -3,7 +3,7 @@ Description=Service for the Shutdown Button Script
 
 [Service]
 Type=idle
-ExecStart=/bin/bash /home/pi/Scripts/shutdownBtn.sh
+ExecStart=/bin/bash /home/pi/Scripts/shutdown_button.sh
 Restart=on-failure
 RestartSec=5s
 

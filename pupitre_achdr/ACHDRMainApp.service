@@ -5,7 +5,7 @@ Description=Service for Loop video python
 Type=idle
 Environment=DISPLAY=:0.0
 Environment=XAUTHORITY=/home/pi/.Xauthority
-ExecStart=/usr/bin/python3 /home/pi/Scripts/LoopVideoIO.py
+ExecStart=/usr/bin/python3 /home/pi/Scripts/achdr_main_app.py
 Restart=on-failure
 RestartSec=5s
 ExecStartPre=/bin/sleep 5

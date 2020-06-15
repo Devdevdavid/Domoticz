@@ -1,0 +1,10 @@
+[Unit]
+Description=ACHDR Launcher
+Requires=media-pi-VIDEO_ACHDR.mount
+After=media-pi-VIDEO_ACHDR.mount
+
+[Service]
+ExecStart=/home/pi/Scripts/achdr_launcher.sh -i
+
+[Install]
+WantedBy=media-pi-VIDEO_ACHDR.mount
