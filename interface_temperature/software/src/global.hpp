@@ -133,7 +133,7 @@
 
 /** MODULE WIFI (Always ON) */
 #define WIFI_SSID                               "RubanLed"            /** SSID of the Access point/network to connect */
-#define WIFI_PWD                                "pascal2019"          /** Password of the Access point/network to connect */
+#define WIFI_PWD                                "pascal2020"          /** Password of the Access point/network to connect */
 #define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 // WIFI configuration for AP Mode
 #define WIFI_AP_LOCAL_IP                        192,168,1,1           /** IP Address of the board */
@@ -142,7 +142,7 @@
 
 /* MODULE_STRIPLED */
 #define STRIPLED_PIN                            2                     /** Output pin for the strip command */
-#define STRIPLED_NB_PIXELS                      59                    /** Number of Pixel on the strip */
+#define STRIPLED_NB_PIXELS                      24                    /** Number of Pixel on the strip */
 #define STRIPLED_NB_BRIGHT_LEVEL                10                    /** Number of level in the brightness table */
 #define STRIPLED_BRIGHT_HYSTERESIS              10                    /** Hysteresis value between two levels (Base 1023) */
 #define STRIPLED_AUTO_BRIGHT_UPDATE_PERIOD      2000                  /** Period of update of the auto brightness (in ms) */
