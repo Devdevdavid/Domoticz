@@ -2,6 +2,7 @@
 #include "temp/temp.hpp"
 #include "relay/relay.hpp"
 #include "domoticz/domoticz.hpp"
+#include "telegram/telegram.hpp"
 #include "io/inputs.hpp"
 #include "io/outputs.hpp"
 #include "cmd/cmd.hpp"
@@ -9,6 +10,7 @@
 extern uint32_t tick;
 uint32_t nextTempCheckTick = 0;
 uint32_t nextDomoticzUpdateTick = 0;
+uint32_t nextTelegramUpdateTick = 0;
 uint32_t nextSecondRelayImpulsTick = UINT32_MAX; // Disabled at startup
 bool isInAlertOld = false;
 
@@ -19,17 +21,30 @@ void script_send_relay_impulse(uint32_t impulseDurationMs);
 
 void script_execute(void)
 {
-#ifdef BOARD_TEMP_DOMOTICZ
+#if defined(MODULE_TEMPERATURE) && defined(MODULE_DOMOTICZ)
     if (tick > nextDomoticzUpdateTick) {
         nextTempCheckTick = tick + SCRIPT_DOMOTICZ_UPT_PERIOD;
 
-        // Send both sensor values
-        domoticz_send_temperature(DOMOTICZ_SENSOR_ID_INSIDE, temp_get_value(DEVICE_INDEX_0));
-        domoticz_send_temperature(DOMOTICZ_SENSOR_ID_OUTSIDE, temp_get_value(DEVICE_INDEX_1));
+        // Send all sensor values
+        for (byte i = 0; i < temp_get_nb_sensor(); ++i) {
+            uint8_t sensorId = (i == DEVICE_INDEX_0) ? DOMOTICZ_SENSOR_ID_INSIDE : DOMOTICZ_SENSOR_ID_OUTSIDE;
+            domoticz_send_temperature(sensorId, temp_get_value(i));
+        }
     }
 #endif
 
-#ifdef BOARD_TEMP_DOMOTICZ
+#if defined(MODULE_TEMPERATURE) && defined(MODULE_TELEGRAM)
+    if (tick > nextTelegramUpdateTick) {
+        nextTelegramUpdateTick = tick + SCRIPT_TELEGRAM_UPT_PERIOD;
+
+        // Send all sensor values
+        for (byte i = 0; i < temp_get_nb_sensor(); ++i) {
+            telegram_send_msg_temperature(i, temp_get_value(i));
+        }
+    }
+#endif
+
+#if defined(BOARD_TEMP_DOMOTICZ) || defined(BOARD_TEMP_TELEGRAM)
     if (tick > nextTempCheckTick) {
         nextTempCheckTick = tick + SCRIPT_TEMP_CHECK_PERIOD;
         float fridgeTemp = temp_get_value(DEVICE_INDEX_0);
@@ -51,7 +66,7 @@ void script_execute(void)
         if (isInAlertOld != _isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT)) {
             isInAlertOld = _isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
             log_error("Script alert is now %s", isInAlertOld ? "active" : "inactive");
-#ifdef BOARD_TEMP_DOMOTICZ_RELAY
+#if defined(BOARD_TEMP_DOMOTICZ_RELAY) || defined(BOARD_TEMP_TELEGRAM_RELAY)
             // Are we in impulsion mode (Jumper set) ? (OPT jumper JP1)
             if (is_input_low(INPUTS_OPT_RELAY_IMPULSION_MODE)) {
                 script_send_relay_impulse(SCRIPT_RELAY_IMPULSION_DURATION);
@@ -67,9 +82,9 @@ void script_execute(void)
                 // No impulsion, just set the relay ON when alert is ON and vice versa
                 relay_set_state(isInAlertOld);
             }
-#ifdef BOARD_TEMP_DOMOTICZ_BUZZER
-            output_set(OUTPUTS_BUZZER, isInAlertOld);
 #endif
+#if defined(BOARD_TEMP_DOMOTICZ_BUZZER) || defined(BOARD_TEMP_TELEGRAM_BUZZER)
+            output_set(OUTPUTS_BUZZER, isInAlertOld);
 #endif
         }
     }
@@ -116,21 +131,13 @@ void script_execute(void)
         detectorEndTick = UINT32_MAX;
     }
 
-    // static uint32_t tick1s = 0;
-    // if (tick > tick1s) {
-    //     tick1s = tick + 1000;
-    //     log_info("OPT_WEB = %d", is_input_high(INPUTS_OPT_WEB_SERVER_DISPLAY));
-    //     log_info("PIR = %d", is_input_high(INPUTS_PIR_DETECTOR));
-    //     log_info("PIR OPT = %d", is_input_high(INPUTS_PIR_DETECTOR_ENABLE));
-    // }
-
 #endif
 }
 
 /**
  * @brief Set the relay ON then turn it OFF after impulseDurationMs milliseconds
- * 
- * @param impulseDurationMs 
+ *
+ * @param impulseDurationMs
  */
 #ifdef MODULE_RELAY
 void script_send_relay_impulse(uint32_t impulseDurationMs)

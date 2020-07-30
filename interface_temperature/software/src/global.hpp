@@ -3,7 +3,7 @@
 #include "tools/log.hpp"
 #include "status.hpp"
 
-#define LIGHTKIT_VERSION      "LightKit v1.8.0"
+#define LIGHTKIT_VERSION      "LightKit v1.9.0"
 
 /**
  * This is the configuration for the board
@@ -128,7 +128,8 @@
 /* MODULE DEFINITION (Use #define or #undef) */
 #define MODULE_FLASH
 #define MODULE_TEMPERATURE
-#define MODULE_DOMOTICZ
+#undef MODULE_DOMOTICZ
+#define MODULE_TELEGRAM
 #define MODULE_STATUS_LED
 #define MODULE_INPUTS
 // 2 versions of this BOARD_TEMP_DOMOTICZ

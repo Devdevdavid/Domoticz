@@ -93,7 +93,7 @@ void get_sensor_address(void)
 }
 
 /**
- *  Read the value of the specified sensor and send it  
+ *  Read the value of the specified sensor and send it
  **/
 void manage_sensor(uint8_t deviceIndex, DeviceAddress deviceAddress){
   float degreesValue = sensors.getTempC(deviceAddress);
@@ -124,6 +124,11 @@ float temp_get_value(uint8_t deviceIndex)
   }
 
   return sensorValue[deviceIndex];
+}
+
+byte temp_get_nb_sensor(void)
+{
+  return (byte) sensorCount;
 }
 
 void temp_init(void)
