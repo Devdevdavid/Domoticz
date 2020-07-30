@@ -161,8 +161,8 @@
 #define TEMP_POLLING_PERIOD_MS                  1*60*1000
 
 /* MODULE_TELEGRAM */
-#define TELEGRAM_HOST                           "192.168.0.32"
-#define TELEGRAM_PORT                           8080
+// #define TELEGRAM_HOST                           "192.168.0.32"
+// #define TELEGRAM_PORT                           8080
 #define TELEGRAM_TIMEOUT_MS                     3*1000
 #define TELEGRAM_CONV_TOKEN						"1175475117:AAE43sh7RscT-WtOk-LJVyRnIIK23Nrvdkc"
 

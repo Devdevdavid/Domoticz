@@ -13,6 +13,7 @@
 #include "cmd/cmd_serial.hpp"
 #include "relay/relay.hpp"
 #include "script/script.hpp"
+#include "telegram/telegram.hpp"
 
 uint32_t tick, curTick;
 
@@ -49,12 +50,15 @@ void setup()
 #ifdef MODULE_RELAY
 	relay_init();
 #endif
+#ifdef MODULE_TELEGRAM
+	telegram_init();
+#endif
 #ifdef MODULE_CMD_SERIAL
 	cmd_serial_init();
 #endif
 }
 
-void loop(void) 
+void loop(void)
 {
 	curTick = millis();
 
@@ -79,6 +83,9 @@ void loop(void)
 #endif
 #ifdef MODULE_STATUS_LED
 		status_led_main();
+#endif
+#ifdef MODULE_TELEGRAM
+		telegram_main();
 #endif
 #ifdef MODULE_RELAY
 		relay_main();

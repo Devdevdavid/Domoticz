@@ -1,21 +1,20 @@
+#include <WiFiClientSecure.h>
+#include <UniversalTelegramBot.h>
+
 #include "global.hpp"
 #include "telegram.hpp"
-#include "status_led/status_led.hpp"
 
 #ifdef MODULE_TELEGRAM
-
-
-#include <WiFiClientSecure.h>
-#include <UniversalTelegramTBot.h>
 
 // EXTERNS
 extern uint32_t tick;
 
 // STATIC
 static uint32_t nextCheckTick = UINT32_MAX;
+static String ThisChat;
 
 WiFiClientSecure client;
-UniversalTelegramTBot TBot(TELEGRAM_CONV_TOKEN, client);
+UniversalTelegramBot TBot(TELEGRAM_CONV_TOKEN, client);
 
 static void telegram_msg_send_motd(void)
 {
@@ -34,6 +33,7 @@ static void telegram_msg_send_motd(void)
 	welcome += "/Skip : No action\n";
 	welcome += "/status : Return connection state\n";
 #endif
+	TBot.sendMessage(ThisChat, welcome, "Markdown");// mise en forme du texte
 }
 
 static void telegram_handle_new_message(telegramMessage * message) {
@@ -51,7 +51,6 @@ static void telegram_handle_new_message(telegramMessage * message) {
 		if (ThisChat=="") {
 			ThisChat = String(message->chat_id);
 		}
-	    TBot.sendMessage(ThisChat, welcome, "Markdown");// mise en forme du texte
 
 	    String keyboardJson = "[[\"/status\"]]";
 	    TBot.sendMessageWithReplyKeyboard(ThisChat, TG_MSG_CHOOSE_OPTION, "", keyboardJson, true);
@@ -62,7 +61,7 @@ static void telegram_handle_new_message(telegramMessage * message) {
 
 void telegram_init(void)
 {
-	// Nothing yet
+	nextCheckTick = 0;
 }
 
 void telegram_main(void)
@@ -77,13 +76,13 @@ void telegram_main(void)
 			for (int i = 0; i < msgNumber; i++) {
 				telegram_handle_new_message(&TBot.messages[i]);
 			}
-		} while(msgId);
+		} while(msgNumber);
 	}
 }
 
 void telegram_send_msg_temperature(uint8_t sensorID, float degreesValue)
 {
-	String msg = String(sensorID) + "]" + TG_MSG_TEMPERATURE_IS + String(degreesValue) + "'C"
+	String msg = String(sensorID) + "]" + TG_MSG_TEMPERATURE_IS + String(degreesValue) + "'C";
 	TBot.sendMessage(ThisChat, msg, "");
 }
 
