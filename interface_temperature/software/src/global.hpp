@@ -3,6 +3,11 @@
 #include "tools/log.hpp"
 #include "status.hpp"
 
+// If you get an error on this file, copy "private_tmpl.hpp" to "private.hpp"
+// and fill the blanked #define
+// This template system avoid leaking password on Github
+#include "private.hpp"
+
 #define LIGHTKIT_VERSION      "LightKit v1.9.0"
 
 /**
@@ -44,8 +49,8 @@
 #undef MODULE_CMD_SERIAL
 
 /** MODULE WIFI (Always ON) */
-#define WIFI_SSID                               "BOX_SSID"            /** SSID of the Access point/network to connect */
-#define WIFI_PWD                                "BOX_PWD"             /** Password of the Access point/network to connect */
+#define WIFI_SSID                               P_WIFI_PASCAL_SSID    /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                P_WIFI_PASCAL_PWD     /** Password of the Access point/network to connect */
 #undef  WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 
 /* MODULE TEMPERATURE */
@@ -150,8 +155,8 @@
 #undef MODULE_CMD_SERIAL
 
 /** MODULE WIFI (Always ON) */
-#define WIFI_SSID                               "freebox"            /** SSID of the Access point/network to connect */
-#define WIFI_PWD                                "pascal1961"         /** Password of the Access point/network to connect */
+#define WIFI_SSID                               P_WIFI_PASCAL_SSID   /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                P_WIFI_PASCAL_PWD    /** Password of the Access point/network to connect */
 #undef  WIFI_IS_IN_AP_MODE                                           /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 
 /* MODULE TEMPERATURE */
@@ -164,7 +169,7 @@
 // #define TELEGRAM_HOST                           "192.168.0.32"
 // #define TELEGRAM_PORT                           8080
 #define TELEGRAM_TIMEOUT_MS                     3*1000
-#define TELEGRAM_CONV_TOKEN						"1175475117:AAE43sh7RscT-WtOk-LJVyRnIIK23Nrvdkc"
+#define TELEGRAM_CONV_TOKEN						P_TELEGRAM_CONV_TOKEN_PASCAL
 
 #define TELEGRAM_LANG_EN						0
 #define TELEGRAM_LANG_FR						1
@@ -241,8 +246,8 @@
 #undef MODULE_CMD_SERIAL
 
 /** MODULE WIFI (Always ON) */
-#define WIFI_SSID                               "RubanLed"            /** SSID of the Access point/network to connect */
-#define WIFI_PWD                                "pascal2020"          /** Password of the Access point/network to connect */
+#define WIFI_SSID                               P_WIFI_RUBAN_SSID     /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                P_WIFI_RUBAN_PWD      /** Password of the Access point/network to connect */
 #define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 // WIFI configuration for AP Mode
 #define WIFI_AP_LOCAL_IP                        192,168,1,1           /** IP Address of the board */
@@ -306,8 +311,8 @@
 #undef MODULE_CMD_SERIAL
 
 /** MODULE WIFI (Always ON) */
-#define WIFI_SSID                               "Led_RGB"             /** SSID of the Access point/network to connect */
-#define WIFI_PWD                                "tours2017"           /** Password of the Access point/network to connect */
+#define WIFI_SSID                               P_WIFI_LEDRGB_SSID    /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                P_WIFI_LEDRGB_PWD     /** Password of the Access point/network to connect */
 #define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 // WIFI configuration for AP Mode
 #define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
@@ -353,8 +358,8 @@
 #undef MODULE_CMD_SERIAL
 
 /** MODULE WIFI (Always ON) */
-#define WIFI_SSID                               "LampeIkea"             /** SSID of the Access point/network to connect */
-#define WIFI_PWD                                "Tours2020"           /** Password of the Access point/network to connect */
+#define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                P_WIFI_LAMPE_IKEA_PWD /** Password of the Access point/network to connect */
 #define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 // WIFI configuration for AP Mode
 #define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
@@ -399,8 +404,8 @@
 #define MODULE_CMD_SERIAL
 
 /** MODULE WIFI (Always ON) */
-#define WIFI_SSID                               "RubanLed"            /** SSID of the Access point/network to connect */
-#define WIFI_PWD                                "pascal2019"          /** Password of the Access point/network to connect */
+#define WIFI_SSID                               P_WIFI_RUBAN_SSID     /** SSID of the Access point/network to connect */
+#define WIFI_PWD                                P_WIFI_RUBAN_PWD      /** Password of the Access point/network to connect */
 #define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 // WIFI configuration for AP Mode
 #define WIFI_AP_LOCAL_IP                        192,168,1,1           /** IP Address of the board */
