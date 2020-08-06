@@ -110,8 +110,9 @@ static void telegram_handle_new_message(telegramMessage * message) {
 		TBot.sendMessage(linkedChat, dummyMessages[randomInt], "");
 	}
 }
-
-// FUNCTION
+// =====================
+// FUNCTIONS
+// =====================
 
 /**
  * @brief Inititalize the telegram module
@@ -137,12 +138,14 @@ void telegram_main(void)
 
 	if (tick >= nextCheckTick)  {
 		nextCheckTick = tick + TELEGRAM_CHECK_PERIOD_MS;
-		log_info("TBot Update %d", tick);
 
 		do {
+			// This take a loooot of time (2.8s)
 			msgNumber = TBot.getUpdates(TBot.last_message_received + 1);
+
+			// For each messages
 			for (int i = 0; i < msgNumber; i++) {
-				log_info("Handling TBot message %d: %s", i, TBot.messages[i].text.c_str());
+				log_info("TBot says: %s", TBot.messages[i].text.c_str());
 				telegram_handle_new_message(&TBot.messages[i]);
 			}
 		} while (msgNumber);
