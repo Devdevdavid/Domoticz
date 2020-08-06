@@ -70,8 +70,14 @@ void get_sensor_address(void)
   sensorCount = get_onewire_address(addressList, TEMP_MAX_SENSOR_SUPPORTED);
   if (sensorCount == 0) {
     log_warn("No sensor found");
+
+    // Set both sensors as faulty
+    _set(STATUS_APPLI, STATUS_APPLI_TEMP_1_FAULT | STATUS_APPLI_TEMP_2_FAULT);
   } else if (sensorCount == 1) {
     memcpy(sensorAddrList[0], addressList[0], sizeof(DeviceAddress));
+
+    // Set sensor 2 as faulty
+    _set(STATUS_APPLI, STATUS_APPLI_TEMP_2_FAULT);
   }
   else if (sensorCount == 2) {
     // The addresses smaller goes in first position

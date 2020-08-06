@@ -45,8 +45,9 @@ void script_execute(void)
 #endif
 
 #if defined(BOARD_TEMP_DOMOTICZ) || defined(BOARD_TEMP_TELEGRAM)
-    if (tick > nextTempCheckTick) {
+    if ((tick > nextTempCheckTick) && _isunset(STATUS_APPLI, STATUS_APPLI_TEMP_1_FAULT | STATUS_APPLI_TEMP_2_FAULT)) {
         nextTempCheckTick = tick + SCRIPT_TEMP_CHECK_PERIOD;
+
         float fridgeTemp = temp_get_value(DEVICE_INDEX_0);
         float frezzerTemp = temp_get_value(DEVICE_INDEX_1);
 
@@ -66,6 +67,12 @@ void script_execute(void)
         if (isInAlertOld != _isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT)) {
             isInAlertOld = _isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
             log_error("Script alert is now %s", isInAlertOld ? "active" : "inactive");
+
+#ifdef MODULE_TELEGRAM
+            // Tell telegram client that alert level changed
+            telegram_send_alert(isInAlertOld);
+#endif
+
 #if defined(BOARD_TEMP_DOMOTICZ_RELAY) || defined(BOARD_TEMP_TELEGRAM_RELAY)
             // Are we in impulsion mode (Jumper set) ? (OPT jumper JP1)
             if (is_input_low(INPUTS_OPT_RELAY_IMPULSION_MODE)) {

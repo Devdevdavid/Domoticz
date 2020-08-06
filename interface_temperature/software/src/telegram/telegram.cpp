@@ -11,6 +11,7 @@
 
 #include "global.hpp"
 #include "telegram.hpp"
+#include "temp/temp.hpp"
 
 #ifdef MODULE_TELEGRAM
 
@@ -31,14 +32,17 @@ static String dummyMessages[TELEGRAM_DUMMY_MSG_COUNT] = {
 	TG_MSG_DUMMY_3
 };
 
+/**
+ * @brief Send a brief message to explain all available commands
+ */
 static void telegram_msg_send_motd(void)
 {
-#if TELEGRAM_LANG == TELEGRAM_LANG_FR
+#if (G_LANG == G_LANG_FR)
 	String welcome = "Interface ES ESP32 alarme.\n";
 	welcome += "`/start  `: Mise en marche central d'alarme\n";
 	welcome += "`/stop   `: Arrêt central d'alarme\n";
 	welcome += "`/status `: Retourne le statut de la connexion\n";
-#elif TELEGRAM_LANG == TELEGRAM_LANG_EN
+#elif (G_LANG == G_LANG_EN)
 	String welcome = "Interface ES ESP32 alarm.\n";
 	welcome += "`/start  `: Starting alarm station\n";
 	welcome += "`/stop   `: Shutdown alarm station\n";
@@ -62,26 +66,40 @@ static void telegram_handle_new_message(telegramMessage * message) {
 	if (message->text == "/start") {
 		isAutoTempMsgEnabled = true;
 
-		TBot.sendMessageWithReplyKeyboard(linkedChat, TG_MSG_HAD_BEEN_STARTED, "", keyboardJson, true);
+		TBot.sendMessageWithReplyKeyboard(linkedChat, EMOJI_ROCKET " " TG_MSG_HAD_BEEN_STARTED, "", keyboardJson, true);
 	}
 	else if (message->text == "/stop") {
 		isAutoTempMsgEnabled = false;
-		TBot.sendMessage(linkedChat, TG_MSG_HAD_BEEN_STOPPED, "");
+		TBot.sendMessage(linkedChat, EMOJI_CROSS_MARK " " TG_MSG_HAD_BEEN_STOPPED, "");
 	}
 	else if (message->text == "/status") {
-		reply += FIRMWARE_VERSION"\n";
-		reply += TG_MSG_IP_ADDRESS + WiFi.localIP().toString() + "\n";
+		reply += FIRMWARE_VERSION "\n";
+		reply += EMOJI_NUMBER_SIGN " " TG_MSG_IP_ADDRESS + WiFi.localIP().toString() + "\n";
 
+#ifdef MODULE_RELAY
 		// Specialized error messages
 		if (_isset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT)) {
-			reply += TG_MSG_BAD_RELAY_FEEDBACK"\n";
+			reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_RELAY_FEEDBACK"\n";
 		}
+#endif
+#ifdef MODULE_TEMPERATURE
+		// Check sensors
+		for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i)
+		{
+			reply += "`Temp. " + String(i) + "] `";
+			if (_isset(STATUS_APPLI, STATUS_APPLI_TEMP_1_FAULT << i)) {
+				reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_TEMP_SENSOR"\n";
+			} else {
+				reply += EMOJI_GREEN_CHECK " " + String(temp_get_value(i)) + " 'C\n";
+			}
+		}
+#endif
 
-		TBot.sendMessage(linkedChat, reply, "");
+		TBot.sendMessage(linkedChat, reply, "Markdown");
 	}
 	else if (message->text[0] == '/') {
 		// Command not supported
-		TBot.sendMessage(linkedChat, TG_MSG_UNKNOWN_CMD, "");
+		TBot.sendMessage(linkedChat, EMOJI_QUESTION_MARK " " TG_MSG_UNKNOWN_CMD, "");
 		telegram_msg_send_motd();
 	} else {
 		// Init rand()
@@ -95,6 +113,9 @@ static void telegram_handle_new_message(telegramMessage * message) {
 
 // FUNCTION
 
+/**
+ * @brief Inititalize the telegram module
+ */
 void telegram_init(void)
 {
 	nextCheckTick = 0;
@@ -107,6 +128,9 @@ void telegram_init(void)
 	wiFiClientSecure.setInsecure();
 }
 
+/**
+ * @brief Main function of the telegram module
+ */
 void telegram_main(void)
 {
 	int msgNumber;
@@ -125,9 +149,16 @@ void telegram_main(void)
 	}
 }
 
+/**
+ * @brief Function called by the module Script to periodically send messages
+ * on the current temperature
+ *
+ * @param sensorID [0-1] The index of the sensor
+ * @param degreesValue The value of the sensor in degrees
+ */
 void telegram_send_msg_temperature(uint8_t sensorID, float degreesValue)
 {
-	// We didn't /start yet
+	// We have nowhere to send this message
 	if (linkedChat == "") {
 		return;
 	}
@@ -135,6 +166,25 @@ void telegram_send_msg_temperature(uint8_t sensorID, float degreesValue)
 	String msg = String(sensorID) + "] " + TG_MSG_TEMPERATURE_IS + String(degreesValue) + "'C";
 	TBot.sendMessage(linkedChat, msg, "");
 	log_info("Sending \"%s\" to %s", msg.c_str(), linkedChat.c_str());
+}
+
+/**
+ * @brief Tell the client that alert changed
+ *
+ * @param isInAlert boolean
+ */
+void telegram_send_alert(bool isInAlert)
+{
+	// We have nowhere to send this message
+	if (linkedChat == "") {
+		return;
+	}
+
+	if (isInAlert) {
+		TBot.sendMessage(linkedChat, EMOJI_RED_REVOLVING_LIGHT " " TG_MSG_ALERT_GOES_ON " " EMOJI_RED_REVOLVING_LIGHT, "");
+	} else {
+		TBot.sendMessage(linkedChat, EMOJI_GREEN_CHECK " " TG_MSG_ALERT_GOES_OFF, "");
+	}
 }
 
 #endif
