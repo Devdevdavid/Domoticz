@@ -4,8 +4,8 @@
 #include "global.hpp"
 
 #define BOOTLOADER_VERSION          "Bootloader v1.1"
-#define OTA_PORT                    8266
-#define OTA_PWD                     "ThisIsSecureNow"
+#define OTA_PORT                    P_OTA_PORT
+#define OTA_PWD                     P_OTA_PWD
 
 // ACESS POINT CONFIGURATION
 #define WIFI_AP_CHANNEL             13                  // Wifi Channel [1-13] (Default = 1)

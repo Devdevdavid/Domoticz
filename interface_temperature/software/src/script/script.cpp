@@ -34,7 +34,7 @@ void script_execute(void)
 #endif
 
 #if defined(MODULE_TEMPERATURE) && defined(MODULE_TELEGRAM)
-    if (tick > nextTelegramUpdateTick) {
+    if ((isAutoTempMsgEnabled == true) && (tick > nextTelegramUpdateTick)) {
         nextTelegramUpdateTick = tick + SCRIPT_TELEGRAM_UPT_PERIOD;
 
         // Send all sensor values

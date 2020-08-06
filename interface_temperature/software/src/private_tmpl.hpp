@@ -7,6 +7,9 @@
 #ifndef PRIVATE_HPP
 #define PRIVATE_HPP
 
+#define P_OTA_PORT 								0
+#define P_OTA_PWD  								""
+
 #define P_WIFI_PASCAL_SSID                      ""
 #define P_WIFI_PASCAL_PWD                       ""
 
