@@ -96,7 +96,7 @@ void get_sensor_address(void)
     }
 
     // Set both sensors as connected
-    _set(STATUS_TEMP, STATUS_TEMP_1_CONN | STATUS_TEMP_1_CONN);
+    _set(STATUS_TEMP, STATUS_TEMP_1_CONN | STATUS_TEMP_2_CONN);
   } else {
     log_error("Unsupported sensor number: %d", sensorCount);
   }
