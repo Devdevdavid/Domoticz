@@ -3,7 +3,7 @@
 
 #include "global.hpp"
 
-#define NB_STATUS               10
+#define NB_STATUS               11
 
 #ifdef STATUS_CPP
 uint8_t boardStatus[NB_STATUS];
@@ -19,16 +19,15 @@ extern uint8_t boardStatus[NB_STATUS];
 #define STATUS_ANIM                     boardStatus[4]  /** ID of the anim currently used */
 #define STATUS_SCRIPT                   boardStatus[5]  /** Script values */
 #define STATUS_NB_LED                   boardStatus[6]  /** Number of LED on the ledstrip */
-#define STATUS_COLOR_R                  boardStatus[7]  /** Default animation color (red) */
-#define STATUS_COLOR_G                  boardStatus[8]  /** Default animation color (green) */
-#define STATUS_COLOR_B                  boardStatus[9]  /** Default animation color (blue) */
+#define STATUS_TEMP                     boardStatus[7]  /** Flag for temp module */
+#define STATUS_COLOR_R                  boardStatus[8]  /** Default animation color (red) */
+#define STATUS_COLOR_G                  boardStatus[9]  /** Default animation color (green) */
+#define STATUS_COLOR_B                  boardStatus[10]  /** Default animation color (blue) */
 
 /* STATUS_APPLI */
 #define STATUS_APPLI_STATUS_LED         0x01
 #define STATUS_APPLI_ERROR              0x02
 #define STATUS_APPLI_AUTOLUM            0x04
-#define STATUS_APPLI_TEMP_1_FAULT       0x08
-#define STATUS_APPLI_TEMP_2_FAULT       0x10
 #define STATUS_APPLI_LED_IS_ON          0x20
 #define STATUS_APPLI_DEMO_MODE          0x40
 #define STATUS_APPLI_RELAY_FAULT        0x80
@@ -37,6 +36,12 @@ extern uint8_t boardStatus[NB_STATUS];
 #define STATUS_WIFI_IS_CO               0x01
 #define STATUS_WIFI_DEVICE_CO           0x02
 #define STATUS_WIFI_DOMOTICZ_FAULT      0x04
+
+/* STATUS_TEMP */
+#define STATUS_TEMP_1_CONN              0x01
+#define STATUS_TEMP_2_CONN              0x02
+#define STATUS_TEMP_1_FAULT             0x04
+#define STATUS_TEMP_2_FAULT             0x08
 
 /* STATUS_SCRIPT */
 #define STATUS_SCRIPT_IN_ALERT          0x01

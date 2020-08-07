@@ -71,13 +71,14 @@ void get_sensor_address(void)
   if (sensorCount == 0) {
     log_warn("No sensor found");
 
-    // Set both sensors as faulty
-    _set(STATUS_APPLI, STATUS_APPLI_TEMP_1_FAULT | STATUS_APPLI_TEMP_2_FAULT);
+    // Set both sensors as unused
+    _unset(STATUS_TEMP, STATUS_TEMP_1_CONN | STATUS_TEMP_1_CONN);
   } else if (sensorCount == 1) {
     memcpy(sensorAddrList[0], addressList[0], sizeof(DeviceAddress));
 
-    // Set sensor 2 as faulty
-    _set(STATUS_APPLI, STATUS_APPLI_TEMP_2_FAULT);
+    // Set sensor 2 as unused
+    _set(STATUS_TEMP, STATUS_TEMP_1_CONN);
+    _unset(STATUS_TEMP, STATUS_TEMP_2_CONN);
   }
   else if (sensorCount == 2) {
     // The addresses smaller goes in first position
@@ -93,6 +94,9 @@ void get_sensor_address(void)
       }
       break; // If we copied, leave loop
     }
+
+    // Set both sensors as connected
+    _set(STATUS_TEMP, STATUS_TEMP_1_CONN | STATUS_TEMP_1_CONN);
   } else {
     log_error("Unsupported sensor number: %d", sensorCount);
   }
@@ -106,15 +110,15 @@ void manage_sensor(uint8_t deviceIndex, DeviceAddress deviceAddress){
 
   if (degreesValue == DEVICE_DISCONNECTED_C) {
     switch(deviceIndex) {
-      case 0: _set(STATUS_APPLI, STATUS_APPLI_TEMP_1_FAULT); break;
-      case 1: _set(STATUS_APPLI, STATUS_APPLI_TEMP_2_FAULT); break;
+      case 0: _set(STATUS_TEMP, STATUS_TEMP_1_FAULT); break;
+      case 1: _set(STATUS_TEMP, STATUS_TEMP_2_FAULT); break;
       default: return;
     }
     log_error("Sensor %d: error getting temperature", deviceIndex);
     return;
   }
 
-  _unset(STATUS_APPLI, (deviceIndex == 0) ? STATUS_APPLI_TEMP_1_FAULT : STATUS_APPLI_TEMP_2_FAULT);
+  _unset(STATUS_TEMP, (deviceIndex == 0) ? STATUS_TEMP_1_FAULT : STATUS_TEMP_2_FAULT);
 
   // Save data
   sensorValue[deviceIndex] = degreesValue;

@@ -87,10 +87,15 @@ static void telegram_handle_new_message(telegramMessage * message) {
 		for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i)
 		{
 			reply += "`Temp. " + String(i) + "] `";
-			if (_isset(STATUS_APPLI, STATUS_APPLI_TEMP_1_FAULT << i)) {
-				reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_TEMP_SENSOR"\n";
+			if (_isunset(STATUS_TEMP, STATUS_TEMP_1_CONN << i)) {
+				reply += TG_MSG_UNUSED_TEMP_SENSOR"\n";
 			} else {
-				reply += EMOJI_GREEN_CHECK " " + String(temp_get_value(i)) + " 'C\n";
+				// Test the state of the sensor
+				if (_isset(STATUS_TEMP, STATUS_TEMP_1_FAULT << i)) {
+					reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_TEMP_SENSOR"\n";
+				} else {
+					reply += EMOJI_GREEN_CHECK " " + String(temp_get_value(i)) + " 'C\n";
+				}
 			}
 		}
 #endif

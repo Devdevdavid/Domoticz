@@ -73,7 +73,7 @@ void status_led_main(void)
   if (!_isset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
     status_led[1].timeOn = 300;
     status_led[1].timeOff = 500;
-  } else if (_isset(STATUS_APPLI, STATUS_APPLI_TEMP_FAULT)) {
+  } else if (_isset(STATUS_TEMP, STATUS_TEMP_1_FAULT | STATUS_TEMP_2_FAULT)) {
     status_led[1].timeOn = 200;
     status_led[1].timeOff = 1800;
   } else if (_isset(STATUS_APPLI, STATUS_APPLI_ERROR)) {
@@ -106,7 +106,7 @@ Adafruit_NeoPixel neoPixel = Adafruit_NeoPixel(STATUS_LED_NB_LED, STATUS_LED_NEO
 
 /**
  * @brief Define the color of the neopixel status LED
- * @param color 
+ * @param color
  * '-': Turn off LED
  * 'r': Show red
  * 'g': Show green
@@ -137,7 +137,7 @@ void status_led_turnoff(void)
   status_led_set_color('-');
 }
 
-void status_led_init(void) 
+void status_led_init(void)
 {
   neoPixel.begin();
   neoPixel.setBrightness(STATUS_LED_NEOPIXEL_BRIGHTNESS);
@@ -158,12 +158,13 @@ void status_led_main(void)
     status_led[0].timeOn = 200;
     status_led[0].timeOff = 200;
     status_led[0].color = 'r';
-  } else if (_isset(STATUS_APPLI, STATUS_APPLI_TEMP_1_FAULT | STATUS_APPLI_TEMP_2_FAULT | STATUS_APPLI_RELAY_FAULT)) {
+  } else if (_isset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT)
+          || _isset(STATUS_TEMP, STATUS_TEMP_1_FAULT | STATUS_TEMP_2_FAULT)) {
     // Hardware Fault
     status_led[0].timeOn = 100;
     status_led[0].timeOff = 900;
     status_led[0].color = 'r';
-  } else if (_isset(STATUS_WIFI, STATUS_WIFI_DOMOTICZ_FAULT) 
+  } else if (_isset(STATUS_WIFI, STATUS_WIFI_DOMOTICZ_FAULT)
           || _isunset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
     // Wireless fault
     status_led[0].timeOn = 100;
