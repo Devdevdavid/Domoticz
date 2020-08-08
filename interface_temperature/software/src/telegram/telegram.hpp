@@ -28,8 +28,9 @@
 	#define TG_MSG_UNUSED_TEMP_SENSOR				"Capteur non utilisé"
 	#define TG_MSG_HAD_BEEN_STARTED					"System is now started"
 	#define TG_MSG_HAD_BEEN_STOPPED					"System is now stopped"
-	#define TG_MSG_ALERT_GOES_ON					"ALERT IS NOW ON "
+	#define TG_MSG_ALERT_GOES_ON					"ALERT IS NOW ON"
 	#define TG_MSG_ALERT_GOES_OFF					"Alert is now off"
+	#define TG_MSG_ALERT_IS_ON						"Alert is ON"
 
 	#define TG_MSG_DUMMY_1							"Sure !"
 	#define TG_MSG_DUMMY_2							"What ever you wish master !"
@@ -49,6 +50,7 @@
 	#define TG_MSG_HAD_BEEN_STOPPED					"Le système est désormais arrété"
 	#define TG_MSG_ALERT_GOES_ON					"L'ALERTE EST DÉSORMAIS ACTIVE"
 	#define TG_MSG_ALERT_GOES_OFF					"L'alerte est désormais inactive"
+	#define TG_MSG_ALERT_IS_ON						"L'alerte est active"
 
 	#define TG_MSG_DUMMY_1							"Bien sur !"
 	#define TG_MSG_DUMMY_2							"Ce que vous voudrez maître !"

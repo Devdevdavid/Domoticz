@@ -45,7 +45,7 @@ void script_execute(void)
 #endif
 
 #if defined(BOARD_TEMP_DOMOTICZ) || defined(BOARD_TEMP_TELEGRAM)
-    if ((tick > nextTempCheckTick) && _isunset(STATUS_TEMP, STATUS_TEMP_1_FAULT | STATUS_TEMP_1_FAULT)) {
+    if ((tick > nextTempCheckTick) && _isunset(STATUS_TEMP, STATUS_TEMP_1_FAULT | STATUS_TEMP_2_FAULT)) {
         nextTempCheckTick = tick + SCRIPT_TEMP_CHECK_PERIOD;
 
         float sensor0Temp = temp_get_value(DEVICE_INDEX_0);

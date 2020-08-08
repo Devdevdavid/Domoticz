@@ -76,10 +76,15 @@ static void telegram_handle_new_message(telegramMessage * message) {
 		reply += FIRMWARE_VERSION "\n";
 		reply += EMOJI_NUMBER_SIGN " " TG_MSG_IP_ADDRESS + WiFi.localIP().toString() + "\n";
 
+		// Is the script in alert ?
+		if (_isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT)) {
+			reply += EMOJI_RED_REVOLVING_LIGHT " " TG_MSG_ALERT_IS_ON "\n";
+		}
+
 #ifdef MODULE_RELAY
 		// Specialized error messages
 		if (_isset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT)) {
-			reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_RELAY_FEEDBACK"\n";
+			reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_RELAY_FEEDBACK "\n";
 		}
 #endif
 #ifdef MODULE_TEMPERATURE
@@ -88,11 +93,11 @@ static void telegram_handle_new_message(telegramMessage * message) {
 		{
 			reply += "`Temp. " + String(i) + "] `";
 			if (_isunset(STATUS_TEMP, STATUS_TEMP_1_CONN << i)) {
-				reply += TG_MSG_UNUSED_TEMP_SENSOR"\n";
+				reply += TG_MSG_UNUSED_TEMP_SENSOR "\n";
 			} else {
 				// Test the state of the sensor
 				if (_isset(STATUS_TEMP, STATUS_TEMP_1_FAULT << i)) {
-					reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_TEMP_SENSOR"\n";
+					reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_TEMP_SENSOR "\n";
 				} else {
 					reply += EMOJI_GREEN_CHECK " " + String(temp_get_value(i)) + " 'C\n";
 				}
