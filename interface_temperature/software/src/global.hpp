@@ -103,8 +103,8 @@
     #define SCRIPT_DOMOTICZ_UPT_PERIOD              10*60*1000
     #define SCRIPT_TEMP_CHECK_PERIOD                10*1000
     #define SCRIPT_TEMP_ALERT_HYSTERESIS            1
-    #define SCRIPT_TEMP_ALERT_SENSOR_0                27
-    #define SCRIPT_TEMP_ALERT_SENSOR_1               30
+    #define SCRIPT_TEMP_ALERT_SENSOR_0              27
+    #define SCRIPT_TEMP_ALERT_SENSOR_1              30
     #define SCRIPT_RELAY_IMPULSION_DURATION         3*1000                /** Duration of the impulsion when the alert is triggered */
     #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    2*1000                /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
 
@@ -171,7 +171,7 @@
     #define STATUS_LED_TYPE                         STATUS_LED_TYPE_NEOPIXEL  /** LED Type, see constant below */
     #define STATUS_LED_NEOPIXEL_PIN                 14                    /** If Neopixel, indicates the NeoPixel Pin */
     #define STATUS_LED_NB_LED                       1                     /** Number of led in the neopixel chain */
-    #define STATUS_LED_NEOPIXEL_BRIGHTNESS          100                   /** Brightness of the neopixel LED [0-255] */
+    #define STATUS_LED_NEOPIXEL_BRIGHTNESS          70                    /** Brightness of the neopixel LED [0-255] */
     #define STATUS_LED_NEOPIXEL_RED                 255                   /** Brightness of red led */
     #define STATUS_LED_NEOPIXEL_GREEN               255                   /** Brightness of green led */
     #define STATUS_LED_NEOPIXEL_BLUE                255                   /** Brightness of blue led */
@@ -204,8 +204,8 @@
     #define SCRIPT_TELEGRAM_UPT_PERIOD              10*60*1000			  /** Period of time between two telegram message when auto send is enabled */
     #define SCRIPT_TEMP_CHECK_PERIOD                10*1000				  /** Period between two sensor mesures */
     #define SCRIPT_TEMP_ALERT_HYSTERESIS            1.0					  /** Hysteresis in degrees (In both ways -1/+1°C) */
-    #define SCRIPT_TEMP_ALERT_SENSOR_0              27.0			      /** High level in degrees */
-    #define SCRIPT_TEMP_ALERT_SENSOR_1              30.0			      /** Low level in degrees */
+    #define SCRIPT_TEMP_ALERT_SENSOR_0              28.0			      /** High level in degrees */
+    #define SCRIPT_TEMP_ALERT_SENSOR_1              35.0			      /** Low level in degrees */
     #define SCRIPT_RELAY_IMPULSION_DURATION         3*1000                /** Duration of the impulsion when the alert is triggered */
     #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    0	                  /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
 
