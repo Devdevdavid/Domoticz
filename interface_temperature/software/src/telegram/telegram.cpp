@@ -52,13 +52,13 @@ static String telegram_append_motd(String msg)
 	msg += FIRMWARE_VERSION "\n\n";
 
 #if (G_LANG == G_LANG_FR)
-	msg += "/start : Mise en marche central d'alarme\n";
-	msg += "/stop : Arrêt central d'alarme\n";
-	msg += "/status : Retourne le statut de la connexion\n";
+	msg += "/start : Démarre l'annonce de la température sur Telegram\n";
+	msg += "/stop : Arrête l'annonce de la température sur Telegram\n";
+	msg += "/status : Retourne le statut du système\n";
 #elif (G_LANG == G_LANG_EN)
-	msg += "/start: Starting alarm station\n";
-	msg += "/stop: Shutdown alarm station\n";
-	msg += "/status: Return connection state\n";
+	msg += "/start:  Starting temperature announcement on telegram\n";
+	msg += "/stop: Stopping temperature announcement on telegram\n";
+	msg += "/status: Return the status of the system\n";
 #endif
 
 	return msg;
