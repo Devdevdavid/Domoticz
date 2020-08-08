@@ -26,15 +26,15 @@
 	#define TG_MSG_BAD_RELAY_FEEDBACK				"Le relais semble défectueux !"
 	#define TG_MSG_BAD_TEMP_SENSOR					"Le capteur est défectueux"
 	#define TG_MSG_UNUSED_TEMP_SENSOR				"Capteur non utilisé"
-	#define TG_MSG_HAD_BEEN_STARTED					"System is now started"
-	#define TG_MSG_HAD_BEEN_STOPPED					"System is now stopped"
-	#define TG_MSG_ALERT_GOES_ON					"ALERT IS NOW ON"
-	#define TG_MSG_ALERT_GOES_OFF					"Alert is now off"
-	#define TG_MSG_ALERT_IS_ON						"Alert is ON"
+	#define TG_MSG_HAD_BEEN_STARTED					"Le système est désormais en marche"
+	#define TG_MSG_HAD_BEEN_STOPPED					"Le système est désormais arrété"
+	#define TG_MSG_ALERT_GOES_ON					"L'ALERTE EST DÉSORMAIS ACTIVE"
+	#define TG_MSG_ALERT_GOES_OFF					"L'alerte est désormais inactive"
+	#define TG_MSG_ALERT_IS_ON						"L'alerte est active"
 
-	#define TG_MSG_DUMMY_1							"Sure !"
-	#define TG_MSG_DUMMY_2							"What ever you wish master !"
-	#define TG_MSG_DUMMY_3							"No ? Really ?"
+	#define TG_MSG_DUMMY_1							"Bien sur !"
+	#define TG_MSG_DUMMY_2							"Ce que vous voudrez maître !"
+	#define TG_MSG_DUMMY_3							"Non ? Vraiment ?"
 
 #elif (G_LANG == G_LANG_EN)
 
@@ -46,15 +46,15 @@
 	#define TG_MSG_BAD_RELAY_FEEDBACK				"Relay seems faulty !"
 	#define TG_MSG_BAD_TEMP_SENSOR					"Sensor is faulty"
 	#define TG_MSG_UNUSED_TEMP_SENSOR				"Sensor is unused"
-	#define TG_MSG_HAD_BEEN_STARTED					"Le système est désormais en marche"
-	#define TG_MSG_HAD_BEEN_STOPPED					"Le système est désormais arrété"
-	#define TG_MSG_ALERT_GOES_ON					"L'ALERTE EST DÉSORMAIS ACTIVE"
-	#define TG_MSG_ALERT_GOES_OFF					"L'alerte est désormais inactive"
-	#define TG_MSG_ALERT_IS_ON						"L'alerte est active"
+	#define TG_MSG_HAD_BEEN_STARTED					"System is now started"
+	#define TG_MSG_HAD_BEEN_STOPPED					"System is now stopped"
+	#define TG_MSG_ALERT_GOES_ON					"ALERT IS NOW ON"
+	#define TG_MSG_ALERT_GOES_OFF					"Alert is now off"
+	#define TG_MSG_ALERT_IS_ON						"Alert is ON"
 
-	#define TG_MSG_DUMMY_1							"Bien sur !"
-	#define TG_MSG_DUMMY_2							"Ce que vous voudrez maître !"
-	#define TG_MSG_DUMMY_3							"Non ? Vraiment ?"
+	#define TG_MSG_DUMMY_1							"Sure !"
+	#define TG_MSG_DUMMY_2							"What ever you wish master !"
+	#define TG_MSG_DUMMY_3							"No ? Really ?"
 
 #endif
 

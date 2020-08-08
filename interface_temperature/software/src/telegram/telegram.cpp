@@ -47,20 +47,21 @@ static void telegram_send(String msg)
 /**
  * @brief Send a brief message to explain all available commands
  */
-static void telegram_msg_send_motd(void)
+static String telegram_append_motd(String msg)
 {
+	msg += FIRMWARE_VERSION "\n\n";
+
 #if (G_LANG == G_LANG_FR)
-	String welcome = "Interface ES ESP32 alarme.\n";
-	welcome += "`/start  `: Mise en marche central d'alarme\n";
-	welcome += "`/stop   `: Arrêt central d'alarme\n";
-	welcome += "`/status `: Retourne le statut de la connexion\n";
+	msg += "/start : Mise en marche central d'alarme\n";
+	msg += "/stop : Arrêt central d'alarme\n";
+	msg += "/status : Retourne le statut de la connexion\n";
 #elif (G_LANG == G_LANG_EN)
-	String welcome = "Interface ES ESP32 alarm.\n";
-	welcome += "`/start  `: Starting alarm station\n";
-	welcome += "`/stop   `: Shutdown alarm station\n";
-	welcome += "`/status `: Return connection state\n";
+	msg += "/start: Starting alarm station\n";
+	msg += "/stop: Shutdown alarm station\n";
+	msg += "/status: Return connection state\n";
 #endif
-	telegram_send(welcome);
+
+	return msg;
 }
 
 /**
@@ -77,7 +78,9 @@ static void telegram_handle_new_message(telegramMessage * message) {
 	if (message->text == "/start") {
 		isAutoTempMsgEnabled = true;
 
-		telegram_send(EMOJI_ROCKET " " TG_MSG_HAD_BEEN_STARTED);
+		reply = EMOJI_ROCKET " " TG_MSG_HAD_BEEN_STARTED "\n";
+		reply = telegram_append_motd(reply);
+		telegram_send(reply);
 	}
 	else if (message->text == "/stop") {
 		isAutoTempMsgEnabled = false;
@@ -121,8 +124,9 @@ static void telegram_handle_new_message(telegramMessage * message) {
 	}
 	else if (message->text[0] == '/') {
 		// Command not supported
-		telegram_send(EMOJI_QUESTION_MARK " " TG_MSG_UNKNOWN_CMD);
-		telegram_msg_send_motd();
+		reply = EMOJI_QUESTION_MARK " " TG_MSG_UNKNOWN_CMD "\n\n";
+		reply = telegram_append_motd(reply);
+		telegram_send(reply);
 	} else {
 		// Init rand()
 		srand(tick);
