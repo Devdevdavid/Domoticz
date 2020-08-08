@@ -14,6 +14,16 @@ uint32_t nextTelegramUpdateTick = 0;
 uint32_t nextSecondRelayImpulsTick = UINT32_MAX; // Disabled at startup
 bool isInAlertOld = false;
 
+// CONSTANTS
+const float sensorThresholdHigh[TEMP_MAX_SENSOR_SUPPORTED] = {
+    SCRIPT_TEMP_ALERT_SENSOR_0 + SCRIPT_TEMP_ALERT_HYSTERESIS,
+    SCRIPT_TEMP_ALERT_SENSOR_1 + SCRIPT_TEMP_ALERT_HYSTERESIS
+};
+const float sensorThresholdLow[TEMP_MAX_SENSOR_SUPPORTED] = {
+    SCRIPT_TEMP_ALERT_SENSOR_0 - SCRIPT_TEMP_ALERT_HYSTERESIS,
+    SCRIPT_TEMP_ALERT_SENSOR_1 - SCRIPT_TEMP_ALERT_HYSTERESIS
+};
+
 // Sub script function prototypes
 #ifdef MODULE_RELAY
 void script_send_relay_impulse(uint32_t impulseDurationMs);
@@ -45,22 +55,34 @@ void script_execute(void)
 #endif
 
 #if defined(BOARD_TEMP_DOMOTICZ) || defined(BOARD_TEMP_TELEGRAM)
-    if ((tick > nextTempCheckTick) && _isunset(STATUS_TEMP, STATUS_TEMP_1_FAULT | STATUS_TEMP_2_FAULT)) {
+    if (tick > nextTempCheckTick) {
         nextTempCheckTick = tick + SCRIPT_TEMP_CHECK_PERIOD;
 
-        float sensor0Temp = temp_get_value(DEVICE_INDEX_0);
-        float sensor1Temp = temp_get_value(DEVICE_INDEX_1);
+        bool atLeastOneIsAbove = false;
+        bool allAreBelow = true;
 
-        if (_isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT)) {
-            if ((sensor0Temp < (SCRIPT_TEMP_ALERT_SENSOR_0 - SCRIPT_TEMP_ALERT_HYSTERESIS))
-                && (sensor1Temp < (SCRIPT_TEMP_ALERT_SENSOR_1 - SCRIPT_TEMP_ALERT_HYSTERESIS))) {
-                _unset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
+        // For each sensor
+        for (int i = 0; i < temp_get_nb_sensor(); ++i) {
+            float sensorTemp = temp_get_value(i);
+
+            // Ignore faulty sensors
+            if (_isset(STATUS_TEMP, STATUS_TEMP_1_FAULT << i)) {
+                continue;
             }
-        } else {
-            if ((sensor0Temp > (SCRIPT_TEMP_ALERT_SENSOR_0 + SCRIPT_TEMP_ALERT_HYSTERESIS))
-                || (sensor1Temp > (SCRIPT_TEMP_ALERT_SENSOR_1 + SCRIPT_TEMP_ALERT_HYSTERESIS))) {
-                _set(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
+
+            if (sensorTemp >= sensorThresholdHigh[i]) {
+                atLeastOneIsAbove = true;
             }
+            if (sensorTemp >= sensorThresholdLow[i]) {
+                allAreBelow = false;
+            }
+        }
+
+        // Define the new state of the alert
+        if (atLeastOneIsAbove) {
+            _set(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
+        } else if (allAreBelow) {
+            _unset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
         }
 
         // Detect edges

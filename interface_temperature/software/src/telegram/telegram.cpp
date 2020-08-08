@@ -31,6 +31,18 @@ static String dummyMessages[TELEGRAM_DUMMY_MSG_COUNT] = {
 	TG_MSG_DUMMY_2,
 	TG_MSG_DUMMY_3
 };
+static const String keyboardJson = "[[\"/start\", \"/stop\"], [\"/status\"]]";
+
+/**
+ * @brief Send a reply to the linked chat
+ * with a special inline keyboard
+ *
+ * @param msg The string to send
+ */
+static void telegram_send(String msg)
+{
+	TBot.sendMessageWithReplyKeyboard(linkedChat, msg, "Markdown", keyboardJson);
+}
 
 /**
  * @brief Send a brief message to explain all available commands
@@ -48,7 +60,7 @@ static void telegram_msg_send_motd(void)
 	welcome += "`/stop   `: Shutdown alarm station\n";
 	welcome += "`/status `: Return connection state\n";
 #endif
-	TBot.sendMessage(linkedChat, welcome, "Markdown"); // mise en forme du texte
+	telegram_send(welcome);
 }
 
 /**
@@ -58,7 +70,6 @@ static void telegram_msg_send_motd(void)
  */
 static void telegram_handle_new_message(telegramMessage * message) {
 	String reply = "";
-	String keyboardJson = "[[\"/start\", \"/stop\"], [\"/status\"]]";
 
 	// Save the chat to wich the reply must be send
 	linkedChat = String(message->chat_id);
@@ -66,11 +77,11 @@ static void telegram_handle_new_message(telegramMessage * message) {
 	if (message->text == "/start") {
 		isAutoTempMsgEnabled = true;
 
-		TBot.sendMessageWithReplyKeyboard(linkedChat, EMOJI_ROCKET " " TG_MSG_HAD_BEEN_STARTED, "", keyboardJson, true);
+		telegram_send(EMOJI_ROCKET " " TG_MSG_HAD_BEEN_STARTED);
 	}
 	else if (message->text == "/stop") {
 		isAutoTempMsgEnabled = false;
-		TBot.sendMessage(linkedChat, EMOJI_CROSS_MARK " " TG_MSG_HAD_BEEN_STOPPED, "");
+		telegram_send(EMOJI_CROSS_MARK " " TG_MSG_HAD_BEEN_STOPPED);
 	}
 	else if (message->text == "/status") {
 		reply += FIRMWARE_VERSION "\n";
@@ -89,10 +100,11 @@ static void telegram_handle_new_message(telegramMessage * message) {
 #endif
 #ifdef MODULE_TEMPERATURE
 		// Check sensors
-		for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i)
-		{
+		for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i) {
 			reply += "`Temp. " + String(i) + "] `";
-			if (_isunset(STATUS_TEMP, STATUS_TEMP_1_CONN << i)) {
+
+			// Is the sensor used ?
+			if (i >= temp_get_nb_sensor()) {
 				reply += TG_MSG_UNUSED_TEMP_SENSOR "\n";
 			} else {
 				// Test the state of the sensor
@@ -105,11 +117,11 @@ static void telegram_handle_new_message(telegramMessage * message) {
 		}
 #endif
 
-		TBot.sendMessage(linkedChat, reply, "Markdown");
+		telegram_send(reply);
 	}
 	else if (message->text[0] == '/') {
 		// Command not supported
-		TBot.sendMessage(linkedChat, EMOJI_QUESTION_MARK " " TG_MSG_UNKNOWN_CMD, "");
+		telegram_send(EMOJI_QUESTION_MARK " " TG_MSG_UNKNOWN_CMD);
 		telegram_msg_send_motd();
 	} else {
 		// Init rand()
@@ -117,7 +129,7 @@ static void telegram_handle_new_message(telegramMessage * message) {
 
 		// Send a dummy message when message is not a command
 		uint8_t randomInt = rand() % TELEGRAM_DUMMY_MSG_COUNT;
-		TBot.sendMessage(linkedChat, dummyMessages[randomInt], "");
+		telegram_send(dummyMessages[randomInt]);
 	}
 }
 // =====================
@@ -177,8 +189,7 @@ void telegram_send_msg_temperature(uint8_t sensorID, float degreesValue)
 	}
 
 	String msg = String(sensorID) + "] " + TG_MSG_TEMPERATURE_IS + String(degreesValue) + "'C";
-	TBot.sendMessage(linkedChat, msg, "");
-	log_info("Sending \"%s\" to %s", msg.c_str(), linkedChat.c_str());
+	telegram_send(msg);
 }
 
 /**
@@ -194,9 +205,9 @@ void telegram_send_alert(bool isInAlert)
 	}
 
 	if (isInAlert) {
-		TBot.sendMessage(linkedChat, EMOJI_RED_REVOLVING_LIGHT " " TG_MSG_ALERT_GOES_ON " " EMOJI_RED_REVOLVING_LIGHT, "");
+		telegram_send(EMOJI_RED_REVOLVING_LIGHT " " TG_MSG_ALERT_GOES_ON " " EMOJI_RED_REVOLVING_LIGHT);
 	} else {
-		TBot.sendMessage(linkedChat, EMOJI_GREEN_CHECK " " TG_MSG_ALERT_GOES_OFF, "");
+		telegram_send(EMOJI_GREEN_CHECK " " TG_MSG_ALERT_GOES_OFF);
 	}
 }
 

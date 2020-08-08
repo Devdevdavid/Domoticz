@@ -70,15 +70,8 @@ void get_sensor_address(void)
   sensorCount = get_onewire_address(addressList, TEMP_MAX_SENSOR_SUPPORTED);
   if (sensorCount == 0) {
     log_warn("No sensor found");
-
-    // Set both sensors as unused
-    _unset(STATUS_TEMP, STATUS_TEMP_1_CONN | STATUS_TEMP_1_CONN);
   } else if (sensorCount == 1) {
     memcpy(sensorAddrList[0], addressList[0], sizeof(DeviceAddress));
-
-    // Set sensor 2 as unused
-    _set(STATUS_TEMP, STATUS_TEMP_1_CONN);
-    _unset(STATUS_TEMP, STATUS_TEMP_2_CONN);
   }
   else if (sensorCount == 2) {
     // The addresses smaller goes in first position
@@ -94,9 +87,6 @@ void get_sensor_address(void)
       }
       break; // If we copied, leave loop
     }
-
-    // Set both sensors as connected
-    _set(STATUS_TEMP, STATUS_TEMP_1_CONN | STATUS_TEMP_2_CONN);
   } else {
     log_error("Unsupported sensor number: %d", sensorCount);
   }
@@ -136,9 +126,9 @@ float temp_get_value(uint8_t deviceIndex)
   return sensorValue[deviceIndex];
 }
 
-byte temp_get_nb_sensor(void)
+uint8_t temp_get_nb_sensor(void)
 {
-  return (byte) sensorCount;
+  return (uint8_t) sensorCount;
 }
 
 void temp_init(void)

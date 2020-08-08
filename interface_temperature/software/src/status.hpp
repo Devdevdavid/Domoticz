@@ -38,10 +38,8 @@ extern uint8_t boardStatus[NB_STATUS];
 #define STATUS_WIFI_DOMOTICZ_FAULT      0x04
 
 /* STATUS_TEMP */
-#define STATUS_TEMP_1_CONN              0x01
-#define STATUS_TEMP_2_CONN              0x02
-#define STATUS_TEMP_1_FAULT             0x04
-#define STATUS_TEMP_2_FAULT             0x08
+#define STATUS_TEMP_1_FAULT             0x01
+#define STATUS_TEMP_2_FAULT             0x02
 
 /* STATUS_SCRIPT */
 #define STATUS_SCRIPT_IN_ALERT          0x01

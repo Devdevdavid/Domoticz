@@ -203,9 +203,9 @@
     /** SCRIPT */
     #define SCRIPT_TELEGRAM_UPT_PERIOD              10*60*1000			  /** Period of time between two telegram message when auto send is enabled */
     #define SCRIPT_TEMP_CHECK_PERIOD                10*1000				  /** Period between two sensor mesures */
-    #define SCRIPT_TEMP_ALERT_HYSTERESIS            1					  /** Hysteresis in degrees (In both ways -1/+1°C) */
-    #define SCRIPT_TEMP_ALERT_SENSOR_0                27					  /** High level in degrees */
-    #define SCRIPT_TEMP_ALERT_SENSOR_1               30					  /** Low level in degrees */
+    #define SCRIPT_TEMP_ALERT_HYSTERESIS            1.0					  /** Hysteresis in degrees (In both ways -1/+1°C) */
+    #define SCRIPT_TEMP_ALERT_SENSOR_0              27.0			      /** High level in degrees */
+    #define SCRIPT_TEMP_ALERT_SENSOR_1              30.0			      /** Low level in degrees */
     #define SCRIPT_RELAY_IMPULSION_DURATION         3*1000                /** Duration of the impulsion when the alert is triggered */
     #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    0	                  /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
 

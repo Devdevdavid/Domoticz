@@ -7,7 +7,7 @@
 #define DEVICE_INDEX_1          1
 
 float temp_get_value(uint8_t deviceIndex);
-byte temp_get_nb_sensor(void);
+uint8_t temp_get_nb_sensor(void);
 void temp_init(void);
 void temp_main(void);
 
