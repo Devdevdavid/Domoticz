@@ -153,11 +153,6 @@ void status_led_main(void)
     status_led[0].timeOn = 0;
     status_led[0].timeOff = 500;
     status_led[0].color = '-';
-  } else if (_isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT)) {
-    // Software Alert
-    status_led[0].timeOn = 200;
-    status_led[0].timeOff = 200;
-    status_led[0].color = 'r';
   } else if (_isset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT)
           || _isset(STATUS_TEMP, STATUS_TEMP_1_FAULT | STATUS_TEMP_2_FAULT)) {
     // Hardware Fault
