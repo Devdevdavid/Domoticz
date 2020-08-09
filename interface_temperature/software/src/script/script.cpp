@@ -10,7 +10,7 @@
 extern uint32_t tick;
 uint32_t nextTempCheckTick = 0;
 uint32_t nextDomoticzUpdateTick = 0;
-uint32_t nextTelegramUpdateTick = 0;
+uint32_t nextTelegramUpdateTick = SCRIPT_TELEGRAM_UPT_PERIOD; // Skip first call
 uint32_t nextTelegramConnOkNotify = SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD; // Skip first call
 uint32_t nextSecondRelayImpulsTick = UINT32_MAX; // Disabled at startup
 bool isInAlertOld = false;

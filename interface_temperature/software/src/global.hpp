@@ -208,7 +208,7 @@
 
     #define METHOD_THRESHOLD                        0                     /** Alert is set active when sensor value is above a specified threshold */
     #define METHOD_DIFFERENTIAL                     1                     /** Alert is set active when the mathematical value difference is above a specified threshold */
-    #define SCRIPT_TEMP_ALERT_METHOD                METHOD_DIFFERENTIAL   /** Select the method of comparaison to use to trigger temp alert */
+    #define SCRIPT_TEMP_ALERT_METHOD                METHOD_THRESHOLD      /** Select the method of comparaison to use to trigger temp alert */
 
     // For METHOD_THRESHOLD
     #define SCRIPT_TEMP_ALERT_SENSOR_0              28.0			      /** High level in degrees */

@@ -79,6 +79,9 @@ static String telegram_append_motd(String msg)
  * @param message The message object given by Telegram API
  */
 static void telegram_handle_new_message(telegramMessage * message) {
+	// Reset reply
+	reply = "";
+
 	// Save the chat to wich the reply must be send
 	linkedChat = String(message->chat_id);
 
