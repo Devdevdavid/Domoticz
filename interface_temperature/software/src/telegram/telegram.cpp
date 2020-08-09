@@ -31,7 +31,9 @@ static String dummyMessages[TELEGRAM_DUMMY_MSG_COUNT] = {
 	TG_MSG_DUMMY_2,
 	TG_MSG_DUMMY_3
 };
-static const String keyboardJson = "[[\"/start\", \"/stop\"], [\"/status\"]]";
+static char dummyBytes[3 * 8 + 1];
+static String reply = "";
+static const String keyboardJson = "[[\"/start\", \"/stop\"], [\"/status\", \"/sensors\"]]";
 
 /**
  * @brief Send a reply to the linked chat
@@ -59,10 +61,12 @@ static String telegram_append_motd(String msg)
 #if (G_LANG == G_LANG_FR)
 	msg += "/start : Démarre l'annonce de la température sur Telegram\n";
 	msg += "/stop : Arrête l'annonce de la température sur Telegram\n";
+	msg += "/sensors : Affiche les adresses des capteurs de température\n";
 	msg += "/status : Retourne le statut du système\n";
 #elif (G_LANG == G_LANG_EN)
 	msg += "/start:  Starting temperature announcement on telegram\n";
 	msg += "/stop: Stopping temperature announcement on telegram\n";
+	msg += "/sensors: Show temperature sensor addresses\n";
 	msg += "/status: Return the status of the system\n";
 #endif
 
@@ -75,8 +79,6 @@ static String telegram_append_motd(String msg)
  * @param message The message object given by Telegram API
  */
 static void telegram_handle_new_message(telegramMessage * message) {
-	String reply = "";
-
 	// Save the chat to wich the reply must be send
 	linkedChat = String(message->chat_id);
 
@@ -127,7 +129,21 @@ static void telegram_handle_new_message(telegramMessage * message) {
 
 		telegram_send(reply);
 	}
-	else if (message->text[0] == '/') {
+#ifdef MODULE_TEMPERATURE
+	else if (message->text == "/sensors") {
+		for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i) {
+			reply += "`Temp. " + String(i) + "] `";
+
+			// Is the sensor used ?
+			if (i >= temp_get_nb_sensor()) {
+				reply += TG_MSG_UNUSED_TEMP_SENSOR "\n";
+			} else {
+				reply += String(temp_get_address(dummyBytes, i)) + "\n";
+			}
+		}
+		telegram_send(reply);
+#endif
+	} else if (message->text[0] == '/') {
 		// Command not supported
 		reply = EMOJI_QUESTION_MARK " " TG_MSG_UNKNOWN_CMD "\n\n";
 		reply = telegram_append_motd(reply);

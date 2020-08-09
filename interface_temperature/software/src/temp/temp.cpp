@@ -19,12 +19,15 @@ DeviceAddress sensorAddrList[TEMP_MAX_SENSOR_SUPPORTED] = {};
 
 float sensorValue[TEMP_MAX_SENSOR_SUPPORTED] = {};
 
-char * get_device_address(char * str, DeviceAddress address)
+char * sensor_addr_to_string(char * str, DeviceAddress address)
 {
   char * strOld = str;
 
   for (byte index = 0; index < sizeof(address); index++) {
-    str += sprintf(str, "%02X ", address[index]);
+    if (index > 0) {
+      str += sprintf(str, "-");
+    }
+    str += sprintf(str, "%02X", address[index]);
   }
   *str = '\0';
 
@@ -68,6 +71,14 @@ void get_sensor_address(void)
   DeviceAddress addressList[TEMP_MAX_SENSOR_SUPPORTED];
 
   sensorCount = get_onewire_address(addressList, TEMP_MAX_SENSOR_SUPPORTED);
+
+  // ONLY FOR DEBUG
+  // sensorCount = 2;
+  // for (byte index = 0; index < sizeof(DeviceAddress); index++) {
+  //   addressList[0][index] = 2 * index;
+  //   addressList[1][index] = 10 * index;
+  // }
+
   if (sensorCount == 0) {
     log_warn("No sensor found");
   } else if (sensorCount == 1) {
@@ -117,6 +128,12 @@ void manage_sensor(uint8_t deviceIndex, DeviceAddress deviceAddress){
   log_info("Sensor %d is %.2f°C", deviceIndex, degreesValue);
 }
 
+/**
+ * @brief Get the last value read for the specified sensor
+ *
+ * @param deviceIndex The index of the sensor
+ * @return Sensor value in celcius or DEVICE_DISCONNECTED_C
+ */
 float temp_get_value(uint8_t deviceIndex)
 {
   if (deviceIndex >= TEMP_MAX_SENSOR_SUPPORTED) {
@@ -126,6 +143,24 @@ float temp_get_value(uint8_t deviceIndex)
   return sensorValue[deviceIndex];
 }
 
+/**
+ * @brief Get the address of the sensor into a string
+ *
+ * @param str string to fill
+ * @param deviceIndex The index of the sensor
+ *
+ * @return The input string
+ */
+char * temp_get_address(char * str, uint8_t deviceIndex)
+{
+  if (deviceIndex >= TEMP_MAX_SENSOR_SUPPORTED) {
+    str[0] = '\0';
+  } else {
+    sensor_addr_to_string(str, sensorAddrList[deviceIndex]);
+  }
+  return str;
+}
+
 uint8_t temp_get_nb_sensor(void)
 {
   return (uint8_t) sensorCount;
@@ -133,7 +168,7 @@ uint8_t temp_get_nb_sensor(void)
 
 void temp_init(void)
 {
-  char strTemp[20];
+  char strTemp[3 * 8 + 1];
   log_info("Locating devices... ");
   get_sensor_address();
 
@@ -141,7 +176,7 @@ void temp_init(void)
 
   for (byte sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
     // Print device name and address
-    log_info("Device [%d/%d]: %s", sensorIndex + 1, sensorCount, get_device_address(strTemp, sensorAddrList[sensorIndex]));
+    log_info("Device [%d/%d]: %s", sensorIndex + 1, sensorCount, sensor_addr_to_string(strTemp, sensorAddrList[sensorIndex]));
 
     // Vérifie si les capteurs sont connectés | check and report if sensors are conneted
     if (!sensors.getAddress(sensorAddrList[sensorIndex], sensorIndex)) {
