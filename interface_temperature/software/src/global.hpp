@@ -203,6 +203,7 @@
 
     /** SCRIPT */
     #define SCRIPT_TELEGRAM_UPT_PERIOD              10*60*1000			  /** Period of time between two telegram message when auto send is enabled */
+    #define SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD   12*60*60*1000         /** Period of time between two telegram message indicating connexion is OK (Put 0 to disable) */
     #define SCRIPT_TEMP_CHECK_PERIOD                10*1000				  /** Period between two sensor mesures */
     #define SCRIPT_TEMP_ALERT_HYSTERESIS            1.0					  /** Hysteresis in degrees (In both ways -1/+1°C) */
     #define SCRIPT_TEMP_ALERT_SENSOR_0              28.0			      /** High level in degrees */

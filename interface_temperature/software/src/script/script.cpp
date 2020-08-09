@@ -11,6 +11,7 @@ extern uint32_t tick;
 uint32_t nextTempCheckTick = 0;
 uint32_t nextDomoticzUpdateTick = 0;
 uint32_t nextTelegramUpdateTick = 0;
+uint32_t nextTelegramConnOkNotify = SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD; // Skip fist call
 uint32_t nextSecondRelayImpulsTick = UINT32_MAX; // Disabled at startup
 bool isInAlertOld = false;
 
@@ -143,6 +144,13 @@ void script_execute(void)
 #endif
         }
     }
+
+#if defined(MODULE_TELEGRAM) && (SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD > 0)
+    if (tick > nextTelegramConnOkNotify) {
+        nextTelegramConnOkNotify = tick + SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD;
+        telegram_send_conn_ok();
+    }
+#endif
 
     // This is the 2nd relay impulsion callback (Activated only when 2nd impulsion duration is > 0)
 #if defined(MODULE_RELAY) && (SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION != 0)

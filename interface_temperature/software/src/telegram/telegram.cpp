@@ -240,4 +240,12 @@ void telegram_send_opt_changed(bool isOptEnabled)
 	}
 }
 
+/**
+ * @brief Tell the client that connexion is OK
+ */
+void telegram_send_conn_ok(void)
+{
+	telegram_send(EMOJI_GREEN_CHECK " " TG_MSG_CONNECTION_OK);
+}
+
 #endif
