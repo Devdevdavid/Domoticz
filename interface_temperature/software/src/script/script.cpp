@@ -11,7 +11,7 @@ extern uint32_t tick;
 uint32_t nextTempCheckTick = 0;
 uint32_t nextDomoticzUpdateTick = 0;
 uint32_t nextTelegramUpdateTick = 0;
-uint32_t nextTelegramConnOkNotify = SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD; // Skip fist call
+uint32_t nextTelegramConnOkNotify = SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD; // Skip first call
 uint32_t nextSecondRelayImpulsTick = UINT32_MAX; // Disabled at startup
 bool isInAlertOld = false;
 
@@ -77,6 +77,13 @@ void script_execute(void)
     if (tick > nextTempCheckTick) {
         nextTempCheckTick = tick + SCRIPT_TEMP_CHECK_PERIOD;
 
+#if defined(BOARD_TEMP_TELEGRAM_BUZZER)
+        /** Force alarm off if OPT is enabled
+         *  Switch is ON when signal is LOW */
+        isTempAlarmDisabled = is_input_low(INPUTS_OPT_TEMP_ALARM_EN);
+#endif
+
+#if (SCRIPT_TEMP_ALERT_METHOD == METHOD_THRESHOLD)
         bool atLeastOneIsAbove = false;
         bool allAreBelow = true;
 
@@ -97,12 +104,6 @@ void script_execute(void)
             }
         }
 
-#if defined(BOARD_TEMP_TELEGRAM_BUZZER)
-        /** Force alarm off if OPT is enabled
-         *  Switch is ON when signal is LOW */
-        isTempAlarmDisabled = is_input_low(INPUTS_OPT_TEMP_ALARM_EN);
-#endif
-
         // Define the new state of the alert
         if (isTempAlarmDisabled) {
             _unset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
@@ -111,6 +112,27 @@ void script_execute(void)
         } else if (allAreBelow) {
             _unset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
         }
+
+#elif (SCRIPT_TEMP_ALERT_METHOD == METHOD_DIFFERENTIAL)
+
+        if (isTempAlarmDisabled) {
+            // Force Off
+            _unset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
+        } else if (temp_get_nb_sensor() < 2) {
+            // We need at least 2 sensors to make a difference
+        } else if (_isset(STATUS_TEMP, STATUS_TEMP_1_FAULT | STATUS_TEMP_2_FAULT)) {
+            // We need both sensor fully operationnal to continue
+        } else {
+            // Take the absolute value of the difference
+            float diffTemp = fabs(temp_get_value(DEVICE_INDEX_1) - temp_get_value(DEVICE_INDEX_0));
+
+            if (diffTemp >= (SCRIPT_TEMP_ALERT_DIFF_THRESHOLD + SCRIPT_TEMP_ALERT_HYSTERESIS)) {
+                _set(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
+            } else if (diffTemp <= (SCRIPT_TEMP_ALERT_DIFF_THRESHOLD - SCRIPT_TEMP_ALERT_HYSTERESIS)) {
+                _unset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
+            }
+        }
+#endif
 
         // Detect edges
         if (isInAlertOld != _isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT)) {

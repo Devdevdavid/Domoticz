@@ -106,20 +106,21 @@ void get_sensor_address(void)
 /**
  *  Read the value of the specified sensor and send it
  **/
-void manage_sensor(uint8_t deviceIndex, DeviceAddress deviceAddress){
+void manage_sensor(uint8_t deviceIndex, DeviceAddress deviceAddress) {
+
+  // ONLY FOR DEBUG
+  // sensorValue[deviceIndex] = (deviceIndex == 0) ? 14.0 : 28.1;
+  // return;
+
   float degreesValue = sensors.getTempC(deviceAddress);
 
   if (degreesValue == DEVICE_DISCONNECTED_C) {
-    switch(deviceIndex) {
-      case 0: _set(STATUS_TEMP, STATUS_TEMP_1_FAULT); break;
-      case 1: _set(STATUS_TEMP, STATUS_TEMP_2_FAULT); break;
-      default: return;
-    }
+    _set(STATUS_TEMP, STATUS_TEMP_1_FAULT << deviceIndex);
     log_error("Sensor %d: error getting temperature", deviceIndex);
     return;
   }
 
-  _unset(STATUS_TEMP, (deviceIndex == 0) ? STATUS_TEMP_1_FAULT : STATUS_TEMP_2_FAULT);
+  _unset(STATUS_TEMP, STATUS_TEMP_1_FAULT << deviceIndex);
 
   // Save data
   sensorValue[deviceIndex] = degreesValue;

@@ -131,6 +131,13 @@ static void telegram_handle_new_message(telegramMessage * message) {
 	}
 #ifdef MODULE_TEMPERATURE
 	else if (message->text == "/sensors") {
+		// Indicate the mode used
+#if (SCRIPT_TEMP_ALERT_METHOD == METHOD_THRESHOLD)
+		reply += TG_MSG_ALERT_METHOD_THRESHOLD "\n";
+#elif (SCRIPT_TEMP_ALERT_METHOD == METHOD_DIFFERENTIAL)
+		reply += TG_MSG_ALERT_METHOD_DIFFERENTIAL "\n";
+#endif
+		// Display addresses
 		for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i) {
 			reply += "`Temp. " + String(i) + "] `";
 
@@ -141,6 +148,7 @@ static void telegram_handle_new_message(telegramMessage * message) {
 				reply += String(temp_get_address(dummyBytes, i)) + "\n";
 			}
 		}
+
 		telegram_send(reply);
 #endif
 	} else if (message->text[0] == '/') {
