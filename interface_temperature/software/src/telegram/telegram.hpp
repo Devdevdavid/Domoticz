@@ -14,6 +14,7 @@
 #define EMOJI_RED_REVOLVING_LIGHT 	"\xF0\x9F\x9A\xA8"
 #define EMOJI_NUMBER_SIGN 			"\x23\xE2\x83\xA3"
 #define EMOJI_QUESTION_MARK 		"\xE2\x9D\x93"
+#define EMOJI_INFORMATION_MARK 		"\xE2\x84\xB9"
 
 // Traducted messages
 #if (G_LANG == G_LANG_FR)
@@ -31,6 +32,8 @@
 	#define TG_MSG_ALERT_GOES_ON					"L'ALERTE EST DÉSORMAIS ACTIVE"
 	#define TG_MSG_ALERT_GOES_OFF					"L'alerte est désormais inactive"
 	#define TG_MSG_ALERT_IS_ON						"L'alerte est active"
+	#define TG_MSG_OPT_GOES_ON						"L'interrupteur d'option est actif"
+	#define TG_MSG_OPT_GOES_OFF						"L'interrupteur d'option est inactif"
 
 	#define TG_MSG_DUMMY_1							"Bien sur !"
 	#define TG_MSG_DUMMY_2							"Ce que vous voudrez maître !"
@@ -51,6 +54,8 @@
 	#define TG_MSG_ALERT_GOES_ON					"ALERT IS NOW ON"
 	#define TG_MSG_ALERT_GOES_OFF					"Alert is now off"
 	#define TG_MSG_ALERT_IS_ON						"Alert is ON"
+	#define TG_MSG_OPT_GOES_ON						"Option switch is enabled"
+	#define TG_MSG_OPT_GOES_OFF						"Option switch is disabled"
 
 	#define TG_MSG_DUMMY_1							"Sure !"
 	#define TG_MSG_DUMMY_2							"What ever you wish master !"
@@ -63,6 +68,7 @@ void telegram_init(void);
 void telegram_main(void);
 void telegram_send_msg_temperature(uint8_t sensorID, float degreesValue);
 void telegram_send_alert(bool isInAlert);
+void telegram_send_opt_changed(bool isOptEnabled);
 
 // Externs
 #ifndef TELEGRAM_TELEGRAM_CPP

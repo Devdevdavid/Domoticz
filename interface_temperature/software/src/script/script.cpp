@@ -31,6 +31,8 @@ void script_send_relay_impulse(uint32_t impulseDurationMs);
 
 void script_execute(void)
 {
+    bool isTempAlarmDisabled = false;
+
 #if defined(MODULE_TEMPERATURE) && defined(MODULE_DOMOTICZ)
     if (tick > nextDomoticzUpdateTick) {
         nextTempCheckTick = tick + SCRIPT_DOMOTICZ_UPT_PERIOD;
@@ -54,6 +56,22 @@ void script_execute(void)
     }
 #endif
 
+#if defined(BOARD_TEMP_TELEGRAM)
+    /** Send a Telegram message when OPT just changed
+     *
+     *  Note: Here we use INPUTS_OPT_TEMP_ALARM_EN define
+     *  whatever the version BUZZER or RELAY
+     */
+    if (is_input_falling(INPUTS_OPT_TEMP_ALARM_EN)) {
+        reset_input_falling(INPUTS_OPT_TEMP_ALARM_EN)
+        telegram_send_opt_changed(true);
+    } else if (is_input_rising(INPUTS_OPT_TEMP_ALARM_EN)) {
+        reset_input_rising(INPUTS_OPT_TEMP_ALARM_EN)
+        telegram_send_opt_changed(false);
+    }
+#endif
+
+    // Temperature alarm
 #if defined(BOARD_TEMP_DOMOTICZ) || defined(BOARD_TEMP_TELEGRAM)
     if (tick > nextTempCheckTick) {
         nextTempCheckTick = tick + SCRIPT_TEMP_CHECK_PERIOD;
@@ -78,8 +96,16 @@ void script_execute(void)
             }
         }
 
+#if defined(BOARD_TEMP_TELEGRAM_BUZZER)
+        /** Force alarm off if OPT is enabled
+         *  Switch is ON when signal is LOW */
+        isTempAlarmDisabled = is_input_low(INPUTS_OPT_TEMP_ALARM_EN);
+#endif
+
         // Define the new state of the alert
-        if (atLeastOneIsAbove) {
+        if (isTempAlarmDisabled) {
+            _unset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
+        } else if (atLeastOneIsAbove) {
             _set(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
         } else if (allAreBelow) {
             _unset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);

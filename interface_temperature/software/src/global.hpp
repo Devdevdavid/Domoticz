@@ -182,7 +182,8 @@
     #define INPUTS_MODES                           {U}                   /** Define the init mode of the input pin (N, U or A) */
     #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
     // Aliases
-    #define INPUTS_OPT_RELAY_IMPULSION_MODE        0                     /** Option jumper JP1 is set as the first button in the module */
+    #define INPUTS_OPT_RELAY_IMPULSION_MODE        0                     /** RELAY ONLY : Option jumper JP1 define the impulsion mode for relay */
+    #define INPUTS_OPT_TEMP_ALARM_EN               0                     /** BUZZER ONLY: Option jumper JP1 define if temp alarm is enabled */
 
     /* MODULE_OUTPUTS */
     #define OUTPUTS_COUNT                           1                    /** Number of outputs managed by the module */

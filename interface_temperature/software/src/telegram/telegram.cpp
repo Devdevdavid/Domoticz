@@ -41,6 +41,11 @@ static const String keyboardJson = "[[\"/start\", \"/stop\"], [\"/status\"]]";
  */
 static void telegram_send(String msg)
 {
+	// We have nowhere to send this message
+	if (linkedChat == "") {
+		return;
+	}
+
 	TBot.sendMessageWithReplyKeyboard(linkedChat, msg, "Markdown", keyboardJson);
 }
 
@@ -187,11 +192,6 @@ void telegram_main(void)
  */
 void telegram_send_msg_temperature(uint8_t sensorID, float degreesValue)
 {
-	// We have nowhere to send this message
-	if (linkedChat == "") {
-		return;
-	}
-
 	String msg = String(sensorID) + "] " + TG_MSG_TEMPERATURE_IS + String(degreesValue) + "'C";
 	telegram_send(msg);
 }
@@ -203,15 +203,24 @@ void telegram_send_msg_temperature(uint8_t sensorID, float degreesValue)
  */
 void telegram_send_alert(bool isInAlert)
 {
-	// We have nowhere to send this message
-	if (linkedChat == "") {
-		return;
-	}
-
 	if (isInAlert) {
 		telegram_send(EMOJI_RED_REVOLVING_LIGHT " " TG_MSG_ALERT_GOES_ON " " EMOJI_RED_REVOLVING_LIGHT);
 	} else {
 		telegram_send(EMOJI_GREEN_CHECK " " TG_MSG_ALERT_GOES_OFF);
+	}
+}
+
+/**
+ * @brief Tell the client that OPT switch changed
+ *
+ * @param isOptEnabled boolean
+ */
+void telegram_send_opt_changed(bool isOptEnabled)
+{
+	if (isOptEnabled) {
+		telegram_send(EMOJI_INFORMATION_MARK " " TG_MSG_OPT_GOES_ON);
+	} else {
+		telegram_send(EMOJI_INFORMATION_MARK " " TG_MSG_OPT_GOES_OFF);
 	}
 }
 
