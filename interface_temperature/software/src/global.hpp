@@ -8,7 +8,7 @@
 // This template system avoid leaking password on Github
 #include "private.hpp"
 
-#define LIGHTKIT_VERSION      "LightKit v1.9.0"
+#define LIGHTKIT_VERSION      "LightKit v1.9.1"
 
 /**
  * This is the configuration for the board
@@ -171,7 +171,7 @@
     #define STATUS_LED_TYPE                         STATUS_LED_TYPE_NEOPIXEL  /** LED Type, see constant below */
     #define STATUS_LED_NEOPIXEL_PIN                 14                    /** If Neopixel, indicates the NeoPixel Pin */
     #define STATUS_LED_NB_LED                       1                     /** Number of led in the neopixel chain */
-    #define STATUS_LED_NEOPIXEL_BRIGHTNESS          70                    /** Brightness of the neopixel LED [0-255] */
+    #define STATUS_LED_NEOPIXEL_BRIGHTNESS          50                    /** Brightness of the neopixel LED [0-255] */
     #define STATUS_LED_NEOPIXEL_RED                 255                   /** Brightness of red led */
     #define STATUS_LED_NEOPIXEL_GREEN               255                   /** Brightness of green led */
     #define STATUS_LED_NEOPIXEL_BLUE                255                   /** Brightness of blue led */
@@ -202,7 +202,7 @@
     #define BUZZER_PIN                              12       /* D6 */     /** Pin of the connected buzzer */
 
     /** SCRIPT */
-    #define SCRIPT_TELEGRAM_UPT_PERIOD              10*60*1000			  /** Period of time between two telegram message when auto send is enabled */
+    #define SCRIPT_TELEGRAM_UPT_PERIOD              60*60*1000			  /** Period of time between two telegram message when auto send is enabled */
     #define SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD   12*60*60*1000         /** Period of time between two telegram message indicating connexion is OK (Put 0 to disable) */
     #define SCRIPT_TEMP_CHECK_PERIOD                10*1000				  /** Period between two sensor mesures */
 
@@ -215,7 +215,7 @@
     #define SCRIPT_TEMP_ALERT_SENSOR_1              35.0			      /** Low level in degrees */
 
     // For METHOD_DIFFERENTIAL
-    #define SCRIPT_TEMP_ALERT_DIFF_THRESHOLD        4.0                   /** Threshold  in degrees to overpass before setting alert active */
+    #define SCRIPT_TEMP_ALERT_DIFF_THRESHOLD        1.0                   /** Threshold  in degrees to overpass before setting alert active (Don't forget to add SCRIPT_TEMP_ALERT_HYSTERESIS when choosing this value) */
 
     // For both methods
     #define SCRIPT_TEMP_ALERT_HYSTERESIS            1.0					  /** Hysteresis in degrees (In both ways -1/+1°C) */
