@@ -17,6 +17,7 @@
 
 // EXTERNS
 extern uint32_t tick;
+extern float sensorThreshold[TEMP_MAX_SENSOR_SUPPORTED];
 
 // VARIABLES
 bool isAutoTempMsgEnabled = false;
@@ -138,7 +139,7 @@ static void telegram_handle_new_message(telegramMessage * message) {
 #if (SCRIPT_TEMP_ALERT_METHOD == METHOD_THRESHOLD)
 		reply += TG_MSG_ALERT_METHOD_THRESHOLD "\n";
 #elif (SCRIPT_TEMP_ALERT_METHOD == METHOD_DIFFERENTIAL)
-		reply += TG_MSG_ALERT_METHOD_DIFFERENTIAL "\n";
+		reply += TG_MSG_ALERT_METHOD_DIFFERENTIAL + String(SCRIPT_TEMP_ALERT_DIFF_THRESHOLD) + "°C)\n";
 #endif
 		// Display addresses
 		for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i) {
@@ -146,10 +147,17 @@ static void telegram_handle_new_message(telegramMessage * message) {
 
 			// Is the sensor used ?
 			if (i >= temp_get_nb_sensor()) {
-				reply += TG_MSG_UNUSED_TEMP_SENSOR "\n";
+				reply += TG_MSG_UNUSED_TEMP_SENSOR;
 			} else {
-				reply += String(temp_get_address(dummyBytes, i)) + "\n";
+				reply += String(temp_get_address(dummyBytes, i));
 			}
+
+			// Display the configure threshold
+#if (SCRIPT_TEMP_ALERT_METHOD == METHOD_THRESHOLD)
+			reply += " (" TG_MSG_SENSOR_THRESHOLD ": " + String(sensorThreshold[i]) + "°C)";
+#endif
+			// Add ending line
+			reply += "\n";
 		}
 
 		telegram_send(reply);

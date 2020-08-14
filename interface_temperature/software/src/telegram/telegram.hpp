@@ -35,7 +35,8 @@
 	#define TG_MSG_OPT_GOES_ON						"L'interrupteur d'option est actif"
 	#define TG_MSG_OPT_GOES_OFF						"L'interrupteur d'option est inactif"
 	#define TG_MSG_ALERT_METHOD_THRESHOLD			"Les capteurs sont en mode SEUIL"
-	#define TG_MSG_ALERT_METHOD_DIFFERENTIAL		"Les capteurs sont en mode DIFFERENTIEL (T1 - T0)"
+	#define TG_MSG_ALERT_METHOD_DIFFERENTIAL		"Les capteurs sont en mode DIFFERENTIEL (T1 - T0 >= "
+	#define TG_MSG_SENSOR_THRESHOLD					"Seuil configuré"
 
 	#define TG_MSG_DUMMY_1							"Bien sur !"
 	#define TG_MSG_DUMMY_2							"Ce que vous voudrez maître !"
@@ -59,7 +60,8 @@
 	#define TG_MSG_OPT_GOES_ON						"Option switch is enabled"
 	#define TG_MSG_OPT_GOES_OFF						"Option switch is disabled"
 	#define TG_MSG_ALERT_METHOD_THRESHOLD			"Sensors are in THRESHOLD mode"
-	#define TG_MSG_ALERT_METHOD_DIFFERENTIAL		"Sensors are in DIFFERENTIAL mode (T1 - T0)"
+	#define TG_MSG_ALERT_METHOD_DIFFERENTIAL		"Sensors are in DIFFERENTIAL mode (T1 - T0 >= "
+	#define TG_MSG_SENSOR_THRESHOLD					"Configured threshold"
 
 	#define TG_MSG_DUMMY_1							"Sure !"
 	#define TG_MSG_DUMMY_2							"What ever you wish master !"

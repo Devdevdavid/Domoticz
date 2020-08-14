@@ -16,6 +16,12 @@ uint32_t nextSecondRelayImpulsTick = UINT32_MAX; // Disabled at startup
 bool isInAlertOld = false;
 
 // CONSTANTS
+// Using extern and const together: https://stackoverflow.com/a/2190981
+extern const float sensorThreshold[TEMP_MAX_SENSOR_SUPPORTED];
+const float sensorThreshold[TEMP_MAX_SENSOR_SUPPORTED] = {
+    SCRIPT_TEMP_ALERT_SENSOR_0,
+    SCRIPT_TEMP_ALERT_SENSOR_1
+};
 const float sensorThresholdHigh[TEMP_MAX_SENSOR_SUPPORTED] = {
     SCRIPT_TEMP_ALERT_SENSOR_0 + SCRIPT_TEMP_ALERT_HYSTERESIS,
     SCRIPT_TEMP_ALERT_SENSOR_1 + SCRIPT_TEMP_ALERT_HYSTERESIS
