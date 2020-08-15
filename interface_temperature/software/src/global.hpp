@@ -136,14 +136,8 @@
     #define MODULE_TELEGRAM
     #define MODULE_STATUS_LED
     #define MODULE_INPUTS
-    // 2 versions of this BOARD_TEMP_DOMOTICZ
-    // One with a buzzer
-    #ifdef BOARD_TEMP_TELEGRAM_BUZZER
-        #define MODULE_OUTPUTS
-    #else
-        #undef MODULE_OUTPUTS
-    #endif
-    // The other with a Relay
+    #define MODULE_OUTPUTS
+    // Relay is not needed when using buzzer
     #ifdef BOARD_TEMP_TELEGRAM_RELAY
         #define MODULE_RELAY
     #else
@@ -187,16 +181,17 @@
 
     /* MODULE_OUTPUTS */
     #define OUTPUTS_COUNT                           1                    /** Number of outputs managed by the module */
-    #define OUTPUTS_PINS                            {12}                 /** Define the pin of the output with following format: {x, y, z} */
+    #define OUTPUTS_PINS                            {12}     /* D6 */    /** Define the pin of the output with following format: {x, y, z} */
     // Aliases
     #define OUTPUTS_BUZZER                          0                    /** Output for the buzzer is the first output declared above */
+    #define OUTPUTS_RELAIS_CMD                      0                    /** Output for the buzzer is the first output declared above */
 
     /* MODULE_RELAY */
     #define RELAY_FEEDBACK_PIN                      16       /* D0 */     /** Define the input to use to get the feedback information */
     #define RELAY_CHECK_PERIOD                      60*1000               /** Delays between 2 relay checks in ms */
     #define RELAY_CHECK_BEFORE_ERROR                3                     /** Try n times to resend commmand before going to error */
     #undef RELAY_IS_BISTABLE                                              /** Define this if the relay is bistable, undef it for monostable */
-    #define RELAY_CMD_PIN                           12       /* D6 */      /** Define the output to use for monostable relay command */
+    #define RELAY_CMD_ALIAS                         OUTPUTS_RELAIS_CMD    /** Define the output to use for monostable relay command */
 
     /* MODULE_BUZZER */
     #define BUZZER_PIN                              12       /* D6 */     /** Pin of the connected buzzer */
@@ -407,3 +402,11 @@
 #define N                                           0                       /** Input no-pull-up */
 #define U                                           1                       /** Input pull-up */
 #define A                                           2                       /** Input analog */
+
+/* ===========================
+ * CHECKS
+ * ===========================
+ */
+#if defined(MODULE_RELAY) && !defined(MODULE_OUTPUTS)
+    #error MODULE_RELAY needs MODULE_OUTPUTS to work properly
+#endif

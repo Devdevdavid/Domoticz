@@ -1,11 +1,9 @@
 #include "global.hpp"
+#include "io/outputs.hpp"
 #include "relay.hpp"
 
 #ifdef MODULE_RELAY
 
-#ifdef RELAY_IS_BISTABLE
-uint32_t nextRelayTurnOffTick = 0;
-#endif
 extern uint32_t tick;
 uint32_t nextRelayToggleTick = UINT32_MAX;
 uint32_t nextRelayCheckTick = 0;
@@ -15,13 +13,15 @@ uint8_t checkCountBeforeError = RELAY_CHECK_BEFORE_ERROR;  /** Soft will try to 
 void relay_set_state(bool isClose)
 {
     #ifdef RELAY_IS_BISTABLE
-        digitalWrite((isClose) ? RELAY_CMD_PIN_1 : RELAY_CMD_PIN_2, HIGH);
-        nextRelayTurnOffTick = tick + RELAY_BISTABLE_ON_TIME_MS;
+        uint8_t alias = (isClose) ? RELAY_CMD_1_ALIAS : RELAY_CMD_2_ALIAS;
+
+        output_set(alias, true);
+        output_delayed_set(alias, false, RELAY_BISTABLE_ON_TIME_MS);
     #else
-        digitalWrite(RELAY_CMD_PIN, (isClose) ? HIGH : LOW);
+        output_set(RELAY_CMD_ALIAS, isClose);
     #endif
     relayTheoreticalState = isClose;
-    
+
     // Force to check the relay in 1 sec
     nextRelayCheckTick = tick + 1000;
 }
@@ -38,12 +38,6 @@ void relay_set_toogle_timeout(uint32_t timeoutMs)
 
 void relay_init(void)
 {
-#ifdef RELAY_IS_BISTABLE
-    pinMode(RELAY_CMD_PIN_1, OUTPUT);
-    pinMode(RELAY_CMD_PIN_2, OUTPUT);
-#else
-    pinMode(RELAY_CMD_PIN, OUTPUT);
-#endif
     pinMode(RELAY_FEEDBACK_PIN, INPUT);
 
     // Set relay open
@@ -52,14 +46,6 @@ void relay_init(void)
 
 void relay_main(void)
 {
-#ifdef RELAY_IS_BISTABLE
-    if (tick > nextRelayTurnOffTick) {
-        nextRelayTurnOffTick = UINT32_MAX;
-        digitalWrite(RELAY_CMD_PIN_1, LOW);
-        digitalWrite(RELAY_CMD_PIN_2, LOW);
-    }
-#endif
-
     // When timeout expires, toggle the relay state by using theorical state
     if (tick > nextRelayToggleTick) {
         nextRelayToggleTick = UINT32_MAX;
@@ -71,7 +57,7 @@ void relay_main(void)
         if (relay_get_state() != relayTheoreticalState) {
             // Try to resend command
             relay_set_state(relayTheoreticalState);
-            
+
             if (checkCountBeforeError > 0) {
                 --checkCountBeforeError;
                 log_warn("Bad feedback for relay %d/%d", RELAY_CHECK_BEFORE_ERROR - checkCountBeforeError, RELAY_CHECK_BEFORE_ERROR);

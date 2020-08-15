@@ -72,6 +72,9 @@ void loop(void)
 #ifdef MODULE_INPUTS
 		inputs_main();
 #endif
+#ifdef MODULE_OUTPUTS
+		output_main();
+#endif
 #ifdef MODULE_TEMPERATURE
 		temp_main();
 #endif
