@@ -151,8 +151,8 @@ void script_execute(void)
 #endif
 
 #if defined(BOARD_TEMP_DOMOTICZ_RELAY) || defined(BOARD_TEMP_TELEGRAM_RELAY)
-            // Are we in impulsion mode (Jumper set) ? (OPT jumper JP1)
-            if (is_input_low(INPUTS_OPT_RELAY_IMPULSION_MODE)) {
+            // Are we in impulsion mode (Jumper set) ?
+            if (is_input_low(INPUTS_OPT_ALARM_IMPULSION_MODE_EN)) {
                 script_send_relay_impulse(SCRIPT_RELAY_IMPULSION_DURATION);
 
                 // If 2nd impulsion is activated and the alert is going from OFF to ON then
@@ -187,7 +187,7 @@ void script_execute(void)
         script_send_relay_impulse(SCRIPT_RELAY_IMPULSION_DURATION);
     }
 #endif
-#endif
+#endif // BOARD_TEMP_DOMOTICZ || BOARD_TEMP_TELEGRAM
 
 #ifdef BOARD_RING
     static uint32_t detectorEndTick = UINT32_MAX;
@@ -221,7 +221,6 @@ void script_execute(void)
         cmd_set_state(false);
         detectorEndTick = UINT32_MAX;
     }
-
 #endif
 }
 

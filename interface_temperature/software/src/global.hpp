@@ -81,7 +81,7 @@
     #define INPUTS_MODES                           {U}                   /** Define the init mode of the input pin (N, U or A) */
     #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
     // Aliases
-    #define INPUTS_OPT_RELAY_IMPULSION_MODE        0                     /** Option jumper JP1 is set as the first button in the module */
+    #define INPUTS_OPT_ALARM_IMPULSION_MODE_EN     0                     /** Option jumper JP2 define alarm method used for relay or buzzer (Impulsion of constant) */
 
     /* MODULE_OUTPUTS */
     #define OUTPUTS_COUNT                           2                    /** Number of outputs managed by the module */
@@ -177,13 +177,13 @@
     #define STATUS_LED_NEOPIXEL_BLUE                255                   /** Brightness of blue led */
 
     /* MODULE_INPUTS */
-    #define INPUTS_COUNT                           1                     /** Number of inputs managed by the module */
-    #define INPUTS_PINS                            {0}                   /** Define the pin of the input with following format: {x, y, z} */
-    #define INPUTS_MODES                           {U}                   /** Define the init mode of the input pin (N, U or A) */
+    #define INPUTS_COUNT                           2                     /** Number of inputs managed by the module */
+    #define INPUTS_PINS                            {0, 5}  /* D3, D1 */  /** Define the pin of the input with following format: {x, y, z} */
+    #define INPUTS_MODES                           {U, U}                /** Define the init mode of the input pin (N, U or A) */
     #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
     // Aliases
-    #define INPUTS_OPT_RELAY_IMPULSION_MODE        0                     /** RELAY ONLY : Option jumper JP1 define the impulsion mode for relay */
-    #define INPUTS_OPT_TEMP_ALARM_EN               0                     /** BUZZER ONLY: Option jumper JP1 define if temp alarm is enabled */
+    #define INPUTS_OPT_TEMP_ALARM_EN               0                     /** Option jumper JP1 define if temp alarm is enabled */
+    #define INPUTS_OPT_ALARM_IMPULSION_MODE_EN     1                     /** Option jumper JP2 define alarm method used for relay or buzzer (Impulsion of constant) */
 
     /* MODULE_OUTPUTS */
     #define OUTPUTS_COUNT                           1                    /** Number of outputs managed by the module */
