@@ -13,6 +13,7 @@ uint32_t nextDomoticzUpdateTick = 0;
 uint32_t nextTelegramUpdateTick = SCRIPT_TELEGRAM_UPT_PERIOD; // Skip first call
 uint32_t nextTelegramConnOkNotify = SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD; // Skip first call
 uint32_t nextSecondRelayImpulsTick = UINT32_MAX; // Disabled at startup
+uint32_t nextBuzzerPulseTick = UINT32_MAX; // Disabled at startup
 bool isInAlertOld = false;
 
 // CONSTANTS
@@ -167,27 +168,50 @@ void script_execute(void)
                 relay_set_state(isInAlertOld);
             }
 #endif
+
 #if defined(BOARD_TEMP_DOMOTICZ_BUZZER) || defined(BOARD_TEMP_TELEGRAM_BUZZER)
-            output_set(OUTPUTS_BUZZER, isInAlertOld);
+            // Are we configure in impulsion mode ?
+            if (is_input_low(INPUTS_OPT_ALARM_IMPULSION_MODE_EN)) {
+                // Either stop pulse (UINT32_MAX) or start now (0)
+                nextBuzzerPulseTick = isInAlertOld ? 0 : UINT32_MAX;
+            } else {
+                // Start/Stop the buzzer in continuous mode
+                output_set(OUTPUTS_BUZZER, isInAlertOld);
+            }
 #endif
         }
     }
 
 #if defined(MODULE_TELEGRAM) && (SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD > 0)
+    // Send a brief message to say connection is OK
     if (tick > nextTelegramConnOkNotify) {
         nextTelegramConnOkNotify = tick + SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD;
         telegram_send_conn_ok();
     }
 #endif
 
-    // This is the 2nd relay impulsion callback (Activated only when 2nd impulsion duration is > 0)
 #if defined(MODULE_RELAY) && (SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION != 0)
+    // This is the 2nd relay impulsion callback (Activated only when 2nd impulsion duration is != 0)
     if (tick > nextSecondRelayImpulsTick) {
         nextSecondRelayImpulsTick = UINT32_MAX; // Disable second relay impulse
         script_send_relay_impulse(SCRIPT_RELAY_IMPULSION_DURATION);
     }
 #endif
-#endif // BOARD_TEMP_DOMOTICZ || BOARD_TEMP_TELEGRAM
+
+#if defined(BOARD_TEMP_DOMOTICZ_BUZZER) || defined(BOARD_TEMP_TELEGRAM_BUZZER)
+    // Manage the pulses of buzzer
+    // It triggers every pulse period (ON + OFF period)
+    // until nextBuzzerPulseTick is set to UINT32_MAX
+    if (tick > nextBuzzerPulseTick) {
+        // Prepare next pulse
+        nextBuzzerPulseTick = tick + SCRIPT_BUZZER_PULSE_ON_MS + SCRIPT_BUZZER_PULSE_OFF_MS;
+
+        // Start pulse now and define when ON state stops (after SCRIPT_BUZZER_PULSE_ON_MS ms)
+        output_set(OUTPUTS_BUZZER, true);
+        output_delayed_set(OUTPUTS_BUZZER, true, SCRIPT_BUZZER_PULSE_ON_MS);
+    }
+#endif
+#endif // End of BOARD_TEMP_DOMOTICZ || BOARD_TEMP_TELEGRAM
 
 #ifdef BOARD_RING
     static uint32_t detectorEndTick = UINT32_MAX;

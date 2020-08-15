@@ -193,9 +193,6 @@
     #undef RELAY_IS_BISTABLE                                              /** Define this if the relay is bistable, undef it for monostable */
     #define RELAY_CMD_ALIAS                         OUTPUTS_RELAIS_CMD    /** Define the output to use for monostable relay command */
 
-    /* MODULE_BUZZER */
-    #define BUZZER_PIN                              12       /* D6 */     /** Pin of the connected buzzer */
-
     /** SCRIPT */
     #define SCRIPT_TELEGRAM_UPT_PERIOD              60*60*1000			  /** Period of time between two telegram message when auto send is enabled */
     #define SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD   12*60*60*1000         /** Period of time between two telegram message indicating connexion is OK (Put 0 to disable) */
@@ -217,6 +214,8 @@
 
     #define SCRIPT_RELAY_IMPULSION_DURATION         3*1000                /** Duration of the impulsion when the alert is triggered */
     #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    0	                  /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
+    #define SCRIPT_BUZZER_PULSE_ON_MS               300                   /** When using pulsed buzzer, this is the ON duration in ms */
+    #define SCRIPT_BUZZER_PULSE_OFF_MS              1700                  /** When using pulsed buzzer, this is the OFF duration in ms */
 
     /** Compilation checks */
     #if defined(BOARD_TEMP_TELEGRAM_RELAIS) && defined(BOARD_TEMP_TELEGRAM_BUZZER)
