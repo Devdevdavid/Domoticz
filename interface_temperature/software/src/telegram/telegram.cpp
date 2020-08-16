@@ -135,6 +135,9 @@ static String telegram_cmd_status(String reply)
 	// Specialized error messages
 	if (_isset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT)) {
 		reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_RELAY_FEEDBACK "\n";
+	} else {
+		reply += EMOJI_GREEN_CHECK " " TG_MSG_GOOD_RELAY_FEEDBACK "\n";
+
 	}
 #endif
 
