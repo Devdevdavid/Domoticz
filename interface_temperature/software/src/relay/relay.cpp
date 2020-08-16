@@ -31,6 +31,14 @@ bool relay_get_state(void)
     return digitalRead(RELAY_FEEDBACK_PIN) ? false : true;
 }
 
+bool relay_toogle_state(void)
+{
+    relay_set_state(!relayTheoreticalState);
+
+    // Return new state
+    return relayTheoreticalState;
+}
+
 void relay_set_toogle_timeout(uint32_t timeoutMs)
 {
     nextRelayToggleTick = tick + timeoutMs;
@@ -49,7 +57,7 @@ void relay_main(void)
     // When timeout expires, toggle the relay state by using theorical state
     if (tick > nextRelayToggleTick) {
         nextRelayToggleTick = UINT32_MAX;
-        relay_set_state(!relayTheoreticalState);
+        relay_toogle_state();
     }
 
     if (tick > nextRelayCheckTick) {

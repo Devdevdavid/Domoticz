@@ -10,6 +10,8 @@
 #include "global.hpp"
 #include "telegram.hpp"
 #include "temp/temp.hpp"
+#include "io/inputs.hpp"
+#include "relay/relay.hpp"
 
 #ifdef MODULE_TELEGRAM
 
@@ -213,6 +215,29 @@ static String telegram_cmd_sensors(String reply)
 }
 #endif
 
+#if defined(MODULE_RELAY)
+static String telegram_cmd_relay(String reply)
+{
+	/** Force alarm off if OPT is enabled
+      *  Switch is set when signal is LOW */
+	if (is_input_high(INPUTS_OPT_TEMP_ALARM_EN)) {
+		reply += EMOJI_INFORMATION_MARK " ";
+
+		if (relay_toogle_state() == true) {
+			reply += TG_MSG_RELAY_IS_NOW_ON "\n";
+		} else {
+			reply += TG_MSG_RELAY_IS_NOW_OFF "\n";
+		}
+
+	} else {
+		reply = EMOJI_INFORMATION_MARK " " TG_MSG_RELAY_CANT_BE_CTRL "\n\n";
+	}
+
+
+	return reply;
+}
+#endif
+
 // =====================
 // FUNCTIONS
 // =====================
@@ -254,6 +279,13 @@ void telegram_init(void)
 	strncpy(pCmd->text, "/sensors", TG_CMD_TEXT_LEN);
 	strncpy(pCmd->desc, TG_MSG_CMD_SENSORS, TG_CMD_DESC_LEN);
 	pCmd->callback = &telegram_cmd_sensors;
+#endif
+
+#if defined(MODULE_RELAY)
+	pCmd = &telegramCmds[telegramCmdsCount++];
+	strncpy(pCmd->text, "/relay", TG_CMD_TEXT_LEN);
+	strncpy(pCmd->desc, TG_MSG_CMD_RELAY, TG_CMD_DESC_LEN);
+	pCmd->callback = &telegram_cmd_relay;
 #endif
 }
 

@@ -28,6 +28,7 @@
 	#define TG_MSG_CMD_START						"Démarre l'annonce de la température sur Telegram"
 	#define TG_MSG_CMD_STOP							"Arrête l'annonce de la température sur Telegram"
 	#define TG_MSG_CMD_SENSORS						"Affiche les adresses des capteurs de température"
+	#define TG_MSG_CMD_RELAY						"Permet la commande du relais quand l'alarme est forcée à OFF"
 
 	#define TG_MSG_CHOOSE_OPTION					"Choisissez l'une des options suivantes"
 	#define TG_MSG_CONNECTION_OK					"La connexion est OK"
@@ -48,6 +49,9 @@
 	#define TG_MSG_ALERT_METHOD_THRESHOLD			"Les capteurs sont en mode SEUIL"
 	#define TG_MSG_ALERT_METHOD_DIFFERENTIAL		"Les capteurs sont en mode DIFFERENTIEL (T1 - T0 >= "
 	#define TG_MSG_SENSOR_THRESHOLD					"Seuil configuré"
+	#define TG_MSG_RELAY_CANT_BE_CTRL				"Le relais ne peut pas être commandé manuellement quand l'alarme n'est pas forcée à OFF"
+	#define TG_MSG_RELAY_IS_NOW_ON					"Le relais est désormais fermé"
+	#define TG_MSG_RELAY_IS_NOW_OFF					"Le relais est désormais ouvert"
 
 	#define TG_MSG_DUMMY_1							"Bien sur !"
 	#define TG_MSG_DUMMY_2							"Ce que vous voudrez maître !"
@@ -59,6 +63,7 @@
 	#define TG_MSG_CMD_START						"Starting temperature announcement on telegram"
 	#define TG_MSG_CMD_STOP							"Stopping temperature announcement on telegram"
 	#define TG_MSG_CMD_SENSORS						"Show temperature sensor addresses"
+	#define TG_MSG_CMD_RELAY						"Allow the control of the relay when alarm is forced OFF"
 
 	#define TG_MSG_CHOOSE_OPTION					"Choose one of the following options"
 	#define TG_MSG_CONNECTION_OK					"Connection is OK"
@@ -79,6 +84,9 @@
 	#define TG_MSG_ALERT_METHOD_THRESHOLD			"Sensors are in THRESHOLD mode"
 	#define TG_MSG_ALERT_METHOD_DIFFERENTIAL		"Sensors are in DIFFERENTIAL mode (T1 - T0 >= "
 	#define TG_MSG_SENSOR_THRESHOLD					"Configured threshold"
+	#define TG_MSG_RELAY_CANT_BE_CTRL				"Relay cannot be controlled manually while alarm is not forced OFF"
+	#define TG_MSG_RELAY_IS_NOW_ON					"Relay is now close"
+	#define TG_MSG_RELAY_IS_NOW_OFF					"Relay is now open"
 
 	#define TG_MSG_DUMMY_1							"Sure !"
 	#define TG_MSG_DUMMY_2							"What ever you wish master !"
