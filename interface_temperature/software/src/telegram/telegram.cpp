@@ -7,13 +7,18 @@
 #include <ESP8266WiFi.h>
 #endif
 
-#define TELEGRAM_TELEGRAM_CPP
-
 #include "global.hpp"
 #include "telegram.hpp"
 #include "temp/temp.hpp"
 
 #ifdef MODULE_TELEGRAM
+
+// STRUCT
+struct telegram_cmd_t {
+	char text[TG_CMD_TEXT_LEN];
+	char desc[TG_CMD_DESC_LEN];
+	String (*callback)(String);
+};
 
 // EXTERNS
 extern uint32_t tick;
@@ -36,6 +41,8 @@ static char dummyBytes[3 * 8 + 1];
 static String reply = "";
 static const String keyboardJson = "[[\"/start\", \"/stop\"], [\"/status\", \"/sensors\"]]";
 
+static struct telegram_cmd_t telegramCmds[TG_CMD_MAX];
+static uint32_t telegramCmdsCount;
 /**
  * @brief Send a reply to the linked chat
  * with a special inline keyboard
@@ -59,17 +66,12 @@ static String telegram_append_motd(String msg)
 {
 	msg += FIRMWARE_VERSION "\n\n";
 
-#if (G_LANG == G_LANG_FR)
-	msg += "/start : Démarre l'annonce de la température sur Telegram\n";
-	msg += "/stop : Arrête l'annonce de la température sur Telegram\n";
-	msg += "/sensors : Affiche les adresses des capteurs de température\n";
-	msg += "/status : Retourne le statut du système\n";
-#elif (G_LANG == G_LANG_EN)
-	msg += "/start:  Starting temperature announcement on telegram\n";
-	msg += "/stop: Stopping temperature announcement on telegram\n";
-	msg += "/sensors: Show temperature sensor addresses\n";
-	msg += "/status: Return the status of the system\n";
-#endif
+	for (uint8_t i = 0; i < telegramCmdsCount; ++i) {
+		msg += String(telegramCmds[i].text);
+		msg += ": ";
+		msg += String(telegramCmds[i].desc);
+		msg += "\n";
+	}
 
 	return msg;
 }
@@ -80,102 +82,134 @@ static String telegram_append_motd(String msg)
  * @param message The message object given by Telegram API
  */
 static void telegram_handle_new_message(telegramMessage * message) {
+	uint8_t i;
+
 	// Reset reply
 	reply = "";
 
 	// Save the chat to wich the reply must be send
 	linkedChat = String(message->chat_id);
 
-	if (message->text == "/start") {
-		isAutoTempMsgEnabled = true;
-
-		reply = EMOJI_ROCKET " " TG_MSG_HAD_BEEN_STARTED "\n";
-		reply = telegram_append_motd(reply);
-		telegram_send(reply);
-	}
-	else if (message->text == "/stop") {
-		isAutoTempMsgEnabled = false;
-		telegram_send(EMOJI_CROSS_MARK " " TG_MSG_HAD_BEEN_STOPPED);
-	}
-	else if (message->text == "/status") {
-		reply += FIRMWARE_VERSION "\n";
-		reply += EMOJI_NUMBER_SIGN " " TG_MSG_IP_ADDRESS + WiFi.localIP().toString() + "\n";
-
-		// Is the script in alert ?
-		if (_isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT)) {
-			reply += EMOJI_RED_REVOLVING_LIGHT " " TG_MSG_ALERT_IS_ON "\n";
+	// Search for a known command
+	for (i = 0; i < telegramCmdsCount; ++i) {
+		if (strncmp(telegramCmds[i].text, message->text.c_str(), TG_CMD_TEXT_LEN) == 0) {
+			reply = telegramCmds[i].callback(reply);
+			break;
 		}
+	}
+
+	// Command not found in telegramCmds ?
+	if (i == telegramCmdsCount) {
+		if (message->text[0] == '/') {
+			// Command not supported
+			reply = EMOJI_QUESTION_MARK " " TG_MSG_UNKNOWN_CMD "\n\n";
+			reply = telegram_append_motd(reply);
+		} else {
+			// Init rand()
+			srand(tick);
+
+			// Send a dummy message when message is not a command
+			uint8_t randomInt = rand() % TELEGRAM_DUMMY_MSG_COUNT;
+			reply = dummyMessages[randomInt];
+		}
+	}
+
+	telegram_send(reply);
+}
+
+// =====================
+// COMMAND CALLBACKS
+// =====================
+
+static String telegram_cmd_status(String reply)
+{
+	reply += FIRMWARE_VERSION "\n";
+	reply += EMOJI_NUMBER_SIGN " " TG_MSG_IP_ADDRESS + WiFi.localIP().toString() + "\n";
+
+	// Is the script in alert ?
+	if (_isset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT)) {
+		reply += EMOJI_RED_REVOLVING_LIGHT " " TG_MSG_ALERT_IS_ON "\n";
+	}
 
 #ifdef MODULE_RELAY
-		// Specialized error messages
-		if (_isset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT)) {
-			reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_RELAY_FEEDBACK "\n";
-		}
+	// Specialized error messages
+	if (_isset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT)) {
+		reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_RELAY_FEEDBACK "\n";
+	}
 #endif
-#ifdef MODULE_TEMPERATURE
-		// Check sensors
-		for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i) {
-			reply += "`Temp. " + String(i) + "] `";
 
-			// Is the sensor used ?
-			if (i >= temp_get_nb_sensor()) {
-				reply += TG_MSG_UNUSED_TEMP_SENSOR "\n";
+#ifdef MODULE_TEMPERATURE
+	// Check sensors
+	for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i) {
+		reply += "`Temp. " + String(i) + "] `";
+
+		// Is the sensor used ?
+		if (i >= temp_get_nb_sensor()) {
+			reply += TG_MSG_UNUSED_TEMP_SENSOR "\n";
+		} else {
+			// Test the state of the sensor
+			if (_isset(STATUS_TEMP, STATUS_TEMP_1_FAULT << i)) {
+				reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_TEMP_SENSOR "\n";
 			} else {
-				// Test the state of the sensor
-				if (_isset(STATUS_TEMP, STATUS_TEMP_1_FAULT << i)) {
-					reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_TEMP_SENSOR "\n";
-				} else {
-					reply += EMOJI_GREEN_CHECK " " + String(temp_get_value(i)) + " 'C\n";
-				}
+				reply += EMOJI_GREEN_CHECK " " + String(temp_get_value(i)) + " 'C\n";
 			}
 		}
-#endif
-
-		telegram_send(reply);
 	}
-#ifdef MODULE_TEMPERATURE
-	else if (message->text == "/sensors") {
-		// Indicate the mode used
-#if (SCRIPT_TEMP_ALERT_METHOD == METHOD_THRESHOLD)
-		reply += TG_MSG_ALERT_METHOD_THRESHOLD "\n";
-#elif (SCRIPT_TEMP_ALERT_METHOD == METHOD_DIFFERENTIAL)
-		reply += TG_MSG_ALERT_METHOD_DIFFERENTIAL + String(SCRIPT_TEMP_ALERT_DIFF_THRESHOLD) + "°C)\n";
 #endif
-		// Display addresses
-		for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i) {
-			reply += "`Temp. " + String(i) + "] `";
 
-			// Is the sensor used ?
-			if (i >= temp_get_nb_sensor()) {
-				reply += TG_MSG_UNUSED_TEMP_SENSOR;
-			} else {
-				reply += String(temp_get_address(dummyBytes, i));
-			}
-
-			// Display the configure threshold
-#if (SCRIPT_TEMP_ALERT_METHOD == METHOD_THRESHOLD)
-			reply += " (" TG_MSG_SENSOR_THRESHOLD ": " + String(sensorThreshold[i]) + "°C)";
-#endif
-			// Add ending line
-			reply += "\n";
-		}
-
-		telegram_send(reply);
-#endif
-	} else if (message->text[0] == '/') {
-		// Command not supported
-		reply = EMOJI_QUESTION_MARK " " TG_MSG_UNKNOWN_CMD "\n\n";
-		reply = telegram_append_motd(reply);
-		telegram_send(reply);
-	} else {
-		// Init rand()
-		srand(tick);
-
-		// Send a dummy message when message is not a command
-		uint8_t randomInt = rand() % TELEGRAM_DUMMY_MSG_COUNT;
-		telegram_send(dummyMessages[randomInt]);
-	}
+	return reply;
 }
+
+static String telegram_cmd_start(String reply)
+{
+	isAutoTempMsgEnabled = true;
+
+	reply = EMOJI_ROCKET " " TG_MSG_HAD_BEEN_STARTED "\n\n";
+	reply = telegram_append_motd(reply);
+
+	return reply;
+}
+
+static String telegram_cmd_stop(String reply)
+{
+	isAutoTempMsgEnabled = false;
+
+	reply += EMOJI_CROSS_MARK " " TG_MSG_HAD_BEEN_STOPPED;
+	return reply;
+}
+
+#if defined(MODULE_TEMPERATURE)
+static String telegram_cmd_sensors(String reply)
+{
+	// Indicate the mode used
+#if (SCRIPT_TEMP_ALERT_METHOD == METHOD_THRESHOLD)
+	reply += TG_MSG_ALERT_METHOD_THRESHOLD "\n";
+#elif (SCRIPT_TEMP_ALERT_METHOD == METHOD_DIFFERENTIAL)
+	reply += TG_MSG_ALERT_METHOD_DIFFERENTIAL + String(SCRIPT_TEMP_ALERT_DIFF_THRESHOLD) + "°C)\n";
+#endif
+	// Display addresses
+	for (int i = 0; i < TEMP_MAX_SENSOR_SUPPORTED; ++i) {
+		reply += "`Temp. " + String(i) + "] `";
+
+		// Is the sensor used ?
+		if (i >= temp_get_nb_sensor()) {
+			reply += TG_MSG_UNUSED_TEMP_SENSOR;
+		} else {
+			reply += String(temp_get_address(dummyBytes, i));
+		}
+
+		// Display the configure threshold
+#if (SCRIPT_TEMP_ALERT_METHOD == METHOD_THRESHOLD)
+		reply += " (" TG_MSG_SENSOR_THRESHOLD ": " + String(sensorThreshold[i]) + "°C)";
+#endif
+		// Add ending line
+		reply += "\n";
+	}
+
+	return reply;
+}
+#endif
+
 // =====================
 // FUNCTIONS
 // =====================
@@ -185,6 +219,8 @@ static void telegram_handle_new_message(telegramMessage * message) {
  */
 void telegram_init(void)
 {
+	struct telegram_cmd_t * pCmd;
+
 	nextCheckTick = 0;
 
 	// This is the simplest way of getting this working
@@ -193,6 +229,29 @@ void telegram_init(void)
   	// least client.setFingerPrint
 	// https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/104#issuecomment-485255312
 	wiFiClientSecure.setInsecure();
+
+	// Define which command are available
+	pCmd = &telegramCmds[telegramCmdsCount++];
+	strncpy(pCmd->text, "/status", TG_CMD_TEXT_LEN);
+	strncpy(pCmd->desc, TG_MSG_CMD_STATUS, TG_CMD_DESC_LEN);
+	pCmd->callback = &telegram_cmd_status;
+
+	pCmd = &telegramCmds[telegramCmdsCount++];
+	strncpy(pCmd->text, "/start", TG_CMD_TEXT_LEN);
+	strncpy(pCmd->desc, TG_MSG_CMD_START, TG_CMD_DESC_LEN);
+	pCmd->callback = &telegram_cmd_start;
+
+	pCmd = &telegramCmds[telegramCmdsCount++];
+	strncpy(pCmd->text, "/stop", TG_CMD_TEXT_LEN);
+	strncpy(pCmd->desc, TG_MSG_CMD_STOP, TG_CMD_DESC_LEN);
+	pCmd->callback = &telegram_cmd_stop;
+
+#if defined(MODULE_TEMPERATURE)
+	pCmd = &telegramCmds[telegramCmdsCount++];
+	strncpy(pCmd->text, "/sensors", TG_CMD_TEXT_LEN);
+	strncpy(pCmd->desc, TG_MSG_CMD_SENSORS, TG_CMD_DESC_LEN);
+	pCmd->callback = &telegram_cmd_sensors;
+#endif
 }
 
 /**

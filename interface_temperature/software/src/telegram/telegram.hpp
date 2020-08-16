@@ -6,6 +6,11 @@
 #define TELEGRAM_CHECK_PERIOD_MS	5*1000 			/** Time between two check for new telegram messages (Should not be under 2.8s because telegram update takes time) */
 #define TELEGRAM_DUMMY_MSG_COUNT	3				/** Number of dummy messages available */
 
+// COMMANDS
+#define TG_CMD_TEXT_LEN				16
+#define TG_CMD_DESC_LEN				64
+#define TG_CMD_MAX					5
+
 // EMOJIS
 // https://apps.timwhitlock.info/emoji/tables/unicode
 #define EMOJI_ROCKET 				"\xF0\x9F\x9A\x80"
@@ -18,6 +23,11 @@
 
 // Traducted messages
 #if (G_LANG == G_LANG_FR)
+
+	#define TG_MSG_CMD_STATUS						"Choisissez l'une des options suivantes"
+	#define TG_MSG_CMD_START						"Démarre l'annonce de la température sur Telegram"
+	#define TG_MSG_CMD_STOP							"Arrête l'annonce de la température sur Telegram"
+	#define TG_MSG_CMD_SENSORS						"Affiche les adresses des capteurs de température"
 
 	#define TG_MSG_CHOOSE_OPTION					"Choisissez l'une des options suivantes"
 	#define TG_MSG_CONNECTION_OK					"La connexion est OK"
@@ -43,6 +53,11 @@
 	#define TG_MSG_DUMMY_3							"Non ? Vraiment ?"
 
 #elif (G_LANG == G_LANG_EN)
+
+	#define TG_MSG_CMD_STATUS						"Return the status of the system"
+	#define TG_MSG_CMD_START						"Starting temperature announcement on telegram"
+	#define TG_MSG_CMD_STOP							"Stopping temperature announcement on telegram"
+	#define TG_MSG_CMD_SENSORS						"Show temperature sensor addresses"
 
 	#define TG_MSG_CHOOSE_OPTION					"Choose one of the following options"
 	#define TG_MSG_CONNECTION_OK					"Connection is OK"
@@ -78,9 +93,6 @@ void telegram_send_opt_changed(bool isOptEnabled);
 void telegram_send_conn_ok(void);
 
 // Externs
-#ifndef TELEGRAM_TELEGRAM_CPP
 extern bool isAutoTempMsgEnabled;
-#endif
-
 
 #endif /* TELEGRAM_TELEGRAM_HPP */
