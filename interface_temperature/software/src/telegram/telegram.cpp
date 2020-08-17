@@ -45,6 +45,7 @@ static String keyboardJson = "";
 
 static struct telegram_cmd_t telegramCmds[TG_CMD_MAX];
 static uint32_t telegramCmdsCount;
+
 /**
  * @brief Send a reply to the linked chat
  * with a special inline keyboard
@@ -139,7 +140,6 @@ static String telegram_cmd_status(String reply)
 		reply += EMOJI_CROSS_MARK " " TG_MSG_BAD_RELAY_FEEDBACK "\n";
 	} else {
 		reply += EMOJI_GREEN_CHECK " " TG_MSG_GOOD_RELAY_FEEDBACK "\n";
-
 	}
 #endif
 
@@ -383,6 +383,18 @@ void telegram_send_opt_changed(bool isOptEnabled)
 void telegram_send_conn_ok(void)
 {
 	telegram_send(EMOJI_GREEN_CHECK " " TG_MSG_CONNECTION_OK);
+}
+
+/**
+ * @brief Tell user about relay feedback when status changed
+ */
+void telegram_send_msg_relay_feedback(bool isOk)
+{
+	if (isOk) {
+		telegram_send(EMOJI_GREEN_CHECK " " TG_MSG_GOOD_RELAY_FEEDBACK);
+	} else {
+		telegram_send(EMOJI_CROSS_MARK " " TG_MSG_BAD_RELAY_FEEDBACK);
+	}
 }
 
 #endif

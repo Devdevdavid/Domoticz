@@ -1,5 +1,6 @@
 #include "global.hpp"
 #include "io/outputs.hpp"
+#include "script/script.hpp"
 #include "relay.hpp"
 
 #ifdef MODULE_RELAY
@@ -76,10 +77,20 @@ void relay_main(void)
                 if (checkCountBeforeError == 0) {
                     _set(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
                     log_error("Relay seems to be broken (Bad feedback)");
+
+                    // Inform script module of the event
+                    script_relay_feedback_event();
                 }
             }
         } else {
-            _unset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
+            // Do nothing if fault is already declared
+            if (_isset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT)) {
+                _unset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
+
+                // Inform script module of the event
+                script_relay_feedback_event();
+            }
+
             // Reset error counter
             checkCountBeforeError = RELAY_CHECK_BEFORE_ERROR;
         }

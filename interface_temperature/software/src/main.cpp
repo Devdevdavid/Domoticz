@@ -93,6 +93,6 @@ void loop(void)
 #ifdef MODULE_RELAY
 		relay_main();
 #endif
-		script_execute();
+		script_main();
 	}
 }

@@ -101,6 +101,7 @@ void telegram_send_msg_temperature(uint8_t sensorID, float degreesValue);
 void telegram_send_alert(bool isInAlert);
 void telegram_send_opt_changed(bool isOptEnabled);
 void telegram_send_conn_ok(void);
+void telegram_send_msg_relay_feedback(bool isOk);
 
 // Externs
 extern bool isAutoTempMsgEnabled;

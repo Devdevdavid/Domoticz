@@ -32,12 +32,33 @@ const float sensorThresholdLow[TEMP_MAX_SENSOR_SUPPORTED] = {
     SCRIPT_TEMP_ALERT_SENSOR_1 - SCRIPT_TEMP_ALERT_HYSTERESIS
 };
 
-// Sub script function prototypes
-#ifdef MODULE_RELAY
-void script_send_relay_impulse(uint32_t impulseDurationMs);
+/***************************************
+            STATIC FUNCTIONS
+ ***************************************/
+
+#if defined(MODULE_RELAY)
+/**
+ * @brief Set the relay ON then turn it OFF after impulseDurationMs milliseconds
+ *
+ * @param impulseDurationMs
+ */
+static void script_send_relay_impulse(uint32_t impulseDurationMs)
+{
+    // Set relay to ON
+    relay_set_state(true);
+    // Turn it OFF after impulseDurationMs milliseconds
+    relay_set_toogle_timeout(impulseDurationMs);
+}
 #endif
 
-void script_execute(void)
+/***************************************
+                FUNCTIONS
+ ***************************************/
+
+/**
+ * @brief Main function of script module
+ */
+void script_main(void)
 {
     bool isTempAlarmDisabled = false;
 
@@ -251,15 +272,11 @@ void script_execute(void)
 
 #if defined(MODULE_RELAY)
 /**
- * @brief Set the relay ON then turn it OFF after impulseDurationMs milliseconds
- *
- * @param impulseDurationMs
+ * @brief Called when RELAY fault is set or cleared
  */
-void script_send_relay_impulse(uint32_t impulseDurationMs)
+void script_relay_feedback_event(void)
 {
-    // Set relay to ON
-    relay_set_state(true);
-    // Turn it OFF after impulseDurationMs milliseconds
-    relay_set_toogle_timeout(impulseDurationMs);
+    bool isOk = _isunset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
+    telegram_send_msg_relay_feedback(isOk);
 }
 #endif
