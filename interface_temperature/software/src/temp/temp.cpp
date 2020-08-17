@@ -170,7 +170,7 @@ uint8_t temp_get_nb_sensor(void)
 void temp_init(void)
 {
   char strTemp[3 * 8 + 1];
-  log_info("Locating devices... ");
+  log_info("Locating OneWire devices... ");
   get_sensor_address();
 
   sensors.begin();

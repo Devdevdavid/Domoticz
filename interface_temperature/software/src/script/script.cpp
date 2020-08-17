@@ -42,8 +42,8 @@ void script_execute(void)
     bool isTempAlarmDisabled = false;
 
 #if defined(MODULE_TEMPERATURE) && defined(MODULE_DOMOTICZ)
-    if (tick > nextDomoticzUpdateTick) {
-        nextTempCheckTick = tick + SCRIPT_DOMOTICZ_UPT_PERIOD;
+    if ((isAutoTempMsgEnabled == true) && (tick > nextDomoticzUpdateTick)) {
+        nextDomoticzUpdateTick = tick + SCRIPT_DOMOTICZ_UPT_PERIOD;
 
         // Send all sensor values
         for (byte i = 0; i < temp_get_nb_sensor(); ++i) {
@@ -71,11 +71,13 @@ void script_execute(void)
      *  whatever the version BUZZER or RELAY
      */
     if (is_input_falling(INPUTS_OPT_TEMP_ALARM_EN)) {
-        reset_input_falling(INPUTS_OPT_TEMP_ALARM_EN)
+        reset_input_falling(INPUTS_OPT_TEMP_ALARM_EN);
         telegram_send_opt_changed(true);
+        nextTempCheckTick = 0; // Force update of temperature
     } else if (is_input_rising(INPUTS_OPT_TEMP_ALARM_EN)) {
-        reset_input_rising(INPUTS_OPT_TEMP_ALARM_EN)
+        reset_input_rising(INPUTS_OPT_TEMP_ALARM_EN);
         telegram_send_opt_changed(false);
+        nextTempCheckTick = 0; // Force update of temperature
     }
 #endif
 
@@ -84,7 +86,7 @@ void script_execute(void)
     if (tick > nextTempCheckTick) {
         nextTempCheckTick = tick + SCRIPT_TEMP_CHECK_PERIOD;
 
-#if defined(BOARD_TEMP_TELEGRAM_BUZZER)
+#if defined(BOARD_TEMP_TELEGRAM)
         /** Force alarm off if OPT is enabled
          *  Switch is ON when signal is LOW */
         isTempAlarmDisabled = is_input_low(INPUTS_OPT_TEMP_ALARM_EN);
@@ -119,7 +121,6 @@ void script_execute(void)
         } else if (allAreBelow) {
             _unset(STATUS_SCRIPT, STATUS_SCRIPT_IN_ALERT);
         }
-
 #elif (SCRIPT_TEMP_ALERT_METHOD == METHOD_DIFFERENTIAL)
 
         if (isTempAlarmDisabled) {
@@ -151,7 +152,7 @@ void script_execute(void)
             telegram_send_alert(isInAlertOld);
 #endif
 
-#if defined(BOARD_TEMP_DOMOTICZ_RELAY) || defined(BOARD_TEMP_TELEGRAM_RELAY)
+#if defined(MODULE_RELAY)
             // Are we in impulsion mode (Jumper set) ?
             if (is_input_low(INPUTS_OPT_ALARM_IMPULSION_MODE_EN)) {
                 script_send_relay_impulse(SCRIPT_RELAY_IMPULSION_DURATION);
@@ -170,7 +171,7 @@ void script_execute(void)
 #endif
 
 #if defined(BOARD_TEMP_DOMOTICZ_BUZZER) || defined(BOARD_TEMP_TELEGRAM_BUZZER)
-            // Are we configure in impulsion mode ?
+            // Are we configured in impulsion mode ?
             if (is_input_low(INPUTS_OPT_ALARM_IMPULSION_MODE_EN)) {
                 // Either stop pulse (UINT32_MAX) or start now (0)
                 nextBuzzerPulseTick = isInAlertOld ? 0 : UINT32_MAX;
@@ -248,12 +249,12 @@ void script_execute(void)
 #endif
 }
 
+#if defined(MODULE_RELAY)
 /**
  * @brief Set the relay ON then turn it OFF after impulseDurationMs milliseconds
  *
  * @param impulseDurationMs
  */
-#ifdef MODULE_RELAY
 void script_send_relay_impulse(uint32_t impulseDurationMs)
 {
     // Set relay to ON

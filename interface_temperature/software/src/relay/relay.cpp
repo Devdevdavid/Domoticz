@@ -63,17 +63,20 @@ void relay_main(void)
     if (tick > nextRelayCheckTick) {
         // Does the relay have the right state ?
         if (relay_get_state() != relayTheoreticalState) {
-            // Try to resend command
-            relay_set_state(relayTheoreticalState);
+            // Do nothing if fault is already declared
+            if (_isunset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT)) {
+                // Try to resend command
+                relay_set_state(relayTheoreticalState);
 
-            if (checkCountBeforeError > 0) {
-                --checkCountBeforeError;
-                log_warn("Bad feedback for relay %d/%d", RELAY_CHECK_BEFORE_ERROR - checkCountBeforeError, RELAY_CHECK_BEFORE_ERROR);
-            }
+                if (checkCountBeforeError > 0) {
+                    --checkCountBeforeError;
+                    log_warn("Bad feedback for relay %d/%d", RELAY_CHECK_BEFORE_ERROR - checkCountBeforeError, RELAY_CHECK_BEFORE_ERROR);
+                }
 
-            if (checkCountBeforeError == 0) {
-                _set(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
-                log_error("Relay seems to be broken (Bad feedback)");
+                if (checkCountBeforeError == 0) {
+                    _set(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
+                    log_error("Relay seems to be broken (Bad feedback)");
+                }
             }
         } else {
             _unset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
