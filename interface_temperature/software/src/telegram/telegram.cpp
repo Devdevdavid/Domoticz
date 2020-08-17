@@ -41,7 +41,7 @@ static String dummyMessages[TELEGRAM_DUMMY_MSG_COUNT] = {
 };
 static char dummyBytes[3 * 8 + 1];
 static String reply = "";
-static const String keyboardJson = "[[\"/start\", \"/stop\"], [\"/status\", \"/sensors\"]]";
+static String keyboardJson = "";
 
 static struct telegram_cmd_t telegramCmds[TG_CMD_MAX];
 static uint32_t telegramCmdsCount;
@@ -287,6 +287,30 @@ void telegram_init(void)
 	strncpy(pCmd->desc, TG_MSG_CMD_RELAY, TG_CMD_DESC_LEN);
 	pCmd->callback = &telegram_cmd_relay;
 #endif
+
+	// Build keyboardJson
+	// Model: "[[\"/start\", \"/stop\"], [\"/status\", \"/sensors\"]]";
+	keyboardJson = "[";
+	for (uint8_t i = 0; i < telegramCmdsCount; ++i) {
+		// Get the shortcut
+		pCmd = &telegramCmds[i];
+
+		if ((i & 1) == 0) { // Left column
+			// Add a coma between columns
+			if (i > 0) {
+				keyboardJson += ",";
+			}
+
+			keyboardJson += "[\"" + String(pCmd->text) + "\"";
+		} else { // Right column
+			keyboardJson += ",\"" + String(pCmd->text) + "\"]";
+		}
+	}
+	// Close the last couple if count is odd
+	if (telegramCmdsCount & 1) {
+		keyboardJson += "]";
+	}
+	keyboardJson += "]";
 }
 
 /**
