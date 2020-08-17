@@ -75,7 +75,15 @@ void bootloader_init(void)
   });
 
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    log_info("Progress: %u%%\r", (progress / (total / 100)));
+    static unsigned int percentOld;
+    unsigned int percent = (progress / (total / 100));
+
+    if (abs(percentOld - percent) < 10) {
+      return;
+    }
+    percentOld = percent;
+
+    log_info("Progress: %u%%\r", percent);
   });
 
   ArduinoOTA.onError([](ota_error_t error) {

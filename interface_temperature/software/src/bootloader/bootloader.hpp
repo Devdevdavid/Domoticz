@@ -3,7 +3,7 @@
 
 #include "global.hpp"
 
-#define BOOTLOADER_VERSION          "Bootloader v1.1"
+#define BOOTLOADER_VERSION          "Bootloader v1.2"
 #define OTA_PORT                    P_OTA_PORT
 #define OTA_PWD                     P_OTA_PWD
 
