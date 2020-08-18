@@ -8,7 +8,7 @@
 #include <Arduino.h>
 #include "tools/tools.hpp"
 #include "tools/log.hpp"
-#include "status.hpp"
+#include "status/status.hpp"
 
 // If you get an error on this file, copy "private_tmpl.hpp" to "private.hpp"
 // and fill the blanked #define

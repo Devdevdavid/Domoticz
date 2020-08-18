@@ -7,7 +7,7 @@
 
 #define STATUS_CPP
 
-#include "status.hpp"
+#include "status/status.hpp"
 #include "cmd/cmd.hpp"
 
 void status_init(void)

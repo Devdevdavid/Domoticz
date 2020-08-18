@@ -1,5 +1,5 @@
 /**
-  * @file   stripLed.hpp
+  * @file   stripled.hpp
   * @brief  Manage led animations on Neopixel strips
   * @author David DEVANT
   * @date   12/08/2019
