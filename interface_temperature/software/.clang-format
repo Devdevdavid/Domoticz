@@ -3,6 +3,10 @@
 
 # Guide : https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
+# --- CHANGELOG ---
+# Rev B (18/08/2020) : Add pointers
+# Rev A (01/06/2020) : First revision
+
 # Others
 AccessModifierOffset: 0
 AlignEscapedNewlinesLeft: true
