@@ -84,3 +84,6 @@ IndentCaseLabels: false
 
 # PPDirective
 IndentPPDirectives: None
+
+# Pointer
+PointerAlignment: Middle
