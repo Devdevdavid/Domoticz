@@ -1,3 +1,10 @@
+/**
+  * @file   relay.cpp
+  * @brief  Control a relay
+  * @author David DEVANT
+  * @date   11/06/2020
+  */
+
 #include "global.hpp"
 #include "io/outputs.hpp"
 #include "script/script.hpp"

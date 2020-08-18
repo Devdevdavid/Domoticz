@@ -1,3 +1,10 @@
+/**
+  * @file   script.hpp
+  * @brief  Interconnection point of all modules
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #ifndef SCRIPT_SCRIPT_HPP
 #define SCRIPT_SCRIPT_HPP
 

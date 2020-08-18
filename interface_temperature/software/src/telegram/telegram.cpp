@@ -1,3 +1,10 @@
+/**
+  * @file   telegram.cpp
+  * @brief  Manage communication with Telegram servers
+  * @author David DEVANT
+  * @date   12/08/2020
+  */
+
 #include <stdlib.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
@@ -232,7 +239,6 @@ static String telegram_cmd_relay(String reply)
 	} else {
 		reply = EMOJI_INFORMATION_MARK " " TG_MSG_RELAY_CANT_BE_CTRL "\n\n";
 	}
-
 
 	return reply;
 }

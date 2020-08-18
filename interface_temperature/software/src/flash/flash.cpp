@@ -1,3 +1,10 @@
+/**
+  * @file   flash.cpp
+  * @brief  Flash write and read API
+  * @author David DEVANT
+  * @date   12/08/2018
+  */
+
 #define FLASH_FLASH_CPP
 
 #include <EEPROM.h>
@@ -22,7 +29,7 @@ void flash_init(void)
 #ifdef MODULE_STRIPLED
         STATUS_NB_LED = STRIPLED_NB_PIXELS;
         STATUS_BRIGHTNESS = STRIPLED_DEFAULT_BRIGHTNESS_VALUE;
-#else 
+#else
         STATUS_NB_LED = 0;
         STATUS_BRIGHTNESS = 0;
 #endif

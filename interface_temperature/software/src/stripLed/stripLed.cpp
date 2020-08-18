@@ -1,3 +1,10 @@
+/**
+  * @file   stripLed.cpp
+  * @brief  Manage led animations on Neopixel strips
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #include <WS2812FX.h>
 #include "global.hpp"
 #include "stripled.hpp"
@@ -28,7 +35,7 @@ uint32_t autoBrightTick;
 void brightness_set(uint8_t brightness)
 {
   STATUS_BRIGHTNESS = brightness;
-  
+
   // Apply new value
   ws2812fx.setBrightness(brightness);
 
@@ -165,7 +172,7 @@ void brightness_table_init(void)
  * Custom show functions which will use the RMT hardware to drive the LEDs.
  */
 #ifdef ESP32
-void stripled_rmt_show(void) 
+void stripled_rmt_show(void)
 {
   uint8_t *pixels = ws2812fx.getPixels();
   // numBytes is one more than the size of the ws2812fx's *pixels array.

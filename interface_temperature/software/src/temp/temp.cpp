@@ -1,3 +1,10 @@
+/**
+  * @file   temp.cpp
+  * @brief  Get temperature of OneWire sensors
+  * @author David DEVANT
+  * @date   12/08/2018
+  */
+
 #include <OneWire.h>
 #include <DallasTemperature.h>
 

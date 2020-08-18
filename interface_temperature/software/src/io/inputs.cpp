@@ -1,3 +1,10 @@
+/**
+  * @file   inputs.cpp
+  * @brief  Handle logic and analog inputs
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #define IO_INPUTS_CPP
 
 #include "global.hpp"
@@ -59,7 +66,7 @@ void inputs_main(void)
 			inputReads[i] |= 1;
 		}
 
-		// High 
+		// High
 		if (inputReads[i] == 0xFF) {
 			_set(inputStates[i], INPUT_STATE_IS_HIGH);
 			if (tick >= (inputRisingTick[i] + INPUTS_LONG_HOLD_TIME)) {

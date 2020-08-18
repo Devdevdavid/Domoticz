@@ -1,3 +1,10 @@
+/**
+  * @file   domoticz.cpp
+  * @brief  Handle domoticz server communication
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #include "global.hpp"
 #include "domoticz.hpp"
 #include "status_led/status_led.hpp"

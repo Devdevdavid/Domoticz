@@ -1,3 +1,10 @@
+/**
+  * @file   status.hpp
+  * @brief  Handle statuses of the board
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #ifndef STATUS_H
 #define STATUS_H
 

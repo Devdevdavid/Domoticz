@@ -1,3 +1,10 @@
+/**
+  * @file   log.cpp
+  * @brief  Print logs on serial debug port
+  * @author David DEVANT
+  * @date   12/08/2017
+  */
+
 #ifndef LOG_H
 #define LOG_H
 

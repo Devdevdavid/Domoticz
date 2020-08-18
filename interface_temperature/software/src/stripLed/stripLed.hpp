@@ -1,3 +1,10 @@
+/**
+  * @file   stripLed.hpp
+  * @brief  Manage led animations on Neopixel strips
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #ifndef STRIPLED_STRIPLED_H
 #define STRIPLED_STRIPLED_H
 

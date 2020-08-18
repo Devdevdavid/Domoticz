@@ -1,3 +1,10 @@
+/**
+  * @file   main.cpp
+  * @brief  Entry point of Arduino Platform
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #define MAIN_C
 
 #include "global.hpp"

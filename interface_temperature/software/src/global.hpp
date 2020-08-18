@@ -1,3 +1,10 @@
+/**
+  * @file   global.hpp
+  * @brief  Main configuration of boards
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #include <Arduino.h>
 #include "tools/tools.hpp"
 #include "tools/log.hpp"

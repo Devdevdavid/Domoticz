@@ -1,3 +1,10 @@
+/**
+  * @file   status_led.cpp
+  * @brief  Handle animation for led status
+  * @author David DEVANT
+  * @date   12/08/2017
+  */
+
 #include "status_led.hpp"
 #include "cmd/cmd.hpp"
 

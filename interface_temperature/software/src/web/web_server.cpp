@@ -1,3 +1,10 @@
+/**
+  * @file   web_server.cpp
+  * @brief  Handle embedded web server
+  * @author David DEVANT
+  * @date   12/08/2018
+  */
+
 #ifdef ESP32
 #include <ESP32WebServer.h>
 #include "SPIFFS.h"
@@ -123,7 +130,7 @@ void handle_get_animation(void)
 }
 
 /**
- * Set the current animation 
+ * Set the current animation
  */
 void handle_set_animation(void)
 {

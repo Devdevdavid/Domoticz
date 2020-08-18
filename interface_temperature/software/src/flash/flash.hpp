@@ -1,3 +1,10 @@
+/**
+  * @file   flash.hpp
+  * @brief  Flash write and read API
+  * @author David DEVANT
+  * @date   12/08/2018
+  */
+
 #include "global.hpp"
 
 #ifndef FLASH_FLASH_HPP

@@ -1,3 +1,10 @@
+/**
+  * @file   file_sys.hpp
+  * @brief  Handle filesystem
+  * @author David DEVANT
+  * @date   11/06/2020
+  */
+
 #ifndef BOOTLOADER_FILE_SYS_H
 #define BOOTLOADER_FILE_SYS_H
 

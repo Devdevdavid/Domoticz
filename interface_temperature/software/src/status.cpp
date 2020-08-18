@@ -1,3 +1,10 @@
+/**
+  * @file   status.cpp
+  * @brief  Handle statuses of the board
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #define STATUS_CPP
 
 #include "status.hpp"

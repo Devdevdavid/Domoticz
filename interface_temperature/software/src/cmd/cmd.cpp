@@ -1,3 +1,10 @@
+/**
+  * @file   cmd.cpp
+  * @brief  General API for serial interface
+  * @author David DEVANT
+  * @date   12/08/2018
+  */
+
 #include "global.hpp"
 #include "cmd.hpp"
 #include "status_led/status_led.hpp"

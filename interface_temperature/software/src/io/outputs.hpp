@@ -1,3 +1,10 @@
+/**
+  * @file   output.hpp
+  * @brief  Handle logic output
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #include <Arduino.h>
 
 #ifndef IO_OUTPUTS_HPP

@@ -1,3 +1,10 @@
+/**
+  * @file   inputs.hpp
+  * @brief  Handle logic and analog inputs
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #include "global.hpp"
 
 #ifndef IO_INPUTS_HPP

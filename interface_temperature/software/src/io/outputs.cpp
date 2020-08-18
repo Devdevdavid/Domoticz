@@ -1,3 +1,10 @@
+/**
+  * @file   output.cpp
+  * @brief  Handle logic output
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #define IO_OUTPUTS_CPP
 
 #include "global.hpp"

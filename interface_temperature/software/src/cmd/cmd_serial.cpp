@@ -1,3 +1,10 @@
+/**
+  * @file   cmd_serial.cpp
+  * @brief  Manage serial interface
+  * @author David DEVANT
+  * @date   12/08/2018
+  */
+
 #include "global.hpp"
 #include "cmd_serial.hpp"
 #include "cmd.hpp"
@@ -147,7 +154,7 @@ void cmd_serial_execute(void)
       }
       break;
 #endif
-#ifdef MODULE_STRIPLED  
+#ifdef MODULE_STRIPLED
     /** ANIMATION */
     case 'A':
       if (serialPort.rxLength <= 1) {

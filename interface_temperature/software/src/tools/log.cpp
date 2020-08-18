@@ -1,3 +1,10 @@
+/**
+  * @file   log.cpp
+  * @brief  Print logs on serial debug port
+  * @author David DEVANT
+  * @date   12/08/2017
+  */
+
 #include "log.hpp"
 
 #include <stdio.h>

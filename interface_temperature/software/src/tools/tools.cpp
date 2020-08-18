@@ -1,9 +1,9 @@
-/*
- * tools.c
- *
- *  Created on: Oct 3, 2018
- *      Author: David
- */
+/**
+  * @file   tools.cpp
+  * @brief  Store useful functions and macros
+  * @author David DEVANT
+  * @date   03/07/2018
+  */
 
 #include "tools.hpp"
 

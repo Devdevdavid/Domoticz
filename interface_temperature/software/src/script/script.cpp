@@ -1,3 +1,10 @@
+/**
+  * @file   script.cpp
+  * @brief  Interconnection point of all modules
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #include "script/script.hpp"
 #include "temp/temp.hpp"
 #include "relay/relay.hpp"

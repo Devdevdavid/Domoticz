@@ -1,3 +1,10 @@
+/**
+  * @file   bootloader.hpp
+  * @brief  Manage wifi and OTA
+  * @author David DEVANT
+  * @date   11/06/2020
+  */
+
 #ifndef BOOTLOADER_H
 #define BOOTLOADER_H
 

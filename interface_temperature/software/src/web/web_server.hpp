@@ -1,3 +1,10 @@
+/**
+  * @file   web_server.hpp
+  * @brief  Handle embedded web server
+  * @author David DEVANT
+  * @date   12/08/2018
+  */
+
 #ifndef WEB_WEB_SERVER_HPP
 #define WEB_WEB_SERVER_HPP
 

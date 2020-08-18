@@ -1,3 +1,10 @@
+/**
+  * @file   cmd_serial.hpp
+  * @brief  Manage serial interface
+  * @author David DEVANT
+  * @date   12/08/2018
+  */
+
 #ifndef CMD_CMD_SERIAL_H
 #define CMD_CMD_SERIAL_H
 

@@ -1,3 +1,10 @@
+/**
+  * @file   temp.hpp
+  * @brief  Get temperature of OneWire sensors
+  * @author David DEVANT
+  * @date   12/08/2018
+  */
+
 #ifndef TEMP_TEMP_HPP
 #define TEMP_TEMP_HPP
 

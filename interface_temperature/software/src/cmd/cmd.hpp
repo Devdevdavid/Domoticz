@@ -1,3 +1,10 @@
+/**
+  * @file   cmd.hpp
+  * @brief  General API for serial interface
+  * @author David DEVANT
+  * @date   12/08/2018
+  */
+
 #ifndef CMD_CMD_H
 #define CMD_CMD_H
 

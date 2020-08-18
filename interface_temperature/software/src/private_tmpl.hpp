@@ -1,3 +1,10 @@
+/**
+  * @file   private_tmpl.hpp
+  * @brief  Confidential informations ignored by git
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 /* This file is a template for "private.hpp"
  * Copy this file to "private.hpp" and fill the blanked #define to your needs
  * This new file will be ignore by git avoiding passwords and

@@ -1,3 +1,10 @@
+/**
+  * @file   bootloader.cpp
+  * @brief  Manage wifi and OTA
+  * @author David DEVANT
+  * @date   11/06/2020
+  */
+
 #ifdef ESP32
 #include <WiFi.h>
 #include <mDNS.h>

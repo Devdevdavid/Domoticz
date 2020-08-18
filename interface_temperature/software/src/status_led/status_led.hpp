@@ -1,3 +1,10 @@
+/**
+  * @file   status_led.hpp
+  * @brief  Handle animation for led status
+  * @author David DEVANT
+  * @date   12/08/2017
+  */
+
 #ifndef STATUS_LED_STATUS_LED_HPP
 #define STATUS_LED_STATUS_LED_HPP
 

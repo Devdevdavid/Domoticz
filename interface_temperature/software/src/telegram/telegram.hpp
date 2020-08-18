@@ -1,3 +1,10 @@
+/**
+  * @file   telegram.hpp
+  * @brief  Manage communication with Telegram servers
+  * @author David DEVANT
+  * @date   12/08/2020
+  */
+
 #ifndef TELEGRAM_TELEGRAM_HPP
 #define TELEGRAM_TELEGRAM_HPP
 

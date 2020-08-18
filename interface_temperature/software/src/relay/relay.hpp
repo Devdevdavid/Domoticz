@@ -1,3 +1,10 @@
+/**
+  * @file   relay.hpp
+  * @brief  Control a relay
+  * @author David DEVANT
+  * @date   11/06/2020
+  */
+
 #ifndef RELAY_RELAY_HPP
 #define RELAY_RELAY_HPP
 
