@@ -14,21 +14,21 @@
 #ifndef PRIVATE_HPP
 #define PRIVATE_HPP
 
-#define P_OTA_PORT 								0
-#define P_OTA_PWD  								""
+#define P_OTA_PORT 0
+#define P_OTA_PWD  ""
 
-#define P_WIFI_PASCAL_SSID                      ""
-#define P_WIFI_PASCAL_PWD                       ""
+#define P_WIFI_PASCAL_SSID ""
+#define P_WIFI_PASCAL_PWD  ""
 
-#define P_WIFI_RUBAN_SSID                       ""
-#define P_WIFI_RUBAN_PWD                        ""
+#define P_WIFI_RUBAN_SSID ""
+#define P_WIFI_RUBAN_PWD  ""
 
-#define P_WIFI_LEDRGB_SSID                      ""
-#define P_WIFI_LEDRGB_PWD                       ""
+#define P_WIFI_LEDRGB_SSID ""
+#define P_WIFI_LEDRGB_PWD  ""
 
-#define P_WIFI_LAMPE_IKEA_SSID                  ""
-#define P_WIFI_LAMPE_IKEA_PWD                   ""
+#define P_WIFI_LAMPE_IKEA_SSID ""
+#define P_WIFI_LAMPE_IKEA_PWD  ""
 
-#define P_TELEGRAM_CONV_TOKEN_PASCAL			""
+#define P_TELEGRAM_CONV_TOKEN_PASCAL ""
 
 #endif /* PRIVATE_HPP */

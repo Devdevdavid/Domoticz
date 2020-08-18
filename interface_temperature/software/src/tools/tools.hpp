@@ -11,16 +11,16 @@
 #include <cstdint>
 #include <cstdlib>
 
-#define OK      0
+#define OK 0
 
-#define POW_2(x)		(x * x)
-#define POW_3(x)		(x * x * x)
-#define POW_4(x)		(POW_2(x) * POW_2(x))
+#define POW_2(x) (x * x)
+#define POW_3(x) (x * x * x)
+#define POW_4(x) (POW_2(x) * POW_2(x))
 
-#define _set(base, flag)    (base) |= (flag);
-#define _unset(base, flag)  (base) &= ~(flag);
-#define _isset(base, flag)  (((base) & (flag)) != 0)
-#define _isunset(base, flag)  (((base) & (flag)) == 0)
+#define _set(base, flag)     (base) |= (flag);
+#define _unset(base, flag)   (base) &= ~(flag);
+#define _isset(base, flag)   (((base) & (flag)) != 0)
+#define _isunset(base, flag) (((base) & (flag)) == 0)
 
 uint16_t sToU16(const char * str, uint16_t length);
 

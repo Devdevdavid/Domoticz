@@ -5,9 +5,9 @@
   * @date   12/08/2020
   */
 
-#include <stdlib.h>
-#include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+#include <WiFiClientSecure.h>
+#include <stdlib.h>
 #ifdef ESP32
 #include <WiFi.h>
 #else
@@ -15,10 +15,10 @@
 #endif
 
 #include "global.hpp"
-#include "telegram.hpp"
-#include "temp/temp.hpp"
 #include "io/inputs.hpp"
 #include "relay/relay.hpp"
+#include "telegram.hpp"
+#include "temp/temp.hpp"
 
 #ifdef MODULE_TELEGRAM
 
@@ -31,27 +31,27 @@ struct telegram_cmd_t {
 
 // EXTERNS
 extern uint32_t tick;
-extern float sensorThreshold[TEMP_MAX_SENSOR_SUPPORTED];
+extern float    sensorThreshold[TEMP_MAX_SENSOR_SUPPORTED];
 
 // VARIABLES
 bool isAutoTempMsgEnabled = false;
 
 // STATIC
-static uint32_t nextCheckTick = 0;
-static String linkedChat;
-static WiFiClientSecure wiFiClientSecure;
+static uint32_t             nextCheckTick = 0;
+static String               linkedChat;
+static WiFiClientSecure     wiFiClientSecure;
 static UniversalTelegramBot TBot(TELEGRAM_CONV_TOKEN, wiFiClientSecure);
-static String dummyMessages[TELEGRAM_DUMMY_MSG_COUNT] = {
-	TG_MSG_DUMMY_1,
-	TG_MSG_DUMMY_2,
-	TG_MSG_DUMMY_3
+static String               dummyMessages[TELEGRAM_DUMMY_MSG_COUNT] = {
+    TG_MSG_DUMMY_1,
+    TG_MSG_DUMMY_2,
+    TG_MSG_DUMMY_3
 };
-static char dummyBytes[3 * 8 + 1];
-static String reply = "";
+static char   dummyBytes[3 * 8 + 1];
+static String reply        = "";
 static String keyboardJson = "";
 
 static struct telegram_cmd_t telegramCmds[TG_CMD_MAX];
-static uint32_t telegramCmdsCount;
+static uint32_t              telegramCmdsCount;
 
 /**
  * @brief Send a reply to the linked chat
@@ -91,7 +91,8 @@ static String telegram_append_motd(String msg)
  *
  * @param message The message object given by Telegram API
  */
-static void telegram_handle_new_message(telegramMessage * message) {
+static void telegram_handle_new_message(telegramMessage * message)
+{
 	uint8_t i;
 
 	// Reset reply
@@ -120,7 +121,7 @@ static void telegram_handle_new_message(telegramMessage * message) {
 
 			// Send a dummy message when message is not a command
 			uint8_t randomInt = rand() % TELEGRAM_DUMMY_MSG_COUNT;
-			reply = dummyMessages[randomInt];
+			reply             = dummyMessages[randomInt];
 		}
 	}
 
@@ -258,9 +259,9 @@ void telegram_init(void)
 	nextCheckTick = 0;
 
 	// This is the simplest way of getting this working
-  	// if you are passing sensitive information, or controlling
-  	// something important, please either use certStore or at
-  	// least client.setFingerPrint
+	// if you are passing sensitive information, or controlling
+	// something important, please either use certStore or at
+	// least client.setFingerPrint
 	// https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/104#issuecomment-485255312
 	wiFiClientSecure.setInsecure();
 
@@ -326,7 +327,7 @@ void telegram_main(void)
 {
 	int msgNumber;
 
-	if (tick >= nextCheckTick)  {
+	if (tick >= nextCheckTick) {
 		nextCheckTick = tick + TELEGRAM_CHECK_PERIOD_MS;
 
 		do {

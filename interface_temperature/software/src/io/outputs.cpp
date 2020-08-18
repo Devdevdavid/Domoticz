@@ -7,22 +7,21 @@
 
 #define IO_OUTPUTS_CPP
 
-#include "global.hpp"
 #include "outputs.hpp"
+#include "global.hpp"
 
 #ifdef MODULE_OUTPUTS
 
-
 struct output_t {
-	uint8_t pin;
-	bool state;
+	uint8_t  pin;
+	bool     state;
 	uint32_t timeout;
-	bool delayedState;
+	bool     delayedState;
 };
 
 // VARIABLES
-extern uint32_t tick;
-static struct output_t outputData[OUTPUTS_COUNT] = {0};
+extern uint32_t        tick;
+static struct output_t outputData[OUTPUTS_COUNT] = { 0 };
 
 void outputs_init(void)
 {
@@ -33,7 +32,7 @@ void outputs_init(void)
 		outputData[i].pin = outputPins[i];
 
 		// Configure the pin as output
-    	pinMode(outputData[i].pin, OUTPUT);
+		pinMode(outputData[i].pin, OUTPUT);
 	}
 }
 
@@ -48,7 +47,7 @@ void output_delayed_set(uint8_t i, bool state, uint32_t delay)
 	if (delay == 0) {
 		output_set(i, state);
 	} else {
-		outputData[i].timeout = tick + delay;
+		outputData[i].timeout      = tick + delay;
 		outputData[i].delayedState = state;
 	}
 }
@@ -63,11 +62,11 @@ void output_main(void)
 	for (uint8_t i = 0; i < OUTPUTS_COUNT; i++) {
 		if (tick >= outputData[i].timeout) {
 			// Reset timeout
-	        outputData[i].timeout = UINT32_MAX;
+			outputData[i].timeout = UINT32_MAX;
 
-	        // Define the new output state
-	        output_set(outputData[i].pin, outputData[i].delayedState);
-	    }
+			// Define the new output state
+			output_set(outputData[i].pin, outputData[i].delayedState);
+		}
 	}
 }
 

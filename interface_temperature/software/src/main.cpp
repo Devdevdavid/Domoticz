@@ -7,20 +7,20 @@
 
 #define MAIN_C
 
-#include "global.hpp"
-#include "flash/flash.hpp"
 #include "bootloader/bootloader.hpp"
 #include "bootloader/file_sys.hpp"
-#include "temp/temp.hpp"
+#include "cmd/cmd_serial.hpp"
+#include "flash/flash.hpp"
+#include "global.hpp"
 #include "io/inputs.hpp"
 #include "io/outputs.hpp"
-#include "web/web_server.hpp"
-#include "stripled/stripled.hpp"
-#include "status_led/status_led.hpp"
-#include "cmd/cmd_serial.hpp"
 #include "relay/relay.hpp"
 #include "script/script.hpp"
+#include "status_led/status_led.hpp"
+#include "stripled/stripled.hpp"
 #include "telegram/telegram.hpp"
+#include "temp/temp.hpp"
+#include "web/web_server.hpp"
 
 uint32_t tick, curTick;
 

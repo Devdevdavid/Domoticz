@@ -7,23 +7,23 @@
 
 #define IO_INPUTS_CPP
 
-#include "global.hpp"
 #include "inputs.hpp"
+#include "global.hpp"
 
 #ifdef MODULE_INPUTS
 
 extern uint32_t tick;
-const uint8_t inputPins[INPUTS_COUNT] = INPUTS_PINS;
-const uint8_t inputModes[INPUTS_COUNT] = INPUTS_MODES;
-uint8_t inputReads[INPUTS_COUNT] = {0};
-uint8_t inputStates[INPUTS_COUNT] = {0};
-uint32_t inputRisingTick[INPUTS_COUNT] = {0};
-uint32_t inputFallingTick[INPUTS_COUNT] = {0};
+const uint8_t   inputPins[INPUTS_COUNT]        = INPUTS_PINS;
+const uint8_t   inputModes[INPUTS_COUNT]       = INPUTS_MODES;
+uint8_t         inputReads[INPUTS_COUNT]       = { 0 };
+uint8_t         inputStates[INPUTS_COUNT]      = { 0 };
+uint32_t        inputRisingTick[INPUTS_COUNT]  = { 0 };
+uint32_t        inputFallingTick[INPUTS_COUNT] = { 0 };
 
 void inputs_init(void)
 {
 	for (uint8_t i = 0; i < INPUTS_COUNT; i++) {
-		switch(inputModes[i]) {
+		switch (inputModes[i]) {
 		case N:
 			pinMode(inputPins[i], INPUT);
 			break;
