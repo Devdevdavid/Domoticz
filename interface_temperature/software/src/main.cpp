@@ -1,18 +1,26 @@
+/**
+  * @file   main.cpp
+  * @brief  Entry point of Arduino Platform
+  * @author David DEVANT
+  * @date   12/08/2019
+  */
+
 #define MAIN_C
 
-#include "global.hpp"
-#include "flash/flash.hpp"
 #include "bootloader/bootloader.hpp"
 #include "bootloader/file_sys.hpp"
-#include "temp/temp.hpp"
+#include "cmd/cmd_serial.hpp"
+#include "flash/flash.hpp"
+#include "global.hpp"
 #include "io/inputs.hpp"
 #include "io/outputs.hpp"
-#include "web/web_server.hpp"
-#include "stripled/stripled.hpp"
-#include "status_led/status_led.hpp"
-#include "cmd/cmd_serial.hpp"
 #include "relay/relay.hpp"
 #include "script/script.hpp"
+#include "status_led/status_led.hpp"
+#include "stripled/stripled.hpp"
+#include "telegram/telegram.hpp"
+#include "temp/temp.hpp"
+#include "web/web_server.hpp"
 
 uint32_t tick, curTick;
 
@@ -49,12 +57,15 @@ void setup()
 #ifdef MODULE_RELAY
 	relay_init();
 #endif
+#ifdef MODULE_TELEGRAM
+	telegram_init();
+#endif
 #ifdef MODULE_CMD_SERIAL
 	cmd_serial_init();
 #endif
 }
 
-void loop(void) 
+void loop(void)
 {
 	curTick = millis();
 
@@ -68,6 +79,9 @@ void loop(void)
 #ifdef MODULE_INPUTS
 		inputs_main();
 #endif
+#ifdef MODULE_OUTPUTS
+		output_main();
+#endif
 #ifdef MODULE_TEMPERATURE
 		temp_main();
 #endif
@@ -80,9 +94,12 @@ void loop(void)
 #ifdef MODULE_STATUS_LED
 		status_led_main();
 #endif
+#ifdef MODULE_TELEGRAM
+		telegram_main();
+#endif
 #ifdef MODULE_RELAY
 		relay_main();
 #endif
-		script_execute();
+		script_main();
 	}
 }
