@@ -5,6 +5,7 @@
   * @date   12/08/2019
   */
 
+#include "global.hpp"
 #include "script/script.hpp"
 #include "cmd/cmd.hpp"
 #include "domoticz/domoticz.hpp"
@@ -181,21 +182,7 @@ void script_main(void)
 #endif
 
 #if defined(MODULE_RELAY)
-			// Are we in impulsion mode (Jumper set) ?
-			if (is_input_low(INPUTS_OPT_ALARM_IMPULSION_MODE_EN)) {
-				script_send_relay_impulse(SCRIPT_RELAY_IMPULSION_DURATION);
-
-				// If 2nd impulsion is activated and the alert is going from OFF to ON then
-				// prepare to send a 2nd impulsion
-#if (SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION != 0)
-				if (isInAlertOld) {
-					nextSecondRelayImpulsTick = tick + SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION;
-				}
-#endif
-			} else {
-				// No impulsion, just set the relay ON when alert is ON and vice versa
-				relay_set_state(isInAlertOld);
-			}
+			script_relay_set_event(isInAlertOld);
 #endif
 
 #if defined(BOARD_TEMP_DOMOTICZ_BUZZER) || defined(BOARD_TEMP_TELEGRAM_BUZZER)
@@ -285,5 +272,26 @@ void script_relay_feedback_event(void)
 {
 	bool isOk = _isunset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
 	telegram_send_msg_relay_feedback(isOk);
+}
+#endif
+
+#if defined(MODULE_RELAY)
+void script_relay_set_event(bool isClosed)
+{
+	// Are we in impulsion mode (Jumper set) ?
+	if (is_input_low(INPUTS_OPT_ALARM_IMPULSION_MODE_EN)) {
+		script_send_relay_impulse(SCRIPT_RELAY_IMPULSION_DURATION);
+
+		// If 2nd impulsion is activated and the alert is going from OFF to ON then
+		// prepare to send a 2nd impulsion
+#if (SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION != 0)
+		if (isClosed) {
+			nextSecondRelayImpulsTick = tick + SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION;
+		}
+#endif
+	} else {
+		// No impulsion, just set the relay ON when alert is ON and vice versa
+		relay_set_state(isClosed);
+	}
 }
 #endif

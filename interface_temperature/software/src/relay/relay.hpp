@@ -10,6 +10,7 @@
 
 #include <Arduino.h>
 
+bool relay_get_theoretical_state(void);
 bool relay_get_state(void);
 void relay_set_toogle_timeout(uint32_t timeoutMs);
 void relay_set_state(bool isClose);

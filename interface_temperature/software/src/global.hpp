@@ -17,7 +17,7 @@
 // This template system avoid leaking password on Github
 #include "private.hpp"
 
-#define LIGHTKIT_VERSION      "LightKit v1.9.4"
+#define LIGHTKIT_VERSION      "LightKit v1.9.5"
 
 /**
  * This is the configuration for the board
@@ -185,8 +185,8 @@
     #define INPUTS_MODES                           {U, U}                /** Define the init mode of the input pin (N, U or A) */
     #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
     // Aliases
-    #define INPUTS_OPT_TEMP_ALARM_EN               0                     /** Option jumper JP1 define if temp alarm is enabled */
-    #define INPUTS_OPT_ALARM_IMPULSION_MODE_EN     1                     /** Option jumper JP2 define alarm method used for relay or buzzer (Impulsion of constant) */
+    #define INPUTS_OPT_TEMP_ALARM_EN               0                     /** Option jumper JP1 define State 0: Alarm is forced off, State 1: Alarm is triggered by temperature */
+    #define INPUTS_OPT_ALARM_IMPULSION_MODE_EN     1                     /** Option jumper JP3 define alarm method used for relay or buzzer (Impulsion of constant) */
 
     /* MODULE_OUTPUTS */
     #define OUTPUTS_COUNT                           1                    /** Number of outputs managed by the module */

@@ -57,8 +57,9 @@
 #define TG_MSG_ALERT_METHOD_DIFFERENTIAL "Les capteurs sont en mode DIFFERENTIEL (T1 - T0 >= "
 #define TG_MSG_SENSOR_THRESHOLD          "Seuil configuré"
 #define TG_MSG_RELAY_CANT_BE_CTRL        "Le relais ne peut pas être commandé manuellement quand l'alarme n'est pas forcée à OFF"
-#define TG_MSG_RELAY_IS_NOW_ON           "Le relais est désormais fermé"
-#define TG_MSG_RELAY_IS_NOW_OFF          "Le relais est désormais ouvert"
+#define TG_MSG_RELAY_IS_NOW_ON           "Relais ON"
+#define TG_MSG_RELAY_IS_NOW_OFF          "Relais OFF"
+#define TG_MSG_RELAY_SEND_IMPULSE        "Relais Impulsion"
 
 #define TG_MSG_DUMMY_1 "Bien sur !"
 #define TG_MSG_DUMMY_2 "Ce que vous voudrez maître !"
@@ -92,8 +93,9 @@
 #define TG_MSG_ALERT_METHOD_DIFFERENTIAL "Sensors are in DIFFERENTIAL mode (T1 - T0 >= "
 #define TG_MSG_SENSOR_THRESHOLD          "Configured threshold"
 #define TG_MSG_RELAY_CANT_BE_CTRL        "Relay cannot be controlled manually while alarm is not forced OFF"
-#define TG_MSG_RELAY_IS_NOW_ON           "Relay is now close"
-#define TG_MSG_RELAY_IS_NOW_OFF          "Relay is now open"
+#define TG_MSG_RELAY_IS_NOW_ON           "Relay ON"
+#define TG_MSG_RELAY_IS_NOW_OFF          "Relay OFF"
+#define TG_MSG_RELAY_SEND_IMPULSE        "Relais Impulsion"
 
 #define TG_MSG_DUMMY_1 "Sure !"
 #define TG_MSG_DUMMY_2 "What ever you wish master !"

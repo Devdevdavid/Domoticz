@@ -34,6 +34,11 @@ void relay_set_state(bool isClose)
 	nextRelayCheckTick = tick + 1000;
 }
 
+bool relay_get_theoretical_state(void)
+{
+	return relayTheoreticalState;
+}
+
 bool relay_get_state(void)
 {
 	return digitalRead(RELAY_FEEDBACK_PIN) ? false : true;
