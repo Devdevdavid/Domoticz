@@ -176,7 +176,7 @@
     #define STATUS_LED_NB_LED                       1                     /** Number of led in the neopixel chain */
     #define STATUS_LED_NEOPIXEL_BRIGHTNESS          50                    /** Brightness of the neopixel LED [0-255] */
     #define STATUS_LED_NEOPIXEL_RED                 255                   /** Brightness of red led */
-    #define STATUS_LED_NEOPIXEL_GREEN               100                    /** Brightness of green led */
+    #define STATUS_LED_NEOPIXEL_GREEN               255                   /** Brightness of green led */
     #define STATUS_LED_NEOPIXEL_BLUE                255                   /** Brightness of blue led */
 
     /* MODULE_INPUTS */
@@ -205,11 +205,11 @@
     /** SCRIPT */
     #define SCRIPT_TELEGRAM_UPT_PERIOD              60*60*1000			  /** Period of time between two telegram message when auto send is enabled */
     #define SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD   12*60*60*1000         /** Period of time between two telegram message indicating connexion is OK (Put 0 to disable) */
-    #define SCRIPT_TEMP_CHECK_PERIOD                10*1000				  /** Period between two sensor mesures */
+    #define SCRIPT_TEMP_CHECK_PERIOD                4*1000				  /** Period between two sensor mesures */
 
     #define METHOD_THRESHOLD                        0                     /** Alert is set active when sensor value is above a specified threshold */
     #define METHOD_DIFFERENTIAL                     1                     /** Alert is set active when the mathematical value difference is above a specified threshold */
-    #define SCRIPT_TEMP_ALERT_METHOD                METHOD_DIFFERENTIAL      /** Select the method of comparaison to use to trigger temp alert */
+    #define SCRIPT_TEMP_ALERT_METHOD                METHOD_THRESHOLD      /** Select the method of comparaison to use to trigger temp alert */
 
     // For METHOD_THRESHOLD
     #define SCRIPT_TEMP_ALERT_SENSOR_0              28.0			      /** High level in degrees */
