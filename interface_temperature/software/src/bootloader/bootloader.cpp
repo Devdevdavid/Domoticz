@@ -50,17 +50,6 @@ void bootloader_init(void)
 	log_info("Trying to connect to %s", WIFI_SSID);
 	WiFi.begin(WIFI_SSID, WIFI_PWD);
 
-	uint8_t timeout = 100;
-	while (WiFi.status() != WL_CONNECTED && (--timeout > 0)) {
-		delay(100);
-	}
-	if (timeout <= 0) {
-		log_error("Timeout occured during first Wifi connection");
-	} else {
-		log_info("ESP IP address: %s", WiFi.localIP().toString().c_str());
-	}
-#endif
-
 	ArduinoOTA.setPort(OTA_PORT);
 	ArduinoOTA.setPassword(OTA_PWD);
 
@@ -107,6 +96,7 @@ void bootloader_init(void)
 			log_error("End Failed");
 	});
 	ArduinoOTA.begin();
+#endif
 }
 
 void bootloader_main(void)
@@ -126,7 +116,10 @@ void bootloader_main(void)
 		if (WiFi.status() != WL_CONNECTED) {
 			_unset(STATUS_WIFI, STATUS_WIFI_IS_CO);
 		} else {
-			_set(STATUS_WIFI, STATUS_WIFI_IS_CO);
+			if (_isunset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
+				_set(STATUS_WIFI, STATUS_WIFI_IS_CO);
+				log_info("ESP IP address: %s", WiFi.localIP().toString().c_str());
+			}
 		}
 #endif
 	}
