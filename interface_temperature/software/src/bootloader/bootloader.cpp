@@ -47,7 +47,7 @@ void bootloader_init(void)
 	WiFi.mode(WIFI_STA);
 	WiFi.setAutoReconnect(true);
 
-	log_info("Trying to connect to %s", WIFI_SSID);
+	log_info("Trying to connect to %s, (Mac: %s)", WIFI_SSID, WiFi.macAddress().c_str());
 	WiFi.begin(WIFI_SSID, WIFI_PWD);
 
 	ArduinoOTA.setPort(OTA_PORT);
