@@ -17,8 +17,8 @@
 #include "global.hpp"
 #include "io/inputs.hpp"
 #include "relay/relay.hpp"
-#include "telegram.hpp"
 #include "script/script.hpp"
+#include "telegram.hpp"
 #include "temp/temp.hpp"
 
 #ifdef MODULE_TELEGRAM
@@ -232,7 +232,7 @@ static String telegram_cmd_relay(String reply)
 	if (is_input_low(INPUTS_OPT_TEMP_ALARM_EN)) {
 		reply += EMOJI_INFORMATION_MARK " ";
 
-		script_relay_set_event(relay_get_theoretical_state());
+		script_relay_set_event(!relay_get_theoretical_state());
 
 		if (is_input_low(INPUTS_OPT_ALARM_IMPULSION_MODE_EN)) {
 			reply += TG_MSG_RELAY_SEND_IMPULSE "\n";
