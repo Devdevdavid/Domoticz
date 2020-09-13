@@ -162,7 +162,7 @@
     #undef  WIFI_IS_IN_AP_MODE                                           /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 
     /* MODULE TEMPERATURE */
-    #define TEMP_1_WIRE_PIN                         2
+    #define TEMP_1_WIRE_PIN                         D4
     #define TEMP_SENSOR_RESOLUTION                  10
     #define TEMP_MAX_SENSOR_SUPPORTED               2
     #define TEMP_POLLING_PERIOD_MS                  1*60*1000
@@ -172,7 +172,7 @@
 
     /* MODULE_STATUS_LED */
     #define STATUS_LED_TYPE                         STATUS_LED_TYPE_NEOPIXEL  /** LED Type, see constant below */
-    #define STATUS_LED_NEOPIXEL_PIN                 14                    /** If Neopixel, indicates the NeoPixel Pin */
+    #define STATUS_LED_NEOPIXEL_PIN                 D5                    /** If Neopixel, indicates the NeoPixel Pin */
     #define STATUS_LED_NB_LED                       1                     /** Number of led in the neopixel chain */
     #define STATUS_LED_NEOPIXEL_BRIGHTNESS          50                    /** Brightness of the neopixel LED [0-255] */
     #define STATUS_LED_NEOPIXEL_RED                 255                   /** Brightness of red led */
@@ -180,23 +180,23 @@
     #define STATUS_LED_NEOPIXEL_BLUE                255                   /** Brightness of blue led */
 
     /* MODULE_INPUTS */
-    #define INPUTS_COUNT                           2                     /** Number of inputs managed by the module */
-    #define INPUTS_PINS                            {0, 5}  /* D3, D1 */  /** Define the pin of the input with following format: {x, y, z} */
-    #define INPUTS_MODES                           {U, U}                /** Define the init mode of the input pin (N, U or A) */
-    #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
+    #define INPUTS_COUNT                            2                     /** Number of inputs managed by the module */
+    #define INPUTS_PINS                             {D3, D1}              /** Define the pin of the input with following format: {x, y, z} */
+    #define INPUTS_MODES                            {U, U}                /** Define the init mode of the input pin (N, U or A) */
+    #define INPUTS_LONG_HOLD_TIME                   3*1000                /** Hold time in ms for long press on input */
     // Aliases
-    #define INPUTS_OPT_TEMP_ALARM_EN               0                     /** Option jumper JP1 define State 0: Alarm is forced off, State 1: Alarm is triggered by temperature */
-    #define INPUTS_OPT_ALARM_IMPULSION_MODE_EN     1                     /** Option jumper JP3 define alarm method used for relay or buzzer (Impulsion of constant) */
+    #define INPUTS_OPT_TEMP_ALARM_EN                0                     /** Option jumper JP1 define State 0: Alarm is forced off, State 1: Alarm is triggered by temperature */
+    #define INPUTS_OPT_ALARM_IMPULSION_MODE_EN      1                     /** Option jumper JP3 define alarm method used for relay or buzzer (Impulsion of constant) */
 
     /* MODULE_OUTPUTS */
-    #define OUTPUTS_COUNT                           1                    /** Number of outputs managed by the module */
-    #define OUTPUTS_PINS                            {12}     /* D6 */    /** Define the pin of the output with following format: {x, y, z} */
+    #define OUTPUTS_COUNT                           1                     /** Number of outputs managed by the module */
+    #define OUTPUTS_PINS                            {D6}                  /** Define the pin of the output with following format: {x, y, z} */
     // Aliases
-    #define OUTPUTS_BUZZER                          0                    /** Output for the buzzer is the first output declared above */
-    #define OUTPUTS_RELAIS_CMD                      0                    /** Output for the buzzer is the first output declared above */
+    #define OUTPUTS_BUZZER                          0                     /** Output for the buzzer is the first output declared above */
+    #define OUTPUTS_RELAIS_CMD                      0                     /** Output for the buzzer is the first output declared above */
 
     /* MODULE_RELAY */
-    #define RELAY_FEEDBACK_PIN                      16       /* D0 */     /** Define the input to use to get the feedback information */
+    #define RELAY_FEEDBACK_PIN                      D0                    /** Define the input to use to get the feedback information */
     #define RELAY_CHECK_PERIOD                      60*1000               /** Delays between 2 relay checks in ms */
     #define RELAY_CHECK_BEFORE_ERROR                3                     /** Try n times to resend commmand before going to error */
     #undef RELAY_IS_BISTABLE                                              /** Define this if the relay is bistable, undef it for monostable */
