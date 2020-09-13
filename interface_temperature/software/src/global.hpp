@@ -58,8 +58,8 @@
     #undef MODULE_CMD_SERIAL
 
     /** MODULE WIFI (Always ON) */
-    #define WIFI_SSID                               P_WIFI_PASCAL_SSID    /** SSID of the Access point/network to connect */
-    #define WIFI_PWD                                P_WIFI_PASCAL_PWD     /** Password of the Access point/network to connect */
+    #define WIFI_SSID                               P_WIFI_CLIENT_SSID    /** SSID of the Access point/network to connect */
+    #define WIFI_PWD                                P_WIFI_CLIENT_PWD     /** Password of the Access point/network to connect */
     #undef  WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 
     /* MODULE TEMPERATURE */
@@ -157,8 +157,8 @@
     #undef MODULE_CMD_SERIAL
 
     /** MODULE WIFI (Always ON) */
-    #define WIFI_SSID                               P_WIFI_PASCAL_SSID   /** SSID of the Access point/network to connect */
-    #define WIFI_PWD                                P_WIFI_PASCAL_PWD    /** Password of the Access point/network to connect */
+    #define WIFI_SSID                               P_WIFI_CLIENT_SSID   /** SSID of the Access point/network to connect */
+    #define WIFI_PWD                                P_WIFI_CLIENT_PWD    /** Password of the Access point/network to connect */
     #undef  WIFI_IS_IN_AP_MODE                                           /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 
     /* MODULE TEMPERATURE */
@@ -168,7 +168,7 @@
     #define TEMP_POLLING_PERIOD_MS                  1*60*1000
 
     /* MODULE_TELEGRAM */
-    #define TELEGRAM_CONV_TOKEN						P_TELEGRAM_CONV_TOKEN_PASCAL   /** Private token use to identify the bot */
+    #define TELEGRAM_CONV_TOKEN						P_TELEGRAM_CONV_TOKEN   /** Private token use to identify the bot */
 
     /* MODULE_STATUS_LED */
     #define STATUS_LED_TYPE                         STATUS_LED_TYPE_NEOPIXEL  /** LED Type, see constant below */

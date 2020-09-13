@@ -17,8 +17,8 @@
 #define P_OTA_PORT 0
 #define P_OTA_PWD  ""
 
-#define P_WIFI_PASCAL_SSID ""
-#define P_WIFI_PASCAL_PWD  ""
+#define P_WIFI_CLIENT_SSID ""
+#define P_WIFI_CLIENT_PWD  ""
 
 #define P_WIFI_RUBAN_SSID ""
 #define P_WIFI_RUBAN_PWD  ""
@@ -29,6 +29,6 @@
 #define P_WIFI_LAMPE_IKEA_SSID ""
 #define P_WIFI_LAMPE_IKEA_PWD  ""
 
-#define P_TELEGRAM_CONV_TOKEN_PASCAL ""
+#define P_TELEGRAM_CONV_TOKEN ""
 
 #endif /* PRIVATE_HPP */
