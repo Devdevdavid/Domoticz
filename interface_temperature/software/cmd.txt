@@ -1,0 +1,2 @@
+platformio run -e board_temp_telegram_relay --target upload
+platformio device monitor

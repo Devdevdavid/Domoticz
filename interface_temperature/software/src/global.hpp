@@ -148,7 +148,7 @@
     #define MODULE_OUTPUTS
     // Relay is not needed when using buzzer
     #ifdef BOARD_TEMP_TELEGRAM_RELAY
-        #define MODULE_RELAY
+        #undef MODULE_RELAY
     #else
         #undef MODULE_RELAY
     #endif
@@ -168,7 +168,8 @@
     #define TEMP_POLLING_PERIOD_MS                  1*60*1000
 
     /* MODULE_TELEGRAM */
-    #define TELEGRAM_CONV_TOKEN						P_TELEGRAM_CONV_TOKEN   /** Private token use to identify the bot */
+    #define TELEGRAM_CONV_TOKEN						P_TELEGRAM_CONV_TOKEN /** Private token use to identify the bot */
+    #define TELEGRAM_CHECK_PERIOD_MS                60*1000               /** Time between two check for new telegram messages (Should not be under 2.8s because telegram update takes time) */
 
     /* MODULE_STATUS_LED */
     #define STATUS_LED_TYPE                         STATUS_LED_TYPE_NEOPIXEL  /** LED Type, see constant below */
@@ -204,8 +205,8 @@
 
     /** SCRIPT */
     #define SCRIPT_TELEGRAM_UPT_PERIOD              60*60*1000			  /** Period of time between two telegram message when auto send is enabled */
-    #define SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD   12*60*60*1000         /** Period of time between two telegram message indicating connexion is OK (Put 0 to disable) */
-    #define SCRIPT_TEMP_CHECK_PERIOD                4*1000				  /** Period between two sensor mesures */
+    #define SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD   0                     /** Period of time between two telegram message indicating connexion is OK (Put 0 to disable) */
+    #define SCRIPT_TEMP_CHECK_PERIOD                5*60*1000		      /** Period between two sensor mesures */
 
     #define METHOD_THRESHOLD                        0                     /** Alert is set active when sensor value is above a specified threshold */
     #define METHOD_DIFFERENTIAL                     1                     /** Alert is set active when the mathematical value difference is above a specified threshold */

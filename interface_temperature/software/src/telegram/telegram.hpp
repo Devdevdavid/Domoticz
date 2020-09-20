@@ -10,8 +10,7 @@
 
 #include <Arduino.h>
 
-#define TELEGRAM_CHECK_PERIOD_MS 5 * 1000 /** Time between two check for new telegram messages (Should not be under 2.8s because telegram update takes time) */
-#define TELEGRAM_DUMMY_MSG_COUNT 3        /** Number of dummy messages available */
+#define TELEGRAM_DUMMY_MSG_COUNT 3 /** Number of dummy messages available */
 
 // COMMANDS
 #define TG_CMD_TEXT_LEN 16
