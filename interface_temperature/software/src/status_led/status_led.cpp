@@ -187,7 +187,7 @@ void status_led_main(void)
 		status_led[0].color   = 'r';
 	} else {
 		status_led[0].timeOn  = 100;
-		status_led[0].timeOff = 0;
+		status_led[0].timeOff = 2900;
 		status_led[0].color   = 'g';
 	}
 
