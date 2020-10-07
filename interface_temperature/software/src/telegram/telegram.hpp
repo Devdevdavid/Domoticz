@@ -111,7 +111,4 @@ void telegram_send_opt_changed(bool isOptEnabled);
 void telegram_send_conn_ok(void);
 void telegram_send_msg_relay_feedback(bool isOk);
 
-// Externs
-extern bool isAutoTempMsgEnabled;
-
 #endif /* TELEGRAM_TELEGRAM_HPP */

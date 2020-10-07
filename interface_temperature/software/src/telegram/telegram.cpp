@@ -33,9 +33,7 @@ struct telegram_cmd_t {
 // EXTERNS
 extern uint32_t tick;
 extern float    sensorThreshold[TEMP_MAX_SENSOR_SUPPORTED];
-
-// VARIABLES
-bool isAutoTempMsgEnabled = false;
+extern bool     isAutoTempMsgEnabled;
 
 // STATIC
 static uint32_t             nextCheckTick = 0;

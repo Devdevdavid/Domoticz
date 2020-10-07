@@ -20,6 +20,7 @@ uint32_t        nextDomoticzUpdateTick    = 0;
 uint32_t        nextSecondRelayImpulsTick = UINT32_MAX; // Disabled at startup
 uint32_t        nextBuzzerPulseTick       = UINT32_MAX; // Disabled at startup
 bool            isInAlertOld              = false;
+bool            isAutoTempMsgEnabled      = false;
 
 #if defined(MODULE_TEMPERATURE) && defined(MODULE_TELEGRAM)
 uint32_t nextTelegramUpdateTick = SCRIPT_TELEGRAM_UPT_PERIOD; // Skip first call
@@ -277,8 +278,10 @@ void script_main(void)
  */
 void script_relay_feedback_event(void)
 {
+#if defined(MODULE_TELEGRAM)
 	bool isOk = _isunset(STATUS_APPLI, STATUS_APPLI_RELAY_FAULT);
 	telegram_send_msg_relay_feedback(isOk);
+#endif
 }
 #endif
 

@@ -42,7 +42,7 @@
     #define MODULE_INPUTS
     // 2 versions of this BOARD_TEMP_DOMOTICZ
     // One with a buzzer
-    #ifdef BOARD_TEMP_DOMOTICZ_BUZZER
+    #if defined(BOARD_TEMP_DOMOTICZ_BUZZER) || defined(BOARD_TEMP_DOMOTICZ_RELAY)
         #define MODULE_OUTPUTS
     #else
         #undef MODULE_OUTPUTS
@@ -97,25 +97,40 @@
     #define OUTPUTS_PINS                            {12}                 /** Define the pin of the output with following format: {x, y, z} */
     // Aliases
     #define OUTPUTS_BUZZER                          0                    /** Output for the buzzer is the first output declared above */
+    #define OUTPUTS_RELAIS_CMD                      0                     /** Output for the buzzer is the first output declared above */
 
     /* MODULE_RELAY */
     #define RELAY_FEEDBACK_PIN                      16                    /** Define the input to use to get the feedback information */
     #define RELAY_CHECK_PERIOD                      60*1000               /** Delays between 2 relay checks in ms */
     #define RELAY_CHECK_BEFORE_ERROR                3                     /** Try n times to resend commmand before going to error */
     #undef RELAY_IS_BISTABLE                                              /** Define this if the relay is bistable, undef it for monostable */
-    #define RELAY_CMD_PIN                           12                    /** Define the output to use for monostable relay command */
+    #define RELAY_CMD_ALIAS                         OUTPUTS_RELAIS_CMD    /** Define the output to use for monostable relay command */
 
     /* MODULE_BUZZER */
     #define BUZZER_PIN                              12                    /** Pin of the connected buzzer */
 
     /** SCRIPT */
-    #define SCRIPT_DOMOTICZ_UPT_PERIOD              10*60*1000
-    #define SCRIPT_TEMP_CHECK_PERIOD                10*1000
-    #define SCRIPT_TEMP_ALERT_HYSTERESIS            1
-    #define SCRIPT_TEMP_ALERT_SENSOR_0              27
-    #define SCRIPT_TEMP_ALERT_SENSOR_1              30
+    #define SCRIPT_DOMOTICZ_UPT_PERIOD              10*60*1000            /** Period of time between two domoticz transactions */
+    #define SCRIPT_TEMP_CHECK_PERIOD                10*1000               /** Period between two sensor mesures */
+
+    #define METHOD_THRESHOLD                        0                     /** Alert is set active when sensor value is above a specified threshold */
+    #define METHOD_DIFFERENTIAL                     1                     /** Alert is set active when the mathematical value difference is above a specified threshold */
+    #define SCRIPT_TEMP_ALERT_METHOD                METHOD_THRESHOLD      /** Select the method of comparaison to use to trigger temp alert */
+
+    // For METHOD_THRESHOLD
+    #define SCRIPT_TEMP_ALERT_SENSOR_0              27                    /** High level in degrees */
+    #define SCRIPT_TEMP_ALERT_SENSOR_1              30                    /** Low level in degrees */
+
+    // For METHOD_DIFFERENTIAL
+    #define SCRIPT_TEMP_ALERT_DIFF_THRESHOLD        1.0                   /** Threshold  in degrees to overpass before setting alert active (Don't forget to add SCRIPT_TEMP_ALERT_HYSTERESIS when choosing this value) */
+
+    // For both methods
+    #define SCRIPT_TEMP_ALERT_HYSTERESIS            1.0                   /** Hysteresis in degrees (In both ways -1/+1°C) */
+
     #define SCRIPT_RELAY_IMPULSION_DURATION         3*1000                /** Duration of the impulsion when the alert is triggered */
     #define SCRIPT_RELAY_MS_BEFORE_2ND_IMPULSION    2*1000                /** Duration in ms before sending a second impulsion when alert is turning on (Set to 0 to disable 2nd impulsion) */
+    #define SCRIPT_BUZZER_PULSE_ON_MS               300                   /** When using pulsed buzzer, this is the ON duration in ms */
+    #define SCRIPT_BUZZER_PULSE_OFF_MS              1700                  /** When using pulsed buzzer, this is the OFF duration in ms */
 
     /** Compilation checks */
     #if defined(BOARD_TEMP_DOMOTICZ_RELAIS) && defined(BOARD_TEMP_DOMOTICZ_BUZZER)
