@@ -5,10 +5,10 @@
   * @date   12/08/2019
   */
 
-#include "global.hpp"
 #include "script/script.hpp"
 #include "cmd/cmd.hpp"
 #include "domoticz/domoticz.hpp"
+#include "global.hpp"
 #include "io/inputs.hpp"
 #include "io/outputs.hpp"
 #include "relay/relay.hpp"
@@ -18,13 +18,20 @@
 extern uint32_t tick;
 uint32_t        nextTempCheckTick         = 0;
 uint32_t        nextDomoticzUpdateTick    = 0;
-uint32_t        nextTelegramUpdateTick    = SCRIPT_TELEGRAM_UPT_PERIOD;            // Skip first call
-uint32_t        nextTelegramConnOkNotify  = SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD; // Skip first call
-uint32_t        nextSecondRelayImpulsTick = UINT32_MAX;                            // Disabled at startup
-uint32_t        nextBuzzerPulseTick       = UINT32_MAX;                            // Disabled at startup
+uint32_t        nextSecondRelayImpulsTick = UINT32_MAX; // Disabled at startup
+uint32_t        nextBuzzerPulseTick       = UINT32_MAX; // Disabled at startup
 bool            isInAlertOld              = false;
 
+#if defined(MODULE_TEMPERATURE) && defined(MODULE_TELEGRAM)
+uint32_t nextTelegramUpdateTick = SCRIPT_TELEGRAM_UPT_PERIOD; // Skip first call
+#endif
+
+#if defined(MODULE_TELEGRAM) && (SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD > 0)
+uint32_t nextTelegramConnOkNotify = SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD; // Skip first call
+#endif
+
 // CONSTANTS
+#if defined(SCRIPT_TEMP_ALERT_METHOD) && (SCRIPT_TEMP_ALERT_METHOD == METHOD_THRESHOLD)
 // Using extern and const together: https://stackoverflow.com/a/2190981
 extern const float sensorThreshold[TEMP_MAX_SENSOR_SUPPORTED];
 const float        sensorThreshold[TEMP_MAX_SENSOR_SUPPORTED] = {
@@ -39,6 +46,7 @@ const float sensorThresholdLow[TEMP_MAX_SENSOR_SUPPORTED] = {
 	SCRIPT_TEMP_ALERT_SENSOR_0 - SCRIPT_TEMP_ALERT_HYSTERESIS,
 	SCRIPT_TEMP_ALERT_SENSOR_1 - SCRIPT_TEMP_ALERT_HYSTERESIS
 };
+#endif
 
 /***************************************
             STATIC FUNCTIONS
@@ -68,8 +76,6 @@ static void script_send_relay_impulse(uint32_t impulseDurationMs)
  */
 void script_main(void)
 {
-	bool isTempAlarmDisabled = false;
-
 #if defined(MODULE_TEMPERATURE) && defined(MODULE_DOMOTICZ)
 	if ((isAutoTempMsgEnabled == true) && (tick > nextDomoticzUpdateTick)) {
 		nextDomoticzUpdateTick = tick + SCRIPT_DOMOTICZ_UPT_PERIOD;
@@ -114,6 +120,8 @@ void script_main(void)
 #if defined(BOARD_TEMP_DOMOTICZ) || defined(BOARD_TEMP_TELEGRAM)
 	if (tick > nextTempCheckTick) {
 		nextTempCheckTick = tick + SCRIPT_TEMP_CHECK_PERIOD;
+
+		bool isTempAlarmDisabled = false;
 
 #if defined(BOARD_TEMP_TELEGRAM)
 		/** Force alarm off if OPT is enabled
