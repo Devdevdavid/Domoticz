@@ -8,7 +8,6 @@
 #include "script/script.hpp"
 #include "cmd/cmd.hpp"
 #include "domoticz/domoticz.hpp"
-#include "global.hpp"
 #include "io/inputs.hpp"
 #include "io/outputs.hpp"
 #include "relay/relay.hpp"
