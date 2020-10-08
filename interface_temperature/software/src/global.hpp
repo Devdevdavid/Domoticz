@@ -269,12 +269,12 @@
     #undef MODULE_CMD_SERIAL
 
     /** MODULE WIFI (Always ON) */
-    #define WIFI_SSID                               P_WIFI_RUBAN_SSID     /** SSID of the Access point/network to connect */
-    #define WIFI_PWD                                P_WIFI_RUBAN_PWD      /** Password of the Access point/network to connect */
+    #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID/** SSID of the Access point/network to connect */
+    #define WIFI_PWD                                P_WIFI_LAMPE_IKEA_PWD /** Password of the Access point/network to connect */
     #define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
     // WIFI configuration for AP Mode
-    #define WIFI_AP_LOCAL_IP                        192,168,1,1           /** IP Address of the board */
-    #define WIFI_AP_GATEWAY                         192,168,1,254         /** IP Address of the Gateway */
+    #define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
+    #define WIFI_AP_GATEWAY                         192,168,4,254         /** IP Address of the Gateway */
     #define WIFI_AP_SUBNET                          255,255,255,0         /** IP Mask */
 
     /* MODULE_STRIPLED */
