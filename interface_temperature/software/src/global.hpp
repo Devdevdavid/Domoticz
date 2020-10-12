@@ -291,7 +291,7 @@
 
     /* MODULE_INPUTS */
     #define INPUTS_COUNT                           4                     /** Number of inputs managed by the module */
-    #define INPUTS_PINS                            {26, 4, 25, 32}       /** Define the pin of the input with following format: {x, y, z} */
+    #define INPUTS_PINS                            {32, 4, 25, 26}       /** Define the pin of the input with following format: {x, y, z} */
     #define INPUTS_MODES                           { N, N,  N,  A}       /** Define the init mode of the input pin (N, U or A) */
     #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
     // Aliases
