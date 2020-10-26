@@ -279,7 +279,7 @@
 
     /* MODULE_STRIPLED */
     #define STRIPLED_PIN                            2                     /** Output pin for the strip command */
-    #define STRIPLED_NB_PIXELS                      24                    /** Number of Pixel on the strip */
+    #define STRIPLED_NB_PIXELS                      12                    /** Number of Pixel on the strip lamp Ikea mini (12) Ikea classic = 24 */
     #define STRIPLED_NB_BRIGHT_LEVEL                10                    /** Number of level in the brightness table */
     #define STRIPLED_BRIGHT_HYSTERESIS              10                    /** Hysteresis value between two levels (Base 1023) */
     #define STRIPLED_AUTO_BRIGHT_UPDATE_PERIOD      2000                  /** Period of update of the auto brightness (in ms) */
@@ -292,7 +292,7 @@
     /* MODULE_INPUTS */
     #define INPUTS_COUNT                           4                     /** Number of inputs managed by the module */
     #define INPUTS_PINS                            {32, 4, 25, 26}       /** Define the pin of the input with following format: {x, y, z} */
-    #define INPUTS_MODES                           { N, N,  N,  A}       /** Define the init mode of the input pin (N, U or A) */
+    #define INPUTS_MODES                           { U, N,  N,  A}       /** Define the init mode of the input pin (N, U or A) */
     #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
     // Aliases
     #define INPUTS_OPT_WEB_SERVER_DISPLAY          0                     /** Option jumper JP1 is set as the first button in the module */
