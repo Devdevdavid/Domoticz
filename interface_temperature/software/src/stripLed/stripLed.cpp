@@ -203,16 +203,10 @@ void stripled_init(void)
 	// Brightness
 	autoBrightTick = tick;
 
-#if defined(BOARD_RING)
-	stripled_set_state(false);
-	set_animation(0); // 0: Static
-	stripled_set_demo_mode(false);
-#else
 	// Go into demo mode at startup
 	stripled_set_state(true);
 	set_animation(STRIPLED_DEFAULT_ANIMATION_ID);
 	stripled_set_demo_mode(true);
-#endif
 
 	ws2812fx.start();
 }
