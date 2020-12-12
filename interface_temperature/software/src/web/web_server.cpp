@@ -12,6 +12,7 @@
 #include <ESP8266WebServer.h>
 #endif
 #include <FS.h>
+#include <string>
 
 #include "bootloader/file_sys.hpp"
 #include "cmd/cmd.hpp"
@@ -265,7 +266,15 @@ void handle_set_nb_led(void)
  */
 void handle_get_color(void)
 {
-	server.send(200, "text/plain", String(cmd_get_color()));
+	uint32_t color = cmd_get_color();
+	String hexColor = String(color, HEX);
+
+	// Add leading zeros
+	while (hexColor.length() < 6) {
+		hexColor = "0" + hexColor;
+	}
+
+	server.send(200, "text/plain", hexColor);
 }
 
 /**
@@ -278,7 +287,7 @@ void handle_set_color(void)
 		return;
 	}
 
-	uint32_t color = server.arg("v").toInt();
+	uint32_t color = (uint32_t) strtol(server.arg("v").c_str(), 0, 16);
 
 	cmd_set_color(color);
 	handle_get_color();

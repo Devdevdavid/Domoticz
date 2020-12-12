@@ -77,25 +77,25 @@
         <!-- Filled by JS -->
       </select>
     </div>
-    
+
     <div id="part_color">
       <h2>Couleur</h2>
       <p>Change la couleur du ruban</p>
       <input type="color" name="color_picker" id="color_picker" value="#000000">
     </div>
-    
+
     <div id="part_demo">
       <h2>Demo</h2>
       <p>Change d'animation toutes les 5 secondes</p>
       <button id="demo_button" class="theme"><!-- Filled by JS --></button>
     </div>
-    
+
     <div id="part_on_off">
       <h2>ON/OFF</h2>
       <p>Active/désactive le ruban de LED</p>
       <button id="on_off_button" class="theme"><!-- Filled by JS --></button>
     </div>
-    
+
     <div id="part_nb_led">
       <h2>Nombre de LED</h2>
       <p>Défini le nombre de LED du ruban</p>
@@ -142,7 +142,7 @@
       animSelect.onchange = function() {
         var params = 'v=' + animSelect.value;
         cgi_request('/set_animation', params, function(textReply) {
-          
+
         });
       }
     }
@@ -199,25 +199,21 @@
       xhttp.send();
     }
 
-    function HEXToIntColor(hrrggbb) {
-      
-    }
-
     function handle_color_picker_update()
     {
-      var rgb = parseInt(colorPicker.value.substr(1, 6), 16);
-
-      var params = 'v=' + rgb;
+      var params = 'v=' + colorPicker.value.substr(1, 6);
       cgi_request('/set_color', params, function(textReply) {
         update_color_picker(textReply);
       });
     }
 
+    /**
+     * @brief Update the color vlue of the color picker
+     * @param  Should be the HEX color code on 6 digits (ex: "00FF34")
+     */
     function update_color_picker(currentColor)
     {
-      currentColor = parseInt(currentColor, 10);
-      currentColor = "000000" + currentColor.toString(16);
-      colorPicker.value = '#' + currentColor.substr(currentColor.length - 6);
+      colorPicker.value = '#' + currentColor;
     }
 
     /**
@@ -228,7 +224,7 @@
       cgi_request('/get_animation', '', function(textReply) {
         create_animation_select(textReply);
       });
-      
+
       brightnessSlider.onchange = function() {
         var params = 'v=' + brightnessSlider.value;
         cgi_request('/set_brightness', params, function(textReply) {

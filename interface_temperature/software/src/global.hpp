@@ -403,6 +403,49 @@
     #define IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
 #endif /* BOARD_NEOPIXEL_WEB */
 
+
+/**
+ * This is the configuration for the board
+ * BOARD_LIGHTKITV2_DAVID
+ *
+ * Just an ESP8266 connected to a LED Strip
+ * with a web server to control it with
+ * HTTP requests using Homebridge
+ */
+#ifdef BOARD_LIGHTKITV2_DAVID
+
+    #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - LIGHTKITV2 DAVID"
+
+    /* MODULE DEFINITION (Use #define or #undef) */
+    #define MODULE_FLASH
+    #undef MODULE_TEMPERATURE
+    #undef MODULE_DOMOTICZ
+    #undef MODULE_STATUS_LED
+    #undef MODULE_INPUTS
+    #undef MODULE_OUTPUTS
+    #undef MODULE_RELAY
+    #define MODULE_WEBSERVER
+    #define MODULE_STRIPLED
+    #undef MODULE_CMD_SERIAL
+
+    /** MODULE WIFI (Always ON) */
+    #define WIFI_SSID                               P_WIFI_CLIENT_SSID    /** SSID of the Access point/network to connect */
+    #define WIFI_PWD                                P_WIFI_CLIENT_PWD     /** Password of the Access point/network to connect */
+    #undef WIFI_IS_IN_AP_MODE                                             /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
+
+    /* MODULE_STRIPLED */
+    #define STRIPLED_PIN                            D2                    /** Output pin for the strip command */
+    #define STRIPLED_NB_PIXELS                      60                    /** Number of Pixel on the strip */
+    #define STRIPLED_NB_BRIGHT_LEVEL                10                    /** Number of level in the brightness table */
+    #define STRIPLED_BRIGHT_HYSTERESIS              10                    /** Hysteresis value between two levels (Base 1023) */
+    #define STRIPLED_DEFAULT_BRIGHTNESS_VALUE       32                    /** Brightness level used at startup [0-255] */
+    #define STRIPLED_DEFAULT_ANIMATION_ID           10                    /** ID of the animation used at startup */
+    #define STRIPLED_DEMO_MODE_PERIOD               5000                  /** Delay betwwen two animation in demo mode (in ms) */
+    #define STRIPLED_MAX_NB_PIXELS                  60                    /** Maximum number of LED that can be supported */
+    #define LIGHT_SENSOR_PIN                        -1                    /** Pin for Light sensor used to ajust output light level (-1 if not used) */
+
+#endif /* BOARD_LIGHTKITV2_DAVID */
+
 /* ===========================
  * COMMON TO ALL BOARDS
  * ===========================
