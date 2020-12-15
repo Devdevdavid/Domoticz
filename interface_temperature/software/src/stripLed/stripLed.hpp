@@ -10,6 +10,10 @@
 
 #include <Arduino.h>
 
+/** Constants for refreshPeriod (The lower the faster the refresh will be) */
+#define STRIPLED_MAX_REFRESH_PERIOD 	   0
+#define STRIPLED_LOWPOWER_REFRESH_PERIOD (10*1000)
+
 /** Data structure for a level */
 struct brightLevel_t {
 	uint8_t  output; /** Output intensity (O-255) */

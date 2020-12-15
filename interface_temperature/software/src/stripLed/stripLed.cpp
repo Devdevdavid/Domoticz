@@ -25,12 +25,22 @@ WS2812FX ws2812fx = WS2812FX(STRIPLED_NB_PIXELS, STRIPLED_PIN, NEO_GRB + NEO_KHZ
 struct brightLevel_t brightTable[STRIPLED_NB_BRIGHT_LEVEL];
 
 // Next tick of animation change and brightness update
+uint32_t refreshTick;
 uint32_t demoTick;
 uint32_t autoBrightTick;
+
+/** Indicate the period in tick between two stripled refresh */
+uint32_t refreshPeriod = STRIPLED_MAX_REFRESH_PERIOD;
 
 /********************************
  *          Tools
  ********************************/
+
+static inline void refresh_now()
+{
+	// Refresh now
+	refreshTick = 0;
+}
 
 void brightness_set(uint8_t brightness)
 {
@@ -41,6 +51,8 @@ void brightness_set(uint8_t brightness)
 
 	// Save settings in flash
 	flash_write();
+
+	refresh_now();
 }
 
 void nb_led_set(uint8_t nbLed)
@@ -55,6 +67,8 @@ void nb_led_set(uint8_t nbLed)
 
 	// Save settings in flash
 	flash_write();
+
+	refresh_now();
 }
 
 void color_set(uint32_t color)
@@ -70,6 +84,10 @@ void color_set(uint32_t color)
 
 	// Save settings in flash
 	flash_write();
+
+	// No need for speed here
+	refreshPeriod = STRIPLED_LOWPOWER_REFRESH_PERIOD;
+	refresh_now();
 }
 
 #if (LIGHT_SENSOR_PIN != -1)
@@ -91,6 +109,7 @@ void brightness_auto_set(void)
 	}
 
 	brightness_set(brightTable[STATUS_BRIGHT_LVL].output);
+	refresh_now();
 }
 #endif
 
@@ -112,6 +131,10 @@ int32_t set_animation(uint8_t animID)
 	// Define this animation as current
 	STATUS_ANIM = animID;
 
+	// High refresh needed for smooth animations
+	refreshPeriod = STRIPLED_MAX_REFRESH_PERIOD;
+	refresh_now();
+
 	return OK;
 }
 
@@ -128,6 +151,7 @@ void stripled_set_demo_mode(bool isDemoModeEn)
 	} else {
 		_unset(STATUS_APPLI, STATUS_APPLI_DEMO_MODE);
 	}
+	refresh_now();
 }
 
 /**
@@ -142,6 +166,7 @@ void stripled_set_state(bool isOn)
 		_unset(STATUS_APPLI, STATUS_APPLI_LED_IS_ON);
 		ws2812fx.strip_off();
 	}
+	refresh_now();
 }
 
 /********************************
@@ -218,11 +243,16 @@ void stripled_init(void)
 void stripled_main(void)
 {
 	if (_isset(STATUS_APPLI, STATUS_APPLI_LED_IS_ON)) {
-		// Refresh strip display
-		ws2812fx.service();
+		if (tick >= refreshTick) {
+			// Program the next refresh
+			refreshTick = tick + refreshPeriod;
+
+			// Refresh strip display
+			ws2812fx.service();
+		}
 	}
 
-	// Update brightness level
+	// Update demo mode
 	if (_isset(STATUS_APPLI, STATUS_APPLI_DEMO_MODE)) {
 		if (tick >= demoTick) {
 			demoTick = tick + STRIPLED_DEMO_MODE_PERIOD;
