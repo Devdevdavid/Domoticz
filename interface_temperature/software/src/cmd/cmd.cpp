@@ -22,6 +22,7 @@ void cmd_print_help(void)
 #ifdef MODULE_STRIPLED
 	log_raw("B[Value]                  Set brightness, no value = Auto\n");
 	log_raw("S[1/0: State]             Set the LED ON or OFF\n");
+	log_raw("D[1/0: State]             Set the demo mode ON or OFF\n");
 	log_raw("A<animID>                 Set animation 0 to 55\n");
 #endif
 #ifdef MODULE_RELAY
