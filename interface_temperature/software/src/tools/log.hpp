@@ -33,6 +33,7 @@ enum
 #define log_error(...) log_log(LOG_ERROR, __FILENAME__, __LINE__, __VA_ARGS__)
 #define log_fatal(...) log_log(LOG_FATAL, __FILENAME__, __LINE__, __VA_ARGS__)
 
+void log_raw(const char * fmt, ...);
 void log_log(int level, const char * file, int line, const char * fmt, ...);
 
 #endif

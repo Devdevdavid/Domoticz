@@ -19,6 +19,30 @@
 
 #define LIGHTKIT_VERSION      "LightKit v1.9.5"
 
+/* ===========================
+ * COMMON TO ALL BOARDS
+ * ===========================
+ */
+#ifdef ESP32
+    #define G_WebServer ESP32WebServer
+#else
+    #define G_WebServer ESP8266WebServer
+#endif
+
+#define G_LANG_EN                                   0
+#define G_LANG_FR                                   1
+#define G_LANG                                      G_LANG_FR
+
+/** Types of Led status */
+#define STATUS_LED_TYPE_CLASSIC                     0                       /** Constant for STATUS_LED_TYPE */
+#define STATUS_LED_TYPE_NEOPIXEL                    1                       /** Constant for STATUS_LED_TYPE */
+
+/** Modes for inputs pins */
+#define I_N                                         0                       /** Input no-pull-up */
+#define I_U                                         1                       /** Input pull-up */
+#define I_A                                         2                       /** Input analog */
+
+
 /**
  * This is the configuration for the board
  * TEMP_DOMOTICZ
@@ -55,7 +79,7 @@
     #endif
     #undef MODULE_WEBSERVER
     #undef MODULE_STRIPLED
-    #undef MODULE_CMD_SERIAL
+    #undef MODULE_SERIAL
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_CLIENT_SSID    /** SSID of the Access point/network to connect */
@@ -87,7 +111,7 @@
     /* MODULE_INPUTS */
     #define INPUTS_COUNT                           1                     /** Number of inputs managed by the module */
     #define INPUTS_PINS                            {0}                   /** Define the pin of the input with following format: {x, y, z} */
-    #define INPUTS_MODES                           {U}                   /** Define the init mode of the input pin (N, U or A) */
+    #define INPUTS_MODES                           {I_U}                 /** Define the init mode of the input pin (N, U or A) */
     #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
     // Aliases
     #define INPUTS_OPT_ALARM_IMPULSION_MODE_EN     0                     /** Option jumper JP2 define alarm method used for relay or buzzer (Impulsion of constant) */
@@ -169,7 +193,7 @@
     #endif
     #undef MODULE_WEBSERVER
     #undef MODULE_STRIPLED
-    #undef MODULE_CMD_SERIAL
+    #undef MODULE_SERIAL
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_CLIENT_SSID   /** SSID of the Access point/network to connect */
@@ -197,7 +221,7 @@
     /* MODULE_INPUTS */
     #define INPUTS_COUNT                            2                     /** Number of inputs managed by the module */
     #define INPUTS_PINS                             {D3, D1}              /** Define the pin of the input with following format: {x, y, z} */
-    #define INPUTS_MODES                            {U, U}                /** Define the init mode of the input pin (N, U or A) */
+    #define INPUTS_MODES                            {I_U, I_U}            /** Define the init mode of the input pin (N, U or A) */
     #define INPUTS_LONG_HOLD_TIME                   3*1000                /** Hold time in ms for long press on input */
     // Aliases
     #define INPUTS_OPT_TEMP_ALARM_EN                0                     /** Option jumper JP1 define State 0: Alarm is forced off, State 1: Alarm is triggered by temperature */
@@ -266,7 +290,7 @@
     #undef MODULE_RELAY
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
-    #undef MODULE_CMD_SERIAL
+    #undef MODULE_SERIAL
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID/** SSID of the Access point/network to connect */
@@ -292,7 +316,7 @@
     /* MODULE_INPUTS */
     #define INPUTS_COUNT                           4                     /** Number of inputs managed by the module */
     #define INPUTS_PINS                            {32, 4, 25, 26}       /** Define the pin of the input with following format: {x, y, z} */
-    #define INPUTS_MODES                           { U, N,  N,  A}       /** Define the init mode of the input pin (N, U or A) */
+    #define INPUTS_MODES                           {I_U, I_N, I_N, I_A}  /** Define the init mode of the input pin (N, U or A) */
     #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
     // Aliases
     #define INPUTS_OPT_WEB_SERVER_DISPLAY          0                     /** Option jumper JP1 is set as the first button in the module */
@@ -330,7 +354,7 @@
     #undef MODULE_RELAY
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
-    #undef MODULE_CMD_SERIAL
+    #undef MODULE_SERIAL
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LEDRGB_SSID    /** SSID of the Access point/network to connect */
@@ -376,7 +400,7 @@
     #undef MODULE_RELAY
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
-    #undef MODULE_CMD_SERIAL
+    #undef MODULE_SERIAL
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID /** SSID of the Access point/network to connect */
@@ -426,7 +450,9 @@
     #undef MODULE_RELAY
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
-    #undef MODULE_CMD_SERIAL
+    #define MODULE_SERIAL
+    #define MODULE_TELNET
+    #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_CLIENT_SSID    /** SSID of the Access point/network to connect */
@@ -447,32 +473,17 @@
 #endif /* BOARD_LIGHTKITV2_DAVID */
 
 /* ===========================
- * COMMON TO ALL BOARDS
- * ===========================
- */
-#ifdef ESP32
-    #define G_WebServer ESP32WebServer
-#else
-    #define G_WebServer ESP8266WebServer
-#endif
-
-#define G_LANG_EN                                   0
-#define G_LANG_FR                                   1
-#define G_LANG                                      G_LANG_FR
-
-/** Types of Led status */
-#define STATUS_LED_TYPE_CLASSIC                     0                       /** Constant for STATUS_LED_TYPE */
-#define STATUS_LED_TYPE_NEOPIXEL                    1                       /** Constant for STATUS_LED_TYPE */
-
-/** Modes for inputs pins */
-#define N                                           0                       /** Input no-pull-up */
-#define U                                           1                       /** Input pull-up */
-#define A                                           2                       /** Input analog */
-
-/* ===========================
  * CHECKS
  * ===========================
  */
 #if defined(MODULE_RELAY) && !defined(MODULE_OUTPUTS)
     #error MODULE_RELAY needs MODULE_OUTPUTS to work properly
+#endif
+
+#if defined(MODULE_TELNET) && !defined(MODULE_TERM)
+    #error MODULE_TELNET needs MODULE_TERM to work properly
+#endif
+
+#if defined(MODULE_SERIAL) && !defined(MODULE_TERM)
+    #error MODULE_SERIAL needs MODULE_TERM to work properly
 #endif

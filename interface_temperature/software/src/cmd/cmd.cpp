@@ -13,34 +13,37 @@
 
 void cmd_print_help(void)
 {
-	Serial.println("=== " FIRMWARE_VERSION " ===");
-	Serial.println("H                         This help");
-	Serial.println("T                         Print board status");
-	Serial.println("L[State]                  Toggle or set Led Visu Visibility");
+	log_raw("=== " FIRMWARE_VERSION " ===\n");
+	log_raw("H                         This help\n");
+	log_raw("T                         Print board status\n");
+#ifdef MODULE_STATUS_LED
+	log_raw("L[State]                  Toggle or set Led Visu Visibility\n");
+#endif
 #ifdef MODULE_STRIPLED
-	Serial.println("B[Value]                  Set brightness, no value = Auto");
-	Serial.println("S[1/0: State]             Set the LED ON or OFF");
-	Serial.println("A<animID>                 Set animation 0 to 55");
+	log_raw("B[Value]                  Set brightness, no value = Auto\n");
+	log_raw("S[1/0: State]             Set the LED ON or OFF\n");
+	log_raw("A<animID>                 Set animation 0 to 55\n");
 #endif
 #ifdef MODULE_RELAY
-	Serial.println("R[1/0: State]             Toggle or Set Relay On or Off");
+	log_raw("R[1/0: State]             Toggle or Set Relay On or Off\n");
 #endif
 }
 
 void cmd_print_status(void)
 {
-	Serial.printf("APPLI:   0x%02X\n", STATUS_APPLI);
-	Serial.printf("WIFI:    0x%02X\n", STATUS_WIFI);
-	Serial.printf("BRIGHT:  %d%%", (STATUS_BRIGHTNESS * 100) / 255);
+	log_raw("APPLI:   0x%02X\n", STATUS_APPLI);
+	log_raw("WIFI:    0x%02X\n", STATUS_WIFI);
+	log_raw("BRIGHT:  %d%%", (STATUS_BRIGHTNESS * 100) / 255);
 	if (_isset(STATUS_APPLI, STATUS_APPLI_AUTOLUM)) {
-		Serial.printf(" AUTO\n");
+		log_raw(" AUTO\n");
 	} else {
-		Serial.printf("\n");
+		log_raw("\n");
 	}
-	Serial.printf("LEVEL:   %d\n", STATUS_BRIGHT_LVL);
-	Serial.printf("ANIM:    %d\n", STATUS_ANIM);
+	log_raw("LEVEL:   %d\n", STATUS_BRIGHT_LVL);
+	log_raw("ANIM:    %d\n", STATUS_ANIM);
 }
 
+#ifdef MODULE_STATUS_LED
 /**
  * Enable/Disable the status leds
  */
@@ -53,6 +56,7 @@ void cmd_set_status_led(uint8_t isEnabled)
 		status_led_turnoff();
 	}
 }
+#endif
 
 /**
  * Set/Reset brightness in automayic mode

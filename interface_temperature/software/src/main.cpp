@@ -7,9 +7,11 @@
 
 #define MAIN_C
 
+#include "cmd/term.hpp"
 #include "bootloader/bootloader.hpp"
 #include "bootloader/file_sys.hpp"
-#include "cmd/cmd_serial.hpp"
+#include "cmd/serial.hpp"
+#include "cmd/telnet.hpp"
 #include "flash/flash.hpp"
 #include "global.hpp"
 #include "io/inputs.hpp"
@@ -26,8 +28,16 @@ uint32_t tick, curTick;
 
 void setup()
 {
-	Serial.begin(115200);
-	Serial.print("\n\r\n\r"); // Jump some lines after internal firmware stuff
+#ifdef MODULE_SERIAL
+	serial_init();
+#endif
+#ifdef MODULE_TELNET
+	telnet_init();
+#endif
+#ifdef MODULE_TERM
+	term_init();
+#endif
+
 	log_info("Starting %s", FIRMWARE_VERSION);
 
 	status_init();
@@ -60,9 +70,6 @@ void setup()
 #ifdef MODULE_TELEGRAM
 	telegram_init();
 #endif
-#ifdef MODULE_CMD_SERIAL
-	cmd_serial_init();
-#endif
 }
 
 void loop(void)
@@ -88,8 +95,14 @@ void loop(void)
 #ifdef MODULE_STRIPLED
 		stripled_main();
 #endif
-#ifdef MODULE_CMD_SERIAL
-		cmd_serial_main();
+#ifdef MODULE_SERIAL
+		serial_main();
+#endif
+#ifdef MODULE_TELNET
+		telnet_main();
+#endif
+#ifdef MODULE_TERM
+		term_main();
 #endif
 #ifdef MODULE_STATUS_LED
 		status_led_main();
