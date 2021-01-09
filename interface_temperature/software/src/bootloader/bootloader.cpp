@@ -100,6 +100,11 @@ void bootloader_init(void)
 #endif
 }
 
+void bootloader_new_firmware_data(void)
+{
+
+}
+
 void bootloader_main(void)
 {
 	ArduinoOTA.handle();

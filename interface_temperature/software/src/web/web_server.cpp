@@ -7,6 +7,7 @@
 
 #ifdef ESP32
 #include <ESP32WebServer.h>
+#include <Update.h>
 #else
 #include <ESP8266WebServer.h>
 #endif
@@ -27,6 +28,20 @@ void web_server_init(void)
 {
 	server.begin();
 
+	// --- Firmware Upload ---
+	server.on("/firmware_upload", HTTP_POST, []() {
+		handle_firmware_upload();
+	}, []() {
+		handle_firmware_data();
+	});
+	server.on("/firmware_config", HTTP_GET, []() {
+		handle_firmware_config();
+	});
+
+	// --- Get/Set interface ---
+	server.on("/get_version", HTTP_GET, []() {
+		handle_get_version();
+	});
 	server.on("/get_animation", HTTP_GET, []() {
 		handle_get_animation();
 	});
@@ -67,6 +82,7 @@ void web_server_init(void)
 		handle_get_display_info();
 	});
 
+	// --- File management ---
 	server.onNotFound([]() {
 		if (!handle_file_read(server.uri())) {
 			server.send(404, "text/plain", "File Not Found");
@@ -131,6 +147,53 @@ bool handle_file_read(String path)
 void handle_bad_parameter(void)
 {
 	server.send(200, "text/plain", "Bad parameter");
+}
+
+void handle_firmware_upload(void)
+{
+	String msg = String(Update.getError());
+	server.sendHeader("Connection", "close");
+    server.send(200, "text/plain", msg);
+    ESP.restart();
+}
+
+void handle_firmware_data(void)
+{
+	HTTPUpload& upload = server.upload();
+
+    if (upload.status == UPLOAD_FILE_START) {
+      log_info("Starting update with: %s", upload.filename.c_str());
+      if (!Update.begin(0xFFFFFFFF)) { //start with max available size
+        //log_error("Firmware update: %s", Update.errorString());
+        Update.printError(Serial);
+      }
+    } else if (upload.status == UPLOAD_FILE_WRITE) {
+      /* flashing firmware to ESP*/
+      if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+        //log_error("Firmware update: %s", Update.errorString());
+        Update.printError(Serial);
+      }
+    } else if (upload.status == UPLOAD_FILE_END) {
+      if (Update.end(true)) { //true to set the size to the current progress
+        log_info("Firmware update DONE");
+      } else {
+        //log_error("Firmware update: %s", Update.errorString());
+        Update.printError(Serial);
+      }
+    }
+}
+
+void handle_firmware_config(void)
+{
+
+}
+
+/**
+ * Send 0 if LED are disabled and 1 if LED are enabled
+ */
+void handle_get_version(void)
+{
+	server.send(200, "text/plain", FIRMWARE_VERSION);
 }
 
 /**

@@ -16,6 +16,12 @@ void   web_server_main(void);
 String getContentType(String filename);
 bool   handle_file_read(String path);
 void   handle_bad_parameter(void);
+
+void handle_firmware_upload(void);
+void handle_firmware_data(void);
+void handle_firmware_config(void);
+
+void   handle_get_version(void);
 void   handle_get_animation(void);
 void   handle_set_animation(void);
 void   handle_get_demo_mode(void);

@@ -1,0 +1,65 @@
+body {
+  text-align: center;
+  background-color: rgb(43, 45, 47);
+  color: white;
+  font-family: "Arial", Times, Sans-serif;
+}
+h2 {
+  padding: 0;
+  border-left: 3px solid white;
+  padding-left: 10px;
+}
+#content {
+  width: 100%;
+  max-width: 300px;
+  margin: auto;
+  text-align: left;
+}
+#footer {
+  margin-top: 20px;
+  color: gray;
+  font-size: 15px;
+}
+.theme {
+  width: 100%;
+  padding: 5px;
+  -webkit-appearance: none;
+  border-radius: 5px;
+  border: white;
+  color: white;
+  background-color: rgb(100, 100, 100);
+  text-align: center;
+}
+.sliderH {
+  -webkit-appearance: slider-horizontal; /* WebKit */
+}
+.sliderV {
+  writing-mode: bt-lr; /* IE */
+  -webkit-appearance: slider-vertical; /* WebKit */
+  width: 8px;
+  height: 175px;
+  padding: 0 5px;
+}
+
+.slidersTable {
+  margin: 0 auto;
+  text-align: center;
+}
+.slidersTable td {
+  width: 30%;
+}
+
+.message_box {
+  text-align: center;
+  height: 18px;
+  margin: 6px 0px;
+  padding: 5px;
+  border-radius: 5px;
+  color: white;
+}
+.message_box_success {
+  background-color: #28a745;
+}
+.message_box_error {
+  background-color: #dc3545;
+}
