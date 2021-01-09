@@ -6,12 +6,10 @@
   */
 
 #ifdef ESP32
-#include "SPIFFS.h"
 #include <ESP32WebServer.h>
 #else
 #include <ESP8266WebServer.h>
 #endif
-#include <FS.h>
 #include <string>
 
 #include "bootloader/file_sys.hpp"
@@ -121,8 +119,8 @@ bool handle_file_read(String path)
 		path += "index.html";
 	}
 	String contentType = getContentType(path);
-	if (SPIFFS.exists(path)) {
-		File file = SPIFFS.open(path, "r");
+	if (file_sys_exist(path)) {
+		File file = file_sys_open(path, "r");
 		server.streamFile(file, contentType);
 		file.close();
 		return true;

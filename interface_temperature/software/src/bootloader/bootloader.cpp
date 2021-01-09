@@ -12,6 +12,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #endif
+
 #include <ArduinoOTA.h>
 #include <WiFiUdp.h>
 
@@ -57,7 +58,7 @@ void bootloader_init(void)
 		String type;
 		if (ArduinoOTA.getCommand() == U_FLASH) {
 			type = "sketch";
-		} else { // U_SPIFFS
+		} else {
 			type = "filesystem";
 		}
 

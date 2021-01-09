@@ -24,9 +24,11 @@
  * ===========================
  */
 #ifdef ESP32
-    #define G_WebServer ESP32WebServer
+    #define G_WebServer  ESP32WebServer
+    #define G_FileSystem SPIFFS
 #else
-    #define G_WebServer ESP8266WebServer
+    #define G_WebServer  ESP8266WebServer
+    #define G_FileSystem LittleFS
 #endif
 
 #define G_LANG_EN                                   0
