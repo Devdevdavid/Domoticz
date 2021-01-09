@@ -48,6 +48,12 @@ static void term_abort(void)
 
 static void term_execute_command(void)
 {
+	// If command is empty, display help menu
+	if (termPort.rxLength == 0) {
+		termPort.rxBuffer[0] = 'H';
+		termPort.rxLength = 0;
+	}
+
 	// Get a new line for awnser
 	switch (termPort.rxBuffer[0]) {
 	case 'H':
