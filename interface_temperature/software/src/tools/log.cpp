@@ -5,6 +5,7 @@
   * @date   12/08/2017
   */
 
+#include "global.hpp"
 #include "log.hpp"
 
 #include <stdlib.h>
