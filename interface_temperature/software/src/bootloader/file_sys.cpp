@@ -16,9 +16,21 @@
 
 void file_sys_init(void)
 {
-	if (!G_FileSystem.begin()) {
-		log_error("G_FileSystem failed to launch");
+	LittleFSConfig config(false); // false: no auto format
+
+	if (!G_FileSystem.setConfig(config)) {
+		log_error("FileSystem failed to set config");
+		goto retError;
 	}
+
+	if (!G_FileSystem.begin()) {
+		log_error("FileSystem failed to start");
+		goto retError;
+	}
+
+	return;
+retError:
+	_set(STATUS_APPLI, STATUS_APPLI_FILESYSTEM);
 }
 
 bool file_sys_exist(String &path)

@@ -83,7 +83,7 @@ void status_led_main(void)
 	} else if (_isset(STATUS_TEMP, STATUS_TEMP_1_FAULT | STATUS_TEMP_2_FAULT)) {
 		status_led[1].timeOn  = 200;
 		status_led[1].timeOff = 1800;
-	} else if (_isset(STATUS_APPLI, STATUS_APPLI_ERROR)) {
+	} else if (_isset(STATUS_APPLI, STATUS_APPLI_ERROR) || _isset(STATUS_APPLI, STATUS_APPLI_FILESYSTEM)) {
 		status_led[1].timeOn  = 100;
 		status_led[1].timeOff = 0;
 	} else {
