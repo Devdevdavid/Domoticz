@@ -42,7 +42,6 @@
 #define I_U                                         1                       /** Input pull-up */
 #define I_A                                         2                       /** Input analog */
 
-
 /**
  * This is the configuration for the board
  * TEMP_DOMOTICZ
@@ -79,9 +78,9 @@
     #endif
     #undef MODULE_WEBSERVER
     #undef MODULE_STRIPLED
-    #undef MODULE_SERIAL
+    #define MODULE_SERIAL
     #undef MODULE_TELNET
-    #undef MODULE_TERM
+    #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_CLIENT_SSID    /** SSID of the Access point/network to connect */
@@ -195,9 +194,9 @@
     #endif
     #undef MODULE_WEBSERVER
     #undef MODULE_STRIPLED
-    #undef MODULE_SERIAL
+    #define MODULE_SERIAL
     #undef MODULE_TELNET
-    #undef MODULE_TERM
+    #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_CLIENT_SSID   /** SSID of the Access point/network to connect */
@@ -294,9 +293,9 @@
     #undef MODULE_RELAY
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
-    #undef MODULE_SERIAL
+    #define MODULE_SERIAL
     #undef MODULE_TELNET
-    #undef MODULE_TERM
+    #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID/** SSID of the Access point/network to connect */
@@ -360,9 +359,9 @@
     #undef MODULE_RELAY
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
-    #undef MODULE_SERIAL
+    #define MODULE_SERIAL
     #undef MODULE_TELNET
-    #undef MODULE_TERM
+    #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LEDRGB_SSID    /** SSID of the Access point/network to connect */
@@ -385,8 +384,6 @@
     #define STRIPLED_MAX_NB_PIXELS                  140                   /** Maximum number of LED that can be supported */
     #define LIGHT_SENSOR_PIN                        -1                    /** Pin for Light sensor used to ajust output light level (-1 if not used) */
 
-    /** CUSTOM DEFINE for this board */
-    #define IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
 #endif /* BOARD_NEOPIXEL_WEB_THIERRY */
 
 /**
@@ -408,9 +405,9 @@
     #undef MODULE_RELAY
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
-    #undef MODULE_SERIAL
+    #define MODULE_SERIAL
     #undef MODULE_TELNET
-    #undef MODULE_TERM
+    #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID /** SSID of the Access point/network to connect */
@@ -433,8 +430,6 @@
     #define STRIPLED_MAX_NB_PIXELS                  140                   /** Maximum number of LED that can be supported */
     #define LIGHT_SENSOR_PIN                        -1                    /** Pin for Light sensor used to ajust output light level (-1 if not used) */
 
-    /** CUSTOM DEFINE for this board */
-    #define IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
 #endif /* BOARD_NEOPIXEL_WEB */
 
 
