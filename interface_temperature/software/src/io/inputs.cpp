@@ -24,13 +24,13 @@ void inputs_init(void)
 {
 	for (uint8_t i = 0; i < INPUTS_COUNT; i++) {
 		switch (inputModes[i]) {
-		case N:
+		case I_N:
 			pinMode(inputPins[i], INPUT);
 			break;
-		case U:
+		case I_U:
 			pinMode(inputPins[i], INPUT_PULLUP);
 			break;
-		case A:
+		case I_A:
 			/* Analog pins are init in analogRead() */
 			break;
 		default:
@@ -43,7 +43,7 @@ void inputs_init(void)
 uint16_t input_analog_read(uint8_t i)
 {
 	// Integrity check
-	if ((inputModes[i] != A) || (i >= INPUTS_COUNT)) {
+	if ((inputModes[i] != I_A) || (i >= INPUTS_COUNT)) {
 		return 0xFFFF;
 	}
 
@@ -54,7 +54,7 @@ void inputs_main(void)
 {
 	for (uint8_t i = 0; i < INPUTS_COUNT; i++) {
 		// Do not read Analog pins
-		if (inputModes[i] == A) {
+		if (inputModes[i] == I_A) {
 			continue;
 		}
 

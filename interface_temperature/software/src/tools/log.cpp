@@ -10,7 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#ifdef MODULE_TERM
 #include "cmd/term.hpp"
+#endif
 
 static char         message[128];
 static char         argsString[512];
@@ -30,7 +32,9 @@ void log_raw(const char * fmt, ...)
 
 	sprintf(message, "%s", argsString);
 
+#ifdef MODULE_TERM
 	term_print(message);
+#endif
 }
 
 void log_log(int level, const char * file, int line, const char * fmt, ...)
@@ -45,5 +49,7 @@ void log_log(int level, const char * file, int line, const char * fmt, ...)
 
 	sprintf(message, "%-5s [%s]:%d: %s\n", level_names[level], file, line, argsString);
 
+#ifdef MODULE_TERM
 	term_print(message);
+#endif
 }

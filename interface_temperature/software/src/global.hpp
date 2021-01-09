@@ -80,6 +80,8 @@
     #undef MODULE_WEBSERVER
     #undef MODULE_STRIPLED
     #undef MODULE_SERIAL
+    #undef MODULE_TELNET
+    #undef MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_CLIENT_SSID    /** SSID of the Access point/network to connect */
@@ -194,6 +196,8 @@
     #undef MODULE_WEBSERVER
     #undef MODULE_STRIPLED
     #undef MODULE_SERIAL
+    #undef MODULE_TELNET
+    #undef MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_CLIENT_SSID   /** SSID of the Access point/network to connect */
@@ -291,6 +295,8 @@
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
     #undef MODULE_SERIAL
+    #undef MODULE_TELNET
+    #undef MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID/** SSID of the Access point/network to connect */
@@ -355,6 +361,8 @@
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
     #undef MODULE_SERIAL
+    #undef MODULE_TELNET
+    #undef MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LEDRGB_SSID    /** SSID of the Access point/network to connect */
@@ -401,6 +409,8 @@
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
     #undef MODULE_SERIAL
+    #undef MODULE_TELNET
+    #undef MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID /** SSID of the Access point/network to connect */
