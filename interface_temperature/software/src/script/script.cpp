@@ -277,7 +277,7 @@ void script_main(void)
 		if (tick >= nextResetTick) {
 			nextResetTick = 0;
 			log_warn("Reseting due to delayed reset !");
-			ESP.reset();
+			ESP.restart();
 		}
 	}
 }
