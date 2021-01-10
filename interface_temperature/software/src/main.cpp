@@ -26,20 +26,37 @@
 
 uint32_t tick = 0, lastTick = 0;
 
-void ICACHE_RAM_ATTR timer1_interrupt()
+/**
+ * @brief Increment tick
+ * @details This function is located in IRAM
+ * to get better speed performance
+ */
+void ICACHE_RAM_ATTR tick_interrupt(void)
 {
 	tick++;
 }
 
+static void config_tick(void)
+{
+	// In both ESP32 and ESP8266, timers are working with a 80MHz clock
+#ifdef ESP32
+	// We use ESP32 Timer1 (0, 1, 2, 3 exists) to get the same ID as for ESP8266
+	hw_timer_t * timer = NULL;
+	timer = timerBegin(1, 80, true); // ID timer, prescaler, rising edge
+	timerAttachInterrupt(timer, &tick_interrupt, true);
+	timerAlarmWrite(timer, 1000, true); // 80MHz / 80 / 1000 = 1kHz
+	timerAlarmEnable(timer);
+#else
+	// Timer0 is used for wifi on ESP8266
+	timer1_attachInterrupt(tick_interrupt);
+    timer1_enable(TIM_DIV16, TIM_EDGE, TIM_LOOP);
+    timer1_write(5000); // 80MHz / 16 / 5000 = 1kHz
+#endif
+}
+
 void setup()
 {
-	timer1_attachInterrupt(timer1_interrupt);
-    timer1_enable(TIM_DIV16, TIM_EDGE, TIM_LOOP);
-#ifdef ESP32
-    timer1_write(5000); //80MHz / 16 / 5000 = 1kHz
-#else
-    timer1_write(5000); //80MHz / 16 / 5000 = 1kHz
-#endif
+	config_tick();
 
 #ifdef MODULE_SERIAL
 	serial_init();
