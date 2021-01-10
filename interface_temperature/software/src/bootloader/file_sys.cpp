@@ -16,12 +16,15 @@
 
 void file_sys_init(void)
 {
+	// This part is exclusive to LittleFS
+#ifdef FS_IS_LITTLEFS
 	LittleFSConfig config(false); // false: no auto format
 
-	if (!G_FileSystem.setConfig(config)) {
-		log_error("FileSystem failed to set config");
+	if (!LittleFS.setConfig(config)) {
+		log_error("LittleFS failed to set config");
 		goto retError;
 	}
+#endif
 
 	if (!G_FileSystem.begin()) {
 		log_error("FileSystem failed to start");
