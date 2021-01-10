@@ -15,6 +15,7 @@
 #include "temp/temp.hpp"
 
 extern uint32_t tick;
+uint32_t        nextResetTick             = 0;
 uint32_t        nextTempCheckTick         = 0;
 uint32_t        nextDomoticzUpdateTick    = 0;
 uint32_t        nextSecondRelayImpulsTick = UINT32_MAX; // Disabled at startup
@@ -270,6 +271,15 @@ void script_main(void)
 		detectorEndTick = UINT32_MAX;
 	}
 #endif
+
+	// Manage delayed reset
+	if (nextResetTick != 0) {
+		if (tick >= nextResetTick) {
+			nextResetTick = 0;
+			log_warn("Reseting due to delayed reset !");
+			ESP.reset();
+		}
+	}
 }
 
 #if defined(MODULE_RELAY)
@@ -305,3 +315,12 @@ void script_relay_set_event(bool isClosed)
 	}
 }
 #endif
+
+/**
+ * @brief Set a delayed reset occuring in tickCount ticks
+ * @note Use 0 to disable the delayed reset
+ */
+void script_delayed_reset(uint32_t tickCount)
+{
+	nextResetTick = tick + tickCount;
+}

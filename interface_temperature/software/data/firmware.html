@@ -87,12 +87,12 @@
       // track completion: both successful or not
       xhr.onloadend = function() {
         if ((xhr.status == 200) && (xhr.responseText == "0")) {
-          set_message("ok", "Installation...");
+          set_message("ok", "Installation... (10s)");
 
           // Program refresh
           setTimeout(function(){
              window.location.reload(1);
-          }, 5000);
+          }, 10000);
         } else {
           set_message("error", "Erreur lors de l'envoi: code=" + xhr.responseText);
         }

@@ -24,10 +24,23 @@
 #include "temp/temp.hpp"
 #include "web/web_server.hpp"
 
-uint32_t tick, curTick;
+uint32_t tick = 0, lastTick = 0;
+
+void ICACHE_RAM_ATTR timer1_interrupt()
+{
+	tick++;
+}
 
 void setup()
 {
+	timer1_attachInterrupt(timer1_interrupt);
+    timer1_enable(TIM_DIV16, TIM_EDGE, TIM_LOOP);
+#ifdef ESP32
+    timer1_write(5000); //80MHz / 16 / 5000 = 1kHz
+#else
+    timer1_write(5000); //80MHz / 16 / 5000 = 1kHz
+#endif
+
 #ifdef MODULE_SERIAL
 	serial_init();
 #endif
@@ -74,15 +87,14 @@ void setup()
 
 void loop(void)
 {
-	curTick = millis();
-
 	bootloader_main();
 #ifdef MODULE_WEBSERVER
 	web_server_main();
 #endif
 
-	if (tick != curTick) {
-		tick = curTick;
+	if (lastTick != tick) {
+		lastTick = tick;
+
 #ifdef MODULE_INPUTS
 		inputs_main();
 #endif

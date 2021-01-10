@@ -15,5 +15,6 @@ void script_main(void);
 void script_relay_feedback_event(void);
 void script_relay_set_event(bool isClosed);
 #endif
+void script_delayed_reset(uint32_t tickCount);
 
 #endif /* SCRIPT_SCRIPT_HPP s*/

@@ -19,6 +19,7 @@
 #include "io/inputs.hpp"
 #include "stripled/stripled.hpp"
 #include "web_server.hpp"
+#include "script/script.hpp"
 
 #ifdef MODULE_WEBSERVER
 
@@ -154,7 +155,6 @@ void handle_firmware_upload(void)
 	String msg = String(Update.getError());
 	server.sendHeader("Connection", "close");
     server.send(200, "text/plain", msg);
-    //ESP.restart();
 }
 
 void handle_firmware_data(void)
@@ -176,8 +176,11 @@ void handle_firmware_data(void)
 			Update.printError(Serial);
 		}
     } else if (upload.status == UPLOAD_FILE_END) {
-        if (Update.end(true)) { //true to set the size to the current progress
+        if (Update.end(true)) { // true: to set the size to the current progress
         	log_info("Firmware update DONE");
+
+        	// Reset to apply in 1s to let time to send HTTP response
+			script_delayed_reset(1000);
         } else {
         	Update.printError(Serial);
         }
