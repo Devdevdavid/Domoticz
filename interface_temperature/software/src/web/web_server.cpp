@@ -154,7 +154,7 @@ void handle_firmware_upload(void)
 	String msg = String(Update.getError());
 	server.sendHeader("Connection", "close");
     server.send(200, "text/plain", msg);
-    ESP.restart();
+    //ESP.restart();
 }
 
 void handle_firmware_data(void)
@@ -162,24 +162,25 @@ void handle_firmware_data(void)
 	HTTPUpload& upload = server.upload();
 
     if (upload.status == UPLOAD_FILE_START) {
-      log_info("Starting update with: %s", upload.filename.c_str());
-      if (!Update.begin(0xFFFFFFFF)) { //start with max available size
-        //log_error("Firmware update: %s", Update.errorString());
-        Update.printError(Serial);
-      }
+    	// Warning : contentLength is not the file length :
+    	// size of entire post request, file size + headers and other request data.
+    	// But it gives a good estimation of the amount of data needed.
+    	// Using max size will overwrite filesystem and therefore break the webserver
+		log_info("Starting update with: %s (%d kB)", upload.filename.c_str(), upload.contentLength / 1000);
+		if (!Update.begin(upload.contentLength)) {
+			Update.printError(Serial);
+		}
     } else if (upload.status == UPLOAD_FILE_WRITE) {
-      /* flashing firmware to ESP*/
-      if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-        //log_error("Firmware update: %s", Update.errorString());
-        Update.printError(Serial);
-      }
+    	// Write the buffer (2048 bytes max)
+		if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+			Update.printError(Serial);
+		}
     } else if (upload.status == UPLOAD_FILE_END) {
-      if (Update.end(true)) { //true to set the size to the current progress
-        log_info("Firmware update DONE");
-      } else {
-        //log_error("Firmware update: %s", Update.errorString());
-        Update.printError(Serial);
-      }
+        if (Update.end(true)) { //true to set the size to the current progress
+        	log_info("Firmware update DONE");
+        } else {
+        	Update.printError(Serial);
+        }
     }
 }
 
