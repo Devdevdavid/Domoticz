@@ -3,16 +3,11 @@
 Ce repository rassemble tous les projets en relation avec notre cher Pascal.
 Voici une rapide description des projets:
 
-## commande_led_rgb
-Ce projet était la première version du pilotage de ruban de led RGB par ESP.
-Il a par la suite été fusionné avec l'interface de température sous forme de module.
-Ce projet est donc désormais **obselète**.
-
-## interface_temperature
+## LightKit
 Un projet à base de module réalisé sur PlatformIO. Voici quelques unes de ses fonctionnalités :
 - Bootloader Mise à Jour OTA
 - Pilotage par UART avec un jeu de commande simple
-- Interface Domoticz
+- Interface Domoticz/Telegram
 - Gestion d'entrées/sorties
 - Pilotage de relais monostable et bistable
 - Execution de scripts
