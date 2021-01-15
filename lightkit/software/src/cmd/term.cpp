@@ -5,9 +5,9 @@
   * @date   19/12/2020
   */
 
-#include "global.hpp"
 #include "term.hpp"
 #include "cmd.hpp"
+#include "global.hpp"
 #include "serial.hpp"
 #include "telnet.hpp"
 
@@ -27,7 +27,7 @@ struct term_t termPort;
 static void term_reset(void)
 {
 	termPort.isInCmdValid = false;
-	termPort.rxLength = 0;
+	termPort.rxLength     = 0;
 }
 
 #define _term_ack(errorCode) term_ack(#errorCode, errorCode)
@@ -51,7 +51,7 @@ static void term_execute_command(void)
 	// If command is empty, display help menu
 	if (termPort.rxLength == 0) {
 		termPort.rxBuffer[0] = 'H';
-		termPort.rxLength = 0;
+		termPort.rxLength    = 0;
 	}
 
 	// Get a new line for awnser
@@ -61,6 +61,13 @@ static void term_execute_command(void)
 		break;
 	case 'T':
 		cmd_print_status();
+		break;
+	case 'F':
+		if (cmd_flash_setting_reset()) {
+			_term_ack(ERROR_INTERNAL);
+		} else {
+			_term_ack(OK);
+		}
 		break;
 #ifdef MODULE_STATUS_LED
 	case 'L':
@@ -237,9 +244,10 @@ void term_print(String str)
 	}
 }
 
-void term_init(void)
+int term_init(void)
 {
 	term_reset();
+	return 0;
 }
 
 void term_main(void)

@@ -41,9 +41,10 @@ extern uint8_t boardStatus[NB_STATUS];
 #define STATUS_APPLI_RELAY_FAULT 0x80
 
 /* STATUS_WIFI */
-#define STATUS_WIFI_IS_CO          0x01
-#define STATUS_WIFI_DEVICE_CO      0x02
-#define STATUS_WIFI_DOMOTICZ_FAULT 0x04
+#define STATUS_WIFI_IS_CO             0x01
+#define STATUS_WIFI_DEVICE_CO         0x02
+#define STATUS_WIFI_USING_FORCED_MODE 0x04
+#define STATUS_WIFI_DOMOTICZ_FAULT    0x08
 
 /* STATUS_TEMP */
 #define STATUS_TEMP_1_FAULT 0x01
@@ -52,6 +53,6 @@ extern uint8_t boardStatus[NB_STATUS];
 /* STATUS_SCRIPT */
 #define STATUS_SCRIPT_IN_ALERT 0x01
 
-void status_init(void);
+int status_init(void);
 
 #endif /* STATUS_H */

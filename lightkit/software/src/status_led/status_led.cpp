@@ -48,7 +48,7 @@ void status_led_turnoff(void)
 	}
 }
 
-void status_led_init(void)
+int status_led_init(void)
 {
 	status_led[0].pin = STATUS_LED_POWER_PIN;
 	status_led[1].pin = STATUS_LED_FAULT_PIN;
@@ -61,6 +61,8 @@ void status_led_init(void)
 		pinMode(status_led[index].pin, OUTPUT);
 		digitalWrite(status_led[index].pin, LOW);
 	}
+
+	return 0;
 }
 
 void status_led_main(void)
@@ -77,7 +79,7 @@ void status_led_main(void)
 	}
 
 	/* FAULT LED */
-	if (!_isset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
+	if (_isunset(STATUS_WIFI, STATUS_WIFI_IS_CO) || _isset(STATUS_WIFI, STATUS_WIFI_USING_FORCED_MODE)) {
 		status_led[1].timeOn  = 300;
 		status_led[1].timeOff = 500;
 	} else if (_isset(STATUS_TEMP, STATUS_TEMP_1_FAULT | STATUS_TEMP_2_FAULT)) {
@@ -155,11 +157,13 @@ void status_led_turnoff(void)
 	status_led_set_color('-');
 }
 
-void status_led_init(void)
+int status_led_init(void)
 {
 	neoPixel.begin();
 	neoPixel.setBrightness(STATUS_LED_NEOPIXEL_BRIGHTNESS);
 	cmd_set_status_led(true);
+
+	return 0;
 }
 
 void status_led_main(void)
@@ -176,7 +180,7 @@ void status_led_main(void)
 		status_led[0].timeOn  = 100;
 		status_led[0].timeOff = 900;
 		status_led[0].color   = 'r';
-	} else if (_isset(STATUS_WIFI, STATUS_WIFI_DOMOTICZ_FAULT) || _isunset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
+	} else if (_isset(STATUS_WIFI, STATUS_WIFI_DOMOTICZ_FAULT) || _isunset(STATUS_WIFI, STATUS_WIFI_IS_CO) || _isset(STATUS_WIFI, STATUS_WIFI_USING_FORCED_MODE)) {
 		// Wireless fault
 		status_led[0].timeOn  = 100;
 		status_led[0].timeOff = 900;

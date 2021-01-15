@@ -174,7 +174,7 @@ uint8_t temp_get_nb_sensor(void)
 	return (uint8_t) sensorCount;
 }
 
-void temp_init(void)
+int temp_init(void)
 {
 	char strTemp[3 * 8 + 1];
 	log_info("Locating OneWire devices... ");
@@ -197,6 +197,8 @@ void temp_init(void)
 		// On vérifie que le capteur est correctement configuré | Check that sensor is correctly configured
 		log_info("Resolution: %d bits", sensors.getResolution(sensorAddrList[sensorIndex]));
 	}
+
+	return 0;
 }
 
 void temp_main(void)

@@ -103,7 +103,7 @@
 
 #endif
 
-void telegram_init(void);
+int  telegram_init(void);
 void telegram_main(void);
 void telegram_send_msg_temperature(uint8_t sensorID, float degreesValue);
 void telegram_send_alert(bool isInAlert);

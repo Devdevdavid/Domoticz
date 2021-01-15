@@ -27,5 +27,6 @@ bool     cmd_get_demo_mode(void);
 int32_t  cmd_set_demo_mode(bool isDemoMode);
 uint8_t  cmd_get_animation(void);
 int32_t  cmd_set_animation(uint8_t animID);
+int32_t  cmd_flash_setting_reset(void);
 
 #endif /* CMD_CMD_H */

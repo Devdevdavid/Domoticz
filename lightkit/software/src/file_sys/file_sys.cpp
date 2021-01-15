@@ -14,7 +14,7 @@
 #include "LittleFS.h"
 #endif
 
-void file_sys_init(void)
+int file_sys_init(void)
 {
 	// This part is exclusive to LittleFS
 #ifdef FS_IS_LITTLEFS
@@ -31,17 +31,18 @@ void file_sys_init(void)
 		goto retError;
 	}
 
-	return;
+	return 0;
 retError:
 	_set(STATUS_APPLI, STATUS_APPLI_FILESYSTEM);
+	return -1;
 }
 
-bool file_sys_exist(String &path)
+bool file_sys_exist(String & path)
 {
 	return G_FileSystem.exists(path);
 }
 
-File file_sys_open(String &path, const char * mode)
+File file_sys_open(String & path, const char * mode)
 {
 	return G_FileSystem.open(path, mode);
 }

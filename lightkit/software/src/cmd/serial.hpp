@@ -11,7 +11,7 @@
 #include <Arduino.h>
 
 void serial_write(uint8_t byte);
-void serial_init(void);
+int  serial_init(void);
 void serial_main(void);
 
 #endif /* CMD_SERIAL_H */

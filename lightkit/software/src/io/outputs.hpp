@@ -12,7 +12,7 @@
 
 #ifdef MODULE_OUTPUTS
 
-void outputs_init();
+int  outputs_init();
 void output_set(uint8_t i, bool state);
 void output_delayed_set(uint8_t i, bool state, uint32_t delay);
 bool output_get(uint8_t i);

@@ -20,7 +20,7 @@ uint8_t         inputStates[INPUTS_COUNT]      = { 0 };
 uint32_t        inputRisingTick[INPUTS_COUNT]  = { 0 };
 uint32_t        inputFallingTick[INPUTS_COUNT] = { 0 };
 
-void inputs_init(void)
+int inputs_init(void)
 {
 	for (uint8_t i = 0; i < INPUTS_COUNT; i++) {
 		switch (inputModes[i]) {
@@ -38,6 +38,8 @@ void inputs_init(void)
 			break;
 		}
 	}
+
+	return 0;
 }
 
 uint16_t input_analog_read(uint8_t i)

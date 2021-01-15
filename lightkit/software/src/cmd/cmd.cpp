@@ -6,6 +6,7 @@
   */
 
 #include "cmd.hpp"
+#include "flash/flash.hpp"
 #include "global.hpp"
 #include "relay/relay.hpp"
 #include "status_led/status_led.hpp"
@@ -16,6 +17,7 @@ void cmd_print_help(void)
 	log_raw("=== " FIRMWARE_VERSION " ===\n");
 	log_raw("H                         This help\n");
 	log_raw("T                         Print board status\n");
+	log_raw("F                         Reset flash setting to default\n");
 #ifdef MODULE_STATUS_LED
 	log_raw("L[State]                  Toggle or set Led Visu Visibility\n");
 #endif
@@ -219,3 +221,11 @@ int32_t cmd_set_animation(uint8_t animID)
 	return set_animation(animID);
 }
 #endif
+
+/**
+ * @brief Call flash_use_default()
+ */
+int32_t cmd_flash_setting_reset(void)
+{
+	return flash_use_default();
+}

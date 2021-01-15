@@ -257,7 +257,7 @@ static String telegram_cmd_relay(String reply)
 /**
  * @brief Inititalize the telegram module
  */
-void telegram_init(void)
+int telegram_init(void)
 {
 	struct telegram_cmd_t * pCmd;
 
@@ -323,6 +323,8 @@ void telegram_init(void)
 		keyboardJson += "]";
 	}
 	keyboardJson += "]";
+
+	return 0;
 }
 
 /**

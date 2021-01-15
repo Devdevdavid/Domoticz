@@ -13,28 +13,25 @@
 #endif
 #include <string>
 
-#include "bootloader/file_sys.hpp"
 #include "cmd/cmd.hpp"
+#include "file_sys/file_sys.hpp"
 #include "global.hpp"
 #include "io/inputs.hpp"
+#include "script/script.hpp"
 #include "stripled/stripled.hpp"
 #include "web_server.hpp"
-#include "script/script.hpp"
 
 #ifdef MODULE_WEBSERVER
 
 G_WebServer server(80); //Server on port 80
 
-void web_server_init(void)
+int web_server_init(void)
 {
 	server.begin();
 
 	// --- Firmware Upload ---
-	server.on("/firmware_upload", HTTP_POST, []() {
-		handle_firmware_upload();
-	}, []() {
-		handle_firmware_data();
-	});
+	server.on(
+	"/firmware_upload", HTTP_POST, []() { handle_firmware_upload(); }, []() { handle_firmware_data(); });
 	server.on("/firmware_config", HTTP_GET, []() {
 		handle_firmware_config();
 	});
@@ -91,6 +88,7 @@ void web_server_init(void)
 	});
 
 	log_info("HTTP server started");
+	return 0;
 }
 
 void web_server_main(void)
@@ -154,44 +152,43 @@ void handle_firmware_upload(void)
 {
 	String msg = String(Update.getError());
 	server.sendHeader("Connection", "close");
-    server.send(200, "text/plain", msg);
+	server.send(200, "text/plain", msg);
 }
 
 void handle_firmware_data(void)
 {
-	HTTPUpload& upload = server.upload();
+	HTTPUpload & upload = server.upload();
 
-    if (upload.status == UPLOAD_FILE_START) {
-    	log_info("upload.totalSize = %d", upload.totalSize);
+	if (upload.status == UPLOAD_FILE_START) {
+		log_info("upload.totalSize = %d", upload.totalSize);
 
-    	// Warning : contentLength is not the file length :
-    	// size of entire post request, file size + headers and other request data.
-    	// But it gives a good estimation of the amount of data needed.
-    	// Using max size will overwrite filesystem and therefore break the webserver
+		// Warning : contentLength is not the file length :
+		// size of entire post request, file size + headers and other request data.
+		// But it gives a good estimation of the amount of data needed.
+		// Using max size will overwrite filesystem and therefore break the webserver
 		// log_info("Starting update with: %s (%d kB)", upload.filename.c_str(), upload.contentLength / 1000);
 		// if (!Update.begin(upload.contentLength)) {
 		// 	Update.printError(Serial);
 		// }
-    } else if (upload.status == UPLOAD_FILE_WRITE) {
-    	// Write the buffer (2048 bytes max)
+	} else if (upload.status == UPLOAD_FILE_WRITE) {
+		// Write the buffer (2048 bytes max)
 		// if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
 		// 	Update.printError(Serial);
 		// }
-    } else if (upload.status == UPLOAD_FILE_END) {
-        if (Update.end(true)) { // true: to set the size to the current progress
-        	log_info("Firmware update DONE");
+	} else if (upload.status == UPLOAD_FILE_END) {
+		if (Update.end(true)) { // true: to set the size to the current progress
+			log_info("Firmware update DONE");
 
-        	// Reset to apply in 1s to let time to send HTTP response
+			// Reset to apply in 1s to let time to send HTTP response
 			script_delayed_reset(1000);
-        } else {
-        	Update.printError(Serial);
-        }
-    }
+		} else {
+			Update.printError(Serial);
+		}
+	}
 }
 
 void handle_firmware_config(void)
 {
-
 }
 
 /**
@@ -333,8 +330,8 @@ void handle_set_nb_led(void)
  */
 void handle_get_color(void)
 {
-	uint32_t color = cmd_get_color();
-	String hexColor = String(color, HEX);
+	uint32_t color    = cmd_get_color();
+	String   hexColor = String(color, HEX);
 
 	// Add leading zeros
 	while (hexColor.length() < 6) {

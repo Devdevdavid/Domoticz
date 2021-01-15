@@ -15,6 +15,7 @@
 #define ERROR_BUFF_OVERRUN 3
 #define ERROR_SPURIOUS     4
 #define ERROR_WRONG_VALUE  5
+#define ERROR_INTERNAL     6
 
 #define TERM_RX_BUFFER_SIZE 64
 #define TERM_END_CMD        '\n'
@@ -22,7 +23,7 @@
 
 void term_rx(uint8_t byte);
 void term_print(String str);
-void term_init(void);
+int  term_init(void);
 void term_main(void);
 
 #endif /* CMD_TERM_HPP */

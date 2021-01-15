@@ -13,7 +13,7 @@
 #define TELNET_PORT 23
 
 void telnet_write(uint8_t byte);
-void telnet_init(void);
+int  telnet_init(void);
 void telnet_main(void);
 
 #endif /* TELNET_H */

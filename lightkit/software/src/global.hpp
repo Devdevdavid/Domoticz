@@ -62,7 +62,6 @@
     #endif
 
     /* MODULE DEFINITION (Use #define or #undef) */
-    #define MODULE_FLASH
     #define MODULE_TEMPERATURE
     #define MODULE_DOMOTICZ
     #define MODULE_STATUS_LED
@@ -183,7 +182,6 @@
     #endif
 
     /* MODULE DEFINITION (Use #define or #undef) */
-    #define MODULE_FLASH
     #define MODULE_TEMPERATURE
     #undef MODULE_DOMOTICZ
     #define MODULE_TELEGRAM
@@ -288,7 +286,6 @@
     #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - RING"
 
     /* MODULE DEFINITION (Use #define or #undef) */
-    #define MODULE_FLASH
     #undef MODULE_TEMPERATURE
     #undef MODULE_DOMOTICZ
     #undef MODULE_STATUS_LED
@@ -354,7 +351,6 @@
     #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - NEOPIXEL_WEB_THIERRY"
 
     /* MODULE DEFINITION (Use #define or #undef) */
-    #define MODULE_FLASH
     #undef MODULE_TEMPERATURE
     #undef MODULE_DOMOTICZ
     #undef MODULE_STATUS_LED
@@ -400,7 +396,6 @@
     #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - NEOPIXEL_WEB"
 
     /* MODULE DEFINITION (Use #define or #undef) */
-    #define MODULE_FLASH
     #undef MODULE_TEMPERATURE
     #undef MODULE_DOMOTICZ
     #undef MODULE_STATUS_LED
@@ -450,7 +445,6 @@
     #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - LIGHTKITV2 DAVID"
 
     /* MODULE DEFINITION (Use #define or #undef) */
-    #define MODULE_FLASH
     #undef MODULE_TEMPERATURE
     #undef MODULE_DOMOTICZ
     #undef MODULE_STATUS_LED

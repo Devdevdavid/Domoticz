@@ -11,68 +11,100 @@
 #include "global.hpp"
 #include <EEPROM.h>
 
-#ifdef MODULE_FLASH
+// Internals
+flash_settings_t flashSettings;
 
-void flash_init(void)
+// Externals
+extern wifi_handle_t defaultWifiSettings;
+
+static uint8_t flash_get_crc(uint8_t * pData, uint32_t size)
 {
-	EEPROM.begin(EEPROM_USED_SIZE);
+	uint32_t i;
+	uint8_t  crc = 0xFF;
+
+	for (i = 0; i < size; i++) {
+		crc = crc ^ (*pData++);
+	}
+
+	return crc;
+}
+
+static bool flash_is_ok(void)
+{
+	uint8_t crcFlash;
+
+	// Save crc
+	crcFlash          = flashSettings.crc;
+	flashSettings.crc = 0;
+
+	// Compute
+	flashSettings.crc = flash_get_crc((uint8_t *) &flashSettings, sizeof(flash_settings_t));
+
+	if (flashSettings.crc != crcFlash) {
+		return false;
+	}
+
+	return (flashSettings.version == FLASH_STRUCT_VERSION);
+}
+
+int flash_use_default(void)
+{
+	memset(&flashSettings, 0, sizeof(flash_settings_t));
+	memcpy(&flashSettings.wifiHandle, &defaultWifiSettings, sizeof(defaultWifiSettings));
+#ifdef MODULE_STRIPLED
+	flashSettings.stripNbLed     = STRIPLED_NB_PIXELS;
+	flashSettings.lastColor.r    = 255;
+	flashSettings.lastBrightness = 128;
+#endif
+	return flash_write();
+}
+
+int flash_init(void)
+{
+	uint32_t  i;
+	uint8_t * pFlashSettings = (uint8_t *) &flashSettings;
+
+	// Read flash
+	EEPROM.begin(sizeof(flash_settings_t));
+	for (i = 0; i < sizeof(flash_settings_t); i++) {
+		*pFlashSettings++ = EEPROM.read(i);
+	}
+	EEPROM.end();
 
 	if (flash_is_ok()) {
-		// Read data from flash only at boot
-		STATUS_NB_LED     = EEPROM.read(EEPROM_NB_LED_ADDRESS);
-		STATUS_COLOR_R    = EEPROM.read(EEPROM_COLOR_R_ADDRESS);
-		STATUS_COLOR_G    = EEPROM.read(EEPROM_COLOR_G_ADDRESS);
-		STATUS_COLOR_B    = EEPROM.read(EEPROM_COLOR_B_ADDRESS);
-		STATUS_BRIGHTNESS = EEPROM.read(EEPROM_BRIGHTNESS_ADDRESS);
+		log_info("Flash is valid: crc = 0x%02X (v%d)", flashSettings.crc, flashSettings.version);
 	} else {
 		log_error("Flash have been corrupted ! Using default values.");
-#ifdef MODULE_STRIPLED
-		STATUS_NB_LED     = STRIPLED_NB_PIXELS;
-		STATUS_BRIGHTNESS = STRIPLED_DEFAULT_BRIGHTNESS_VALUE;
-#else
-		STATUS_NB_LED     = 0;
-		STATUS_BRIGHTNESS = 0;
-#endif
-		STATUS_COLOR_R = 255; // White color
-		STATUS_COLOR_G = 255;
-		STATUS_COLOR_B = 255;
-		flash_write();
+		flash_use_default();
 	}
+
+	// Read data from flash only at boot
+	STATUS_NB_LED     = flashSettings.stripNbLed;
+	STATUS_COLOR_R    = flashSettings.lastColor.r;
+	STATUS_COLOR_G    = flashSettings.lastColor.g;
+	STATUS_COLOR_B    = flashSettings.lastColor.b;
+	STATUS_BRIGHTNESS = flashSettings.lastBrightness;
+
+	return 0;
 }
 
-bool flash_is_ok(void)
+int flash_write(void)
 {
-	uint8_t crcFlash = EEPROM.read(EEPROM_CRC_ADDRESS);
-	uint8_t crc      = 0xFF;
+	uint8_t * pFlashSettings = (uint8_t *) &flashSettings;
+	uint32_t  i;
 
-	// -1: do not include CRC in the computation
-	for (uint8_t i = 0; i < EEPROM_USED_SIZE - 1; i++) {
-		crc = crc ^ EEPROM.read(i);
-	}
+	flashSettings.version = FLASH_STRUCT_VERSION;
 
-	return (crc == crcFlash);
-}
-
-#define flash_hdlc_write(addr, value) \
-	{                                 \
-		EEPROM.write(addr, value);    \
-		crc ^= value;                 \
-	}
-
-void flash_write(void)
-{
-	uint8_t crc = 0xFF;
+	// Clear crc and compute the new one
+	flashSettings.crc = 0;
+	flashSettings.crc = flash_get_crc((uint8_t *) &flashSettings, sizeof(flash_settings_t));
 
 	// Write data
-	flash_hdlc_write(EEPROM_NB_LED_ADDRESS, STATUS_NB_LED);
-	flash_hdlc_write(EEPROM_COLOR_R_ADDRESS, STATUS_COLOR_R);
-	flash_hdlc_write(EEPROM_COLOR_G_ADDRESS, STATUS_COLOR_G);
-	flash_hdlc_write(EEPROM_COLOR_B_ADDRESS, STATUS_COLOR_B);
-	flash_hdlc_write(EEPROM_BRIGHTNESS_ADDRESS, STATUS_BRIGHTNESS);
+	EEPROM.begin(sizeof(flash_settings_t));
+	for (i = 0; i < sizeof(flash_settings_t); i++) {
+		EEPROM.write(i, *pFlashSettings++);
+	}
+	EEPROM.end();
 
-	// Write the ending CRC
-	EEPROM.write(EEPROM_CRC_ADDRESS, crc);
-	EEPROM.commit();
+	return 0;
 }
-
-#endif /* MODULE_FLASH */

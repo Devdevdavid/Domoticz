@@ -7,15 +7,15 @@
 
 #define MAIN_C
 
-#include "cmd/term.hpp"
-#include "bootloader/bootloader.hpp"
-#include "bootloader/file_sys.hpp"
 #include "cmd/serial.hpp"
 #include "cmd/telnet.hpp"
+#include "cmd/term.hpp"
+#include "file_sys/file_sys.hpp"
 #include "flash/flash.hpp"
 #include "global.hpp"
 #include "io/inputs.hpp"
 #include "io/outputs.hpp"
+#include "ota/ota.hpp"
 #include "relay/relay.hpp"
 #include "script/script.hpp"
 #include "status_led/status_led.hpp"
@@ -23,6 +23,7 @@
 #include "telegram/telegram.hpp"
 #include "temp/temp.hpp"
 #include "web/web_server.hpp"
+#include "wifi/wifi.hpp"
 
 uint32_t tick = 0, lastTick = 0;
 
@@ -36,81 +37,95 @@ void ICACHE_RAM_ATTR tick_interrupt(void)
 	tick++;
 }
 
-static void config_tick(void)
+static int config_tick(void)
 {
 	// In both ESP32 and ESP8266, timers are working with a 80MHz clock
 #ifdef ESP32
 	// We use ESP32 Timer1 (0, 1, 2, 3 exists) to get the same ID as for ESP8266
 	hw_timer_t * timer = NULL;
-	timer = timerBegin(1, 80, true); // ID timer, prescaler, rising edge
+	timer              = timerBegin(1, 80, true); // ID timer, prescaler, rising edge
 	timerAttachInterrupt(timer, &tick_interrupt, true);
 	timerAlarmWrite(timer, 1000, true); // 80MHz / 80 / 1000 = 1kHz
 	timerAlarmEnable(timer);
 #else
 	// Timer0 is used for wifi on ESP8266
 	timer1_attachInterrupt(tick_interrupt);
-    timer1_enable(TIM_DIV16, TIM_EDGE, TIM_LOOP);
-    timer1_write(5000); // 80MHz / 16 / 5000 = 1kHz
+	timer1_enable(TIM_DIV16, TIM_EDGE, TIM_LOOP);
+	timer1_write(5000); // 80MHz / 16 / 5000 = 1kHz
 #endif
+
+	return 0;
 }
 
-void setup()
+static int init_modules(void)
 {
-	config_tick();
+	CHECK_CALL(config_tick())
 
 #ifdef MODULE_SERIAL
-	serial_init();
+	CHECK_CALL(serial_init())
 #endif
 #ifdef MODULE_TELNET
-	telnet_init();
+	CHECK_CALL(telnet_init())
 #endif
 #ifdef MODULE_TERM
-	term_init();
+	CHECK_CALL(term_init())
 #endif
 
 	log_info("Starting %s", FIRMWARE_VERSION);
 
-	status_init();
-#ifdef MODULE_FLASH
-	flash_init();
-#endif
-	file_sys_init();
+	CHECK_CALL(status_init())
+	CHECK_CALL(flash_init())
+	CHECK_CALL(file_sys_init())
 #ifdef MODULE_INPUTS
-	inputs_init();
+	CHECK_CALL(inputs_init())
 #endif
 #ifdef MODULE_OUTPUTS
-	outputs_init();
+	CHECK_CALL(outputs_init())
 #endif
 #ifdef MODULE_STATUS_LED
-	status_led_init();
+	CHECK_CALL(status_led_init())
 #endif
-	bootloader_init();
+	CHECK_CALL(wifi_init())
+	CHECK_CALL(ota_init())
 #ifdef MODULE_WEBSERVER
-	web_server_init();
+	CHECK_CALL(web_server_init())
 #endif
 #ifdef MODULE_TEMPERATURE
-	temp_init();
+	CHECK_CALL(temp_init())
 #endif
 #ifdef MODULE_STRIPLED
-	stripled_init();
+	CHECK_CALL(stripled_init())
 #endif
 #ifdef MODULE_RELAY
-	relay_init();
+	CHECK_CALL(relay_init())
 #endif
 #ifdef MODULE_TELEGRAM
-	telegram_init();
+	CHECK_CALL(telegram_init())
 #endif
+	return 0;
+}
+
+void setup()
+{
+	if (init_modules() != 0) {
+		// We do not manage faulty modules
+		log_error("--- Infinite loop ---");
+		while (1)
+			;
+	}
 }
 
 void loop(void)
 {
-	bootloader_main();
+	ota_main();
 #ifdef MODULE_WEBSERVER
 	web_server_main();
 #endif
 
 	if (lastTick != tick) {
 		lastTick = tick;
+
+		wifi_main();
 
 #ifdef MODULE_INPUTS
 		inputs_main();

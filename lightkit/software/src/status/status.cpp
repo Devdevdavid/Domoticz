@@ -10,7 +10,8 @@
 #include "status/status.hpp"
 #include "cmd/cmd.hpp"
 
-void status_init(void)
+int status_init(void)
 {
 	memset(boardStatus, 0, NB_STATUS);
+	return 0;
 }

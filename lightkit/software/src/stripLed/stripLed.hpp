@@ -11,8 +11,8 @@
 #include <Arduino.h>
 
 /** Constants for refreshPeriod (The lower the faster the refresh will be) */
-#define STRIPLED_MAX_REFRESH_PERIOD 	   0
-#define STRIPLED_LOWPOWER_REFRESH_PERIOD (10*1000)
+#define STRIPLED_MAX_REFRESH_PERIOD      0
+#define STRIPLED_LOWPOWER_REFRESH_PERIOD (10 * 1000)
 
 /** Data structure for a level */
 struct brightLevel_t {
@@ -20,6 +20,12 @@ struct brightLevel_t {
 	uint16_t low;    /** Low value of input luminosity (0-1023) */
 	uint16_t high;   /** High value of input luminosity (0-1023) */
 };
+
+typedef struct {
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+} rgb_t;
 
 // StripLed
 void    brightness_set(uint8_t brightness);
@@ -31,7 +37,7 @@ void    stripled_set_demo_mode(bool isDemoModeEn);
 void    stripled_set_state(bool isOn);
 
 void brightness_table_init(void);
-void stripled_init(void);
+int  stripled_init(void);
 void stripled_main(void);
 
 #endif /* STRIPLED_STRIPLED_H */

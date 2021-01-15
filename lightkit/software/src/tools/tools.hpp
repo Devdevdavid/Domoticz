@@ -22,6 +22,12 @@
 #define _isset(base, flag)   (((base) & (flag)) != 0)
 #define _isunset(base, flag) (((base) & (flag)) == 0)
 
+#define CHECK_CALL(call)              \
+	if (call) {                       \
+		log_error(#call " failed()"); \
+		return -1;                    \
+	}
+
 uint16_t sToU16(const char * str, uint16_t length);
 
 #endif /* SRC_TOOLS_HPP_ */

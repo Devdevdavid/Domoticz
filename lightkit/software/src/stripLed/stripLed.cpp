@@ -209,7 +209,7 @@ void stripled_rmt_show(void)
 /**
  * Init the strip led
  */
-void stripled_init(void)
+int stripled_init(void)
 {
 	brightness_table_init();
 
@@ -234,6 +234,8 @@ void stripled_init(void)
 	stripled_set_demo_mode(true);
 
 	ws2812fx.start();
+
+	return 0;
 }
 
 /**

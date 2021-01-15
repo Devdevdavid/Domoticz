@@ -1,5 +1,5 @@
-#include "global.hpp"
 #include "telnet.hpp"
+#include "global.hpp"
 #include "term.hpp"
 
 #ifdef ESP32
@@ -18,10 +18,11 @@ void telnet_write(uint8_t byte)
 	telnetClient.write(&byte, 1);
 }
 
-void telnet_init(void)
+int telnet_init(void)
 {
 	telnetServer.begin();
- 	telnetServer.setNoDelay(true);
+	telnetServer.setNoDelay(true);
+	return 0;
 }
 
 void telnet_main(void)
@@ -33,14 +34,14 @@ void telnet_main(void)
 				telnetClient.stop();
 			}
 			telnetClient = telnetServer.available();
-      		telnetClient.flush();
-      	}
-  	}
+			telnetClient.flush();
+		}
+	}
 
-  	// Read Data from client and send it to terminal
-  	while (telnetClient.available()) {
-    	term_rx(telnetClient.read());
-  	}
+	// Read Data from client and send it to terminal
+	while (telnetClient.available()) {
+		term_rx(telnetClient.read());
+	}
 }
 
 #endif

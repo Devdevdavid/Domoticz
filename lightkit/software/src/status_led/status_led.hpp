@@ -27,7 +27,7 @@ struct status_led_t {
 
 void status_led_set_color(char color);
 void status_led_turnoff(void);
-void status_led_init(void);
+int  status_led_init(void);
 void status_led_main(void);
 
 #endif /* STATUS_LED_STATUS_LED_HPP */

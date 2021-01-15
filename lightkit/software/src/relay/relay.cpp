@@ -57,12 +57,14 @@ void relay_set_toogle_timeout(uint32_t timeoutMs)
 	nextRelayToggleTick = tick + timeoutMs;
 }
 
-void relay_init(void)
+int relay_init(void)
 {
 	pinMode(RELAY_FEEDBACK_PIN, INPUT);
 
 	// Set relay open
 	relay_set_state(false);
+
+	return 0;
 }
 
 void relay_main(void)

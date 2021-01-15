@@ -5,8 +5,8 @@
   * @date   12/08/2018
   */
 
-#include "global.hpp"
 #include "serial.hpp"
+#include "global.hpp"
 #include "term.hpp"
 
 #ifdef MODULE_SERIAL
@@ -19,10 +19,11 @@ void serial_write(uint8_t byte)
 	}
 }
 
-void serial_init(void)
+int serial_init(void)
 {
 	Serial.begin(115200);
 	Serial.print("\n\r\n\r"); // Jump some lines after internal firmware stuff
+	return 0;
 }
 
 void serial_main(void)

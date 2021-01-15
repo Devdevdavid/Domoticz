@@ -23,7 +23,7 @@ struct output_t {
 extern uint32_t        tick;
 static struct output_t outputData[OUTPUTS_COUNT] = { 0 };
 
-void outputs_init(void)
+int outputs_init(void)
 {
 	const uint8_t outputPins[OUTPUTS_COUNT] = OUTPUTS_PINS;
 
@@ -34,6 +34,8 @@ void outputs_init(void)
 		// Configure the pin as output
 		pinMode(outputData[i].pin, OUTPUT);
 	}
+
+	return 0;
 }
 
 void output_set(uint8_t i, bool state)

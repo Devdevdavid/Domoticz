@@ -5,25 +5,34 @@
   * @date   12/08/2018
   */
 
-#include "global.hpp"
-
 #ifndef FLASH_FLASH_HPP
 #define FLASH_FLASH_HPP
 
-#ifdef MODULE_FLASH
+#include "global.hpp"
+#include "stripLed/stripLed.hpp"
+#include "wifi/wifi.hpp"
 
 /** EEPROM used size in bytes */
-#define EEPROM_USED_SIZE          5
-#define EEPROM_NB_LED_ADDRESS     0
-#define EEPROM_COLOR_R_ADDRESS    1
-#define EEPROM_COLOR_G_ADDRESS    2
-#define EEPROM_COLOR_B_ADDRESS    3
-#define EEPROM_BRIGHTNESS_ADDRESS 4
-#define EEPROM_CRC_ADDRESS        5
+#define EEPROM_USED_SIZE 256
 
-void flash_init(void);
-bool flash_is_ok(void);
-void flash_write(void);
+/** Increment this each time flash_settings_t is incompatible with previous version */
+#define FLASH_STRUCT_VERSION 1
 
-#endif /** MODULE_FLASH */
+typedef struct {
+	uint8_t       stripNbLed;
+	rgb_t         lastColor;
+	uint8_t       lastBrightness;
+	wifi_handle_t wifiHandle;
+
+	// -- Used for flash purpose --
+	uint8_t crc;
+	uint8_t version;
+} flash_settings_t;
+
+static_assert(sizeof(flash_settings_t) < EEPROM_USED_SIZE, "flash_settings_t is bigger than EEPROM size");
+
+int flash_use_default(void);
+int flash_init(void);
+int flash_write(void);
+
 #endif /* FLASH_FLASH_HPP */
