@@ -17,7 +17,9 @@
 // This template system avoid leaking password on Github
 #include "private.hpp"
 
-#define LIGHTKIT_VERSION      "LightKit v1.9.6"
+#define APP_VERSION           "LightKit v1.9.6"
+#define BUILD_DATE            __DATE__ " " __TIME__
+#define LIGHTKIT_VERSION      APP_VERSION " build " BUILD_DATE
 
 /* ===========================
  * COMMON TO ALL BOARDS
