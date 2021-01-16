@@ -15,7 +15,7 @@ extern flash_settings_t flashSettings;
 // Internals
 wifi_handle_t * wifiHandle     = NULL;
 uint32_t        wifiTick       = 0;
-uint32_t        APFallbackTick = 0;
+uint32_t        APFallbackTick = 0; // Tick set at init before falling in AP mode in case of unsuccessfull client mode
 
 /**
  * We need some compiler tricks here
@@ -24,7 +24,7 @@ uint32_t        APFallbackTick = 0;
 // clang-format off
 wifi_handle_t defaultWifiSettings = {
 	.mode       = MODE_NONE,
-	.userMode   = MODE_CLIENT,
+	.userMode   = MODE_AP,
 	.forcedMode = MODE_NONE,
 
 	.ap = {

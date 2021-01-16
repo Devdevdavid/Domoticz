@@ -4,6 +4,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, user-scalable=no"/>
   <link rel="stylesheet" type="text/css" href="default.css" media="screen" />
+  <script src="lib.js"></script>
   <title>Ruban RGB</title>
 </head>
 <body onload="page_start()">
@@ -24,6 +25,7 @@
           <div id='progress_bar'></div>
         </div>
       </form>
+      <a href="index.html" class="theme">< Retour</a>
     </div>
   </div>
   <div id="footer">
@@ -45,25 +47,6 @@
       };
       xhttp.open('GET', url + '?' + params, true);
       xhttp.send();
-    }
-
-    function set_message(type, msg)
-    {
-      var statusMsg = document.getElementById('status_msg');
-      statusMsg.innerHTML = msg;
-
-      if (type == 'hide') {
-        statusMsg.style.display = "none";
-      } else {
-        statusMsg.style.display = "block";
-        if (type == 'error') {
-          statusMsg.classList.add("message_box_error");
-          statusMsg.classList.remove("message_box_success");
-        } else {
-          statusMsg.classList.remove("message_box_error");
-          statusMsg.classList.add("message_box_success");
-        }
-      }
     }
 
     function upload_file(file) {

@@ -1,3 +1,6 @@
+* {
+  box-sizing: border-box;
+}
 body {
   text-align: center;
   background-color: rgb(43, 45, 47);
@@ -21,14 +24,20 @@ h2 {
   font-size: 15px;
 }
 .theme {
+  display: block;
   width: 100%;
   padding: 5px;
+  margin: 8px 0px;
   -webkit-appearance: none;
   border-radius: 5px;
   border: white;
   color: white;
   background-color: rgb(100, 100, 100);
   text-align: center;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 25px;
+  text-decoration:none
 }
 .sliderH {
   -webkit-appearance: slider-horizontal; /* WebKit */
@@ -62,4 +71,28 @@ h2 {
 }
 .message_box_error {
   background-color: #dc3545;
+}
+
+.frame {
+  border: 1px solid gray;
+  margin: 5px 0px;
+  padding: 10px 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.classic_form label {
+  margin-top: 20px;
+}
+
+.classic_form input[type="text"], .classic_form input[type="number"] {
+  padding: 5px;
+  border-radius: 5px;
+  border: 0px;
+  width: 100%;
+}
+
+.classic_form_help {
+  color: gray;
+  font-size: 13px;
 }

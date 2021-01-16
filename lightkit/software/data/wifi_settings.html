@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="fr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no"/>
+  <link rel="stylesheet" type="text/css" href="default.css" media="screen" />
+  <title>Ruban RGB</title>
+  <script src="lib.js"></script>
+  <style type="text/css">
+    .classic_form .frame input {
+      font-family:'Courier New';
+      font-size: 13px;
+    }
+
+  </style>
+</head>
+<body onload="page_start()">
+  <h1 id="title">Ruban RGB</h1>
+  <div id="content">
+    <p id="status_msg" class="message_box">Erreur</p>
+    <div id="part_select_file">
+      <h2>Wifi</h2>
+      <p>
+        Configuration des paramètres pour la connexion wifi.
+      </p>
+      <form method='GET' id="wifi_form" class="classic_form">
+
+        <div class="frame">
+          <label>Mode :</label><br>
+          <input type="radio" id="wifiModeAP" name="wifiMode" value="ap" onchange="wifi_mode_changed()">
+          <label for="wifiModeAP">Point d'accès</label><br>
+          <input type="radio" id="wifiModeClient" name="wifiMode" value="client" onchange="wifi_mode_changed()">
+          <label for="wifiModeClient">Connexion à un réseau existant</label>
+        </div>
+        <!-- AP -->
+        <div class="frame">
+          <div id="wifiAPForm">
+            <label for="wifiAPSSID">SSID :</label><br>
+            <input type="text" id="wifiAPSSID" name="wifiAPSSID" placeholder="Ex: Lightkit_SSID"><br>
+
+            <br>
+            <label for="wifiAPPassword">Mot de passe :</label><br>
+            <input type="text" id="wifiAPPassword" name="wifiAPPassword" placeholder="Ex: jdhr-joei-klom"><br>
+
+            <br>
+            <label for="wifiAPIP">IP :</label><br>
+            <input type="text" id="wifiAPIP" name="wifiAPIP" placeholder="Ex: 192.168.1.1"><br>
+
+            <br>
+            <label for="wifiAPSubnet">Masque de sous-réseau :</label><br>
+            <input type="text" id="wifiAPSubnet" name="wifiAPSubnet" placeholder="Ex: 255.255.255.0"><br>
+
+            <br>
+            <label for="wifiAPGateway">Passerelle :</label><br>
+            <input type="text" id="wifiAPGateway" name="wifiAPGateway" placeholder="Ex: 192.168.1.254"><br>
+
+            <br>
+            <span>Paramètres avancés</span>
+            <hr>
+
+            <br>
+            <input type="checkbox" id="wifiAPisHidden" name="wifiAPisHidden" value="1">
+            <label for="wifiAPisHidden">SSID caché</label><br>
+
+            <br>
+            <label for="wifiAPChannel">Canal (De 1 à 16):</label><br>
+            <input type="number" id="wifiAPChannel" name="wifiAPChannel" value="1" min="1" max="16"><br>
+
+            <br>
+            <label for="wifiAPmaxCo">Connexions simultanées (De 1 à 3):</label><br>
+            <input type="number" id="wifiAPmaxCo" name="wifiAPmaxCo" value="1" min="1" max="3"><br>
+          </div>
+
+        <!-- Client -->
+          <div id="wifiClientForm">
+            <label for="wifiClientSSID">SSID :</label><br>
+            <input type="text" id="wifiClientSSID" name="wifiClientSSID" placeholder="Ex: BBox-787B9C"><br>
+
+            <br>
+            <label for="wifiClientPassword">Mot de passe :</label><br>
+            <input type="text" id="wifiClientPassword" name="wifiClientPassword" placeholder="Ex: jdhr-joei-klom"><br>
+
+            <br>
+            <label for="wifiAPmaxCo">Délais de passage en AP (60 sec max)</label><br>
+            <input type="number" id="wifiAPmaxCo" name="wifiAPmaxCo" value="1" min="1" max="60"><br>
+            <p class="classic_form_help">
+              Si le module ne parvient pas à se connecter au réseau existant avec les paramètres fournis, il basculera en mode Point d'Accès après le délais indiqué ci-dessus.
+            </p>
+
+          </div>
+        </div>
+
+        <div>
+          <button class="theme">Valeur par défaut</button>
+          <input type="submit" class="theme" value="Enregistrer"></input>
+          <a href="index.html" class="theme">< Retour</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+  <div id="footer">
+    Hardware - Pascal RONDANE<br>
+    Software - David DEVANT<br>
+    Janvier 2020
+  </div>
+  <script type="text/javascript">
+    /**
+     * Send params to url and call callback when response is ok
+     */
+    function cgi_request(url, params, callback)
+    {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          callback(xhttp.responseText);
+        }
+      };
+      xhttp.open('GET', url + '?' + params, true);
+      xhttp.send();
+    }
+
+    function wifi_mode_changed()
+    {
+      if (document.getElementById('wifiModeAP').checked) {
+        document.getElementById('wifiAPForm').style.display = 'block';
+        document.getElementById('wifiClientForm').style.display = 'none';
+      } else if (document.getElementById('wifiModeClient').checked) {
+        document.getElementById('wifiAPForm').style.display = 'none';
+        document.getElementById('wifiClientForm').style.display = 'block';
+      }
+    }
+
+    /**
+     * Start function to load the page
+     */
+    function page_start()
+    {
+      document.getElementById('wifiModeClient').checked = true;
+
+      // Hide the box
+      set_message("hide");
+
+      wifi_mode_changed();
+    }
+  </script>
+</body>
+</html>
