@@ -24,7 +24,7 @@ uint32_t        APFallbackTick = 0; // Tick set at init before falling in AP mod
 // clang-format off
 wifi_handle_t defaultWifiSettings = {
 	.mode       = MODE_NONE,
-	.userMode   = MODE_AP,
+	.userMode   = MODE_CLIENT,
 	.forcedMode = MODE_NONE,
 
 	.ap = {
@@ -96,6 +96,78 @@ static int wifi_client_init(void)
 
 	APFallbackTick = tick + wifiHandle->client.delayBeforeAPFallbackMs;
 	return 0;
+}
+
+static bool wifi_is_handle_valid(wifi_handle_t * pWifiHandle, String &reason)
+{
+	if (pWifiHandle->mode >= MODE_MAX) {
+		reason = "Mauvais mode";
+		return false;
+	}
+
+	if (strlen(pWifiHandle->ap.ssid) < 8) {
+		reason = "[AP] SSID trop court (8 car.)";
+		return false;
+	}
+	if (strlen(pWifiHandle->ap.password) < 8) {
+		reason = "[AP] Mot de passe trop court (8 car.)";
+		return false;
+	}
+	if ((pWifiHandle->ap.channel <= 0) || (pWifiHandle->ap.channel > 16)) {
+		reason = "[AP] Canal invalide: " + String(pWifiHandle->ap.channel) + " [1-16]";
+		return false;
+	}
+	if ((pWifiHandle->ap.maxConnection <= 0) || (pWifiHandle->ap.maxConnection > 3)) {
+		reason = "[AP] Connexion max. invalide [1-16]";
+		return false;
+	}
+	if (strlen(pWifiHandle->client.ssid) < 8) {
+		reason = "[Client] SSID trop court (8 car.)";
+		return false;
+	}
+	if (strlen(pWifiHandle->client.password) < 8) {
+		reason = "[Client] Mot de passe trop court (8 car.)";
+		return false;
+	}
+	if ((pWifiHandle->client.delayBeforeAPFallbackMs <= 0) || (pWifiHandle->client.delayBeforeAPFallbackMs > 60000)) {
+		reason = "[Client] Délais de passage en AP (60s max)";
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * @brief Provide a pointer to handle for other modules
+ */
+wifi_handle_t * wifi_get_handle(void)
+{
+	return wifiHandle;
+}
+
+/**
+ * @brief Use new settings for wifi module
+ * @details Store them in flash after validation check
+ */
+int32_t wifi_use_new_settings(wifi_handle_t * pWifiHandle, String &reason)
+{
+	if (wifi_is_handle_valid(pWifiHandle, reason)) {
+		// Copy new data to handle
+		memcpy(&wifiHandle, pWifiHandle, sizeof(wifi_handle_t));
+
+		// Save handle to flash
+		return flash_write();
+	} else {
+		return -1;
+	}
+}
+
+/**
+ * @brief Use default settings for wifi module
+ */
+int32_t wifi_use_default_settings(String &reason)
+{
+	return wifi_use_new_settings(&defaultWifiSettings, reason);
 }
 
 int wifi_init(void)

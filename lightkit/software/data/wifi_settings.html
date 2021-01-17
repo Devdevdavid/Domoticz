@@ -4,7 +4,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, user-scalable=no"/>
   <link rel="stylesheet" type="text/css" href="default.css" media="screen" />
-  <title>Ruban RGB</title>
+  <title>Lightkit</title>
   <script src="lib.js"></script>
   <style type="text/css">
     .classic_form .frame input {
@@ -15,7 +15,7 @@
   </style>
 </head>
 <body onload="page_start()">
-  <h1 id="title">Ruban RGB</h1>
+  <h1 id="title">Lightkit</h1>
   <div id="content">
     <p id="status_msg" class="message_box">Erreur</p>
     <div id="part_select_file">
@@ -23,7 +23,7 @@
       <p>
         Configuration des paramètres pour la connexion wifi.
       </p>
-      <form method='GET' id="wifi_form" class="classic_form">
+      <form id="wifi_form" class="classic_form">
 
         <div class="frame">
           <label>Mode :</label><br>
@@ -35,24 +35,27 @@
         <!-- AP -->
         <div class="frame">
           <div id="wifiAPForm">
+            <p class="classic_form_help">
+              Le module "crée son wifi" et l'on peut s'y connecter avec un smartphone.
+            </p>
             <label for="wifiAPSSID">SSID :</label><br>
-            <input type="text" id="wifiAPSSID" name="wifiAPSSID" placeholder="Ex: Lightkit_SSID"><br>
+            <input type="text" id="wifiAPSSID" name="wifiAPSSID" autocomplete="off" placeholder="Ex: Lightkit_SSID"><br>
 
             <br>
             <label for="wifiAPPassword">Mot de passe :</label><br>
-            <input type="text" id="wifiAPPassword" name="wifiAPPassword" placeholder="Ex: jdhr-joei-klom"><br>
+            <input type="text" id="wifiAPPassword" name="wifiAPPassword" autocomplete="off" placeholder="Ex: jdhr-joei-klom"><br>
 
             <br>
             <label for="wifiAPIP">IP :</label><br>
-            <input type="text" id="wifiAPIP" name="wifiAPIP" placeholder="Ex: 192.168.1.1"><br>
+            <input type="text" id="wifiAPIP" name="wifiAPIP" autocomplete="off" placeholder="Ex: 192.168.1.1"><br>
 
             <br>
             <label for="wifiAPSubnet">Masque de sous-réseau :</label><br>
-            <input type="text" id="wifiAPSubnet" name="wifiAPSubnet" placeholder="Ex: 255.255.255.0"><br>
+            <input type="text" id="wifiAPSubnet" name="wifiAPSubnet" autocomplete="off" placeholder="Ex: 255.255.255.0"><br>
 
             <br>
             <label for="wifiAPGateway">Passerelle :</label><br>
-            <input type="text" id="wifiAPGateway" name="wifiAPGateway" placeholder="Ex: 192.168.1.254"><br>
+            <input type="text" id="wifiAPGateway" name="wifiAPGateway" autocomplete="off" placeholder="Ex: 192.168.1.254"><br>
 
             <br>
             <span>Paramètres avancés</span>
@@ -64,25 +67,29 @@
 
             <br>
             <label for="wifiAPChannel">Canal (De 1 à 16):</label><br>
-            <input type="number" id="wifiAPChannel" name="wifiAPChannel" value="1" min="1" max="16"><br>
+            <input type="number" id="wifiAPChannel" name="wifiAPChannel" autocomplete="off" value="1" min="1" max="16"><br>
 
             <br>
             <label for="wifiAPmaxCo">Connexions simultanées (De 1 à 3):</label><br>
-            <input type="number" id="wifiAPmaxCo" name="wifiAPmaxCo" value="1" min="1" max="3"><br>
+            <input type="number" id="wifiAPmaxCo" name="wifiAPmaxCo" autocomplete="off" value="1" min="1" max="3"><br>
           </div>
 
         <!-- Client -->
           <div id="wifiClientForm">
+            <p class="classic_form_help">
+              Le module se connecte à un réseau wifi existant grâce au SSID et mode passe wifi.
+            </p>
+
             <label for="wifiClientSSID">SSID :</label><br>
-            <input type="text" id="wifiClientSSID" name="wifiClientSSID" placeholder="Ex: BBox-787B9C"><br>
+            <input type="text" id="wifiClientSSID" name="wifiClientSSID" autocomplete="off" placeholder="Ex: BBox-787B9C"><br>
 
             <br>
             <label for="wifiClientPassword">Mot de passe :</label><br>
-            <input type="text" id="wifiClientPassword" name="wifiClientPassword" placeholder="Ex: jdhr-joei-klom"><br>
+            <input type="text" id="wifiClientPassword" name="wifiClientPassword" autocomplete="off" placeholder="Ex: jdhr-joei-klom"><br>
 
             <br>
-            <label for="wifiAPmaxCo">Délais de passage en AP (60 sec max)</label><br>
-            <input type="number" id="wifiAPmaxCo" name="wifiAPmaxCo" value="1" min="1" max="60"><br>
+            <label for="wifiClientDelayBeforeAPFallbackMs">Délais de passage en AP (60 sec max)</label><br>
+            <input type="number" id="wifiClientDelayBeforeAPFallbackMs" name="wifiClientDelayBeforeAPFallbackMs" autocomplete="off" value="1" min="1" max="60"><br>
             <p class="classic_form_help">
               Si le module ne parvient pas à se connecter au réseau existant avec les paramètres fournis, il basculera en mode Point d'Accès après le délais indiqué ci-dessus.
             </p>
@@ -91,8 +98,8 @@
         </div>
 
         <div>
-          <button class="theme">Valeur par défaut</button>
-          <input type="submit" class="theme" value="Enregistrer"></input>
+          <button id="wifiFormDefault" class="theme">Valeur par défaut</button>
+          <button id="wifiFormSubmit" class="theme">Enregistrer</button>
           <a href="index.html" class="theme">< Retour</a>
         </div>
 
@@ -105,21 +112,13 @@
     Janvier 2020
   </div>
   <script type="text/javascript">
-    /**
-     * Send params to url and call callback when response is ok
-     */
-    function cgi_request(url, params, callback)
-    {
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          callback(xhttp.responseText);
-        }
-      };
-      xhttp.open('GET', url + '?' + params, true);
-      xhttp.send();
-    }
+    const MODE_NONE = 0;
+    const MODE_AP = 1;
+    const MODE_CLIENT = 2;
 
+    /**
+     * @brief Hide/Show form parts acording to selected mode
+     */
     function wifi_mode_changed()
     {
       if (document.getElementById('wifiModeAP').checked) {
@@ -131,17 +130,96 @@
       }
     }
 
+    function write_wifi_form(json)
+    {
+      document.getElementById('wifiModeAP').checked = (json["mode"] == MODE_AP);
+      document.getElementById('wifiModeClient').checked = (json["mode"] == MODE_CLIENT);
+      document.getElementById('wifiAPSSID').value = json["ap"]["ssid"];
+      document.getElementById('wifiAPPassword').value = json["ap"]["password"];
+      document.getElementById('wifiAPIP').value = json["ap"]["ip"];
+      document.getElementById('wifiAPSubnet').value = json["ap"]["subnet"];
+      document.getElementById('wifiAPGateway').value = json["ap"]["gateway"];
+      document.getElementById('wifiAPisHidden').checked = json["ap"]["isHidden"];
+      document.getElementById('wifiAPChannel').value = json["ap"]["channel"];
+      document.getElementById('wifiAPmaxCo').value = json["ap"]["maxConnection"];
+      document.getElementById('wifiClientSSID').value = json["client"]["ssid"];
+      document.getElementById('wifiClientPassword').value = json["client"]["password"];
+      document.getElementById('wifiClientDelayBeforeAPFallbackMs').value = json["client"]["delayBeforeAPFallbackMs"] / 1000;
+    }
+
+    function read_wifi_form(json)
+    {
+      var json = {};
+
+      json["use_default"] = false;
+
+      if (document.getElementById('wifiModeAP').checked) {
+        json["mode"] = MODE_AP;
+      } else if (document.getElementById('wifiModeClient').checked) {
+        json["mode"] = MODE_CLIENT;
+      } else {
+        json["mode"] = MODE_NONE;
+      }
+      json["ap"] = {};
+      json["ap"]["ssid"] = document.getElementById('wifiAPSSID').value;
+      json["ap"]["password"] = document.getElementById('wifiAPPassword').value;
+      json["ap"]["ip"] = document.getElementById('wifiAPIP').value;
+      json["ap"]["subnet"] = document.getElementById('wifiAPSubnet').value;
+      json["ap"]["gateway"] = document.getElementById('wifiAPGateway').value;
+      json["ap"]["isHidden"] = document.getElementById('wifiAPisHidden').checked;
+      json["ap"]["channel"] = document.getElementById('wifiAPChannel').value;
+      json["ap"]["maxConnection"] = document.getElementById('wifiAPmaxCo').value;
+      json["client"] = {};
+      json["client"]["ssid"] = document.getElementById('wifiClientSSID').value;
+      json["client"]["password"] = document.getElementById('wifiClientPassword').value;
+      json["client"]["delayBeforeAPFallbackMs"] = document.getElementById('wifiClientDelayBeforeAPFallbackMs').value * 1000;
+
+      var params = 'v=' + JSON.stringify(json);
+      cgi_request('/set_wifi_settings', params, function(textReply) {
+        if (textReply == "ok") {
+          set_message('ok', 'Paramètres sauvegardés !<br>Redémarrez pour prendre en compte');
+        } else {
+          set_message('error', textReply);
+        }
+      });
+    }
+
+    function use_default(json)
+    {
+      var json = {};
+
+      json["use_default"] = true;
+
+      var params = 'v=' + JSON.stringify(json);
+      cgi_request('/set_wifi_settings', params, function(textReply) {
+        set_message('ok', 'Paramètres sauvegardés !<br>Redémarrez pour prendre en compte');
+      });
+    }
+
     /**
      * Start function to load the page
      */
     function page_start()
     {
-      document.getElementById('wifiModeClient').checked = true;
-
       // Hide the box
       set_message("hide");
 
-      wifi_mode_changed();
+      document.getElementById('wifiFormSubmit').onclick = function(event) {
+        event.preventDefault()
+        read_wifi_form();
+      }
+      document.getElementById('wifiFormDefault').onclick = function(event) {
+        event.preventDefault()
+        use_default();
+      }
+
+      cgi_request('/get_wifi_settings', '', function(textReply) {
+        var json = JSON.parse(textReply);
+        write_wifi_form(json);
+
+        // Update mode
+        wifi_mode_changed();
+      });
     }
   </script>
 </body>

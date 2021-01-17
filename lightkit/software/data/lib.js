@@ -1,3 +1,6 @@
+/**
+ * @brief Set error message in box id=status_msg
+ */
 function set_message(type, msg)
 {
   var statusMsg = document.getElementById('status_msg');
@@ -10,9 +13,24 @@ function set_message(type, msg)
     if (type == 'error') {
       statusMsg.classList.add("message_box_error");
       statusMsg.classList.remove("message_box_success");
-    } else {
+    } else if (type == 'ok') {
       statusMsg.classList.remove("message_box_error");
       statusMsg.classList.add("message_box_success");
     }
   }
+}
+
+/**
+ * Send params to url and call callback when response is ok
+ */
+function cgi_request(url, params, callback)
+{
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      callback(xhttp.responseText);
+    }
+  };
+  xhttp.open('GET', url + '?' + params, true);
+  xhttp.send();
 }

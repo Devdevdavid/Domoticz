@@ -37,7 +37,9 @@ typedef enum
 {
 	MODE_NONE = 0,
 	MODE_AP,
-	MODE_CLIENT
+	MODE_CLIENT,
+
+	MODE_MAX
 } WIFI_MODE_E;
 
 /**
@@ -72,6 +74,9 @@ typedef struct {
 } wifi_handle_t;
 
 // PROTOTYPES
+wifi_handle_t * wifi_get_handle(void);
+int32_t wifi_use_new_settings(wifi_handle_t * pWifiHandle, String &reason);
+int32_t wifi_use_default_settings(String &reason);
 int  wifi_init(void);
 void wifi_main(void);
 

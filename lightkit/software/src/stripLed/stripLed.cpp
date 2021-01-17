@@ -231,7 +231,7 @@ int stripled_init(void)
 	// Go into demo mode at startup
 	stripled_set_state(true);
 	set_animation(STRIPLED_DEFAULT_ANIMATION_ID);
-	stripled_set_demo_mode(true);
+	//stripled_set_demo_mode(true);
 
 	ws2812fx.start();
 
