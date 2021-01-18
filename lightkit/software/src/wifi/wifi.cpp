@@ -98,10 +98,20 @@ static int wifi_client_init(void)
 	return 0;
 }
 
+/**
+ * @brief Check if pWifiHandle contains valid data
+ *
+ * @param pWifiHandle Data to check
+ * @param reason Text message containing the reason of not valid
+ * @warning This text message appears in the webserver, it has to be
+ * written using the appropriate language
+ *
+ * @return boolean
+ */
 static bool wifi_is_handle_valid(wifi_handle_t * pWifiHandle, String &reason)
 {
-	if (pWifiHandle->mode >= MODE_MAX) {
-		reason = "Mauvais mode";
+	if (pWifiHandle->userMode >= MODE_MAX) {
+		reason = "Mauvais mode wifi";
 		return false;
 	}
 
@@ -153,7 +163,9 @@ int32_t wifi_use_new_settings(wifi_handle_t * pWifiHandle, String &reason)
 {
 	if (wifi_is_handle_valid(pWifiHandle, reason)) {
 		// Copy new data to handle
-		memcpy(&wifiHandle, pWifiHandle, sizeof(wifi_handle_t));
+		memcpy(wifiHandle, pWifiHandle, sizeof(wifi_handle_t));
+		wifiHandle->forcedMode = MODE_NONE;
+		wifiHandle->mode = MODE_NONE;
 
 		// Save handle to flash
 		return flash_write();
@@ -165,8 +177,9 @@ int32_t wifi_use_new_settings(wifi_handle_t * pWifiHandle, String &reason)
 /**
  * @brief Use default settings for wifi module
  */
-int32_t wifi_use_default_settings(String &reason)
+int32_t wifi_use_default_settings(void)
 {
+	String reason;
 	return wifi_use_new_settings(&defaultWifiSettings, reason);
 }
 
@@ -204,6 +217,10 @@ int wifi_init(void)
 		wifi_print();
 	} else {
 		log_error("Wifi mode not supported: %d", wifiHandle->mode);
+
+		// Somehow, we managed to save a wrong configuration
+		// Use default for next reset
+		wifi_use_default_settings();
 	}
 
 	// Check error

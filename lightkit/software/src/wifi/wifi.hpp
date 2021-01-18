@@ -76,7 +76,7 @@ typedef struct {
 // PROTOTYPES
 wifi_handle_t * wifi_get_handle(void);
 int32_t wifi_use_new_settings(wifi_handle_t * pWifiHandle, String &reason);
-int32_t wifi_use_default_settings(String &reason);
+int32_t wifi_use_default_settings(void);
 int  wifi_init(void);
 void wifi_main(void);
 

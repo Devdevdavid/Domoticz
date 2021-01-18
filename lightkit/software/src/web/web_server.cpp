@@ -396,7 +396,7 @@ void handle_get_wifi_settings(void)
 
 	wifiHandle = wifi_get_handle();
 
-	json["mode"] = wifiHandle->mode;
+	json["userMode"] = wifiHandle->userMode;
 	json["ap"]["ssid"] = wifiHandle->ap.ssid;
 	json["ap"]["password"] = wifiHandle->ap.password;
 	json["ap"]["channel"] = wifiHandle->ap.channel;
@@ -420,11 +420,8 @@ void handle_set_wifi_settings(void)
 {
 	String reason = "";
 	int32_t ret = 0;
-	wifi_handle_t * wifiHandle;
 	wifi_handle_t wifiHandleTmp;
 	DynamicJsonDocument json(1024);
-
-	wifiHandle = wifi_get_handle();
 
 	if (!server.hasArg("v")) {
 		handle_bad_parameter();
@@ -434,10 +431,10 @@ void handle_set_wifi_settings(void)
 	deserializeJson(json, server.arg("v"));
 
 	if (json["use_default"] == true) {
-		ret = wifi_use_default_settings(reason);
+		ret = wifi_use_default_settings();
 	} else {
 		// Copy data
-		wifiHandleTmp.mode = json["mode"];
+		wifiHandleTmp.userMode = json["userMode"];
 		strncpy(wifiHandleTmp.ap.ssid, json["ap"]["ssid"].as<char*>(), WIFI_SSID_MAX_LEN);
 		strncpy(wifiHandleTmp.ap.password, json["ap"]["password"].as<char*>(), WIFI_PASSWORD_MAX_LEN);
 		wifiHandleTmp.ap.channel = json["ap"]["channel"];
@@ -454,8 +451,10 @@ void handle_set_wifi_settings(void)
 	}
 
 	if (ret == 0) {
+		log_info("Using new wifi settings");
 		server.send(200, "text/plain", "ok");
 	} else {
+		log_info("Failed to update wifi settings: %s", reason.c_str());
 		server.send(200, "text/plain", reason);
 	}
 }

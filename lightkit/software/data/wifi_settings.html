@@ -77,7 +77,7 @@
         <!-- Client -->
           <div id="wifiClientForm">
             <p class="classic_form_help">
-              Le module se connecte à un réseau wifi existant grâce au SSID et mode passe wifi.
+              Le module se connecte à un réseau wifi existant grâce au SSID et mot de passe wifi.
             </p>
 
             <label for="wifiClientSSID">SSID :</label><br>
@@ -132,8 +132,8 @@
 
     function write_wifi_form(json)
     {
-      document.getElementById('wifiModeAP').checked = (json["mode"] == MODE_AP);
-      document.getElementById('wifiModeClient').checked = (json["mode"] == MODE_CLIENT);
+      document.getElementById('wifiModeAP').checked = (json["userMode"] == MODE_AP);
+      document.getElementById('wifiModeClient').checked = (json["userMode"] == MODE_CLIENT);
       document.getElementById('wifiAPSSID').value = json["ap"]["ssid"];
       document.getElementById('wifiAPPassword').value = json["ap"]["password"];
       document.getElementById('wifiAPIP').value = json["ap"]["ip"];
@@ -154,11 +154,11 @@
       json["use_default"] = false;
 
       if (document.getElementById('wifiModeAP').checked) {
-        json["mode"] = MODE_AP;
+        json["userMode"] = MODE_AP;
       } else if (document.getElementById('wifiModeClient').checked) {
-        json["mode"] = MODE_CLIENT;
+        json["userMode"] = MODE_CLIENT;
       } else {
-        json["mode"] = MODE_NONE;
+        json["userMode"] = MODE_NONE;
       }
       json["ap"] = {};
       json["ap"]["ssid"] = document.getElementById('wifiAPSSID').value;
