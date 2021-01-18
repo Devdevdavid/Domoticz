@@ -14,9 +14,9 @@ extern flash_settings_t flashSettings;
 
 // Internals
 wifi_handle_t * wifiHandle     = NULL;
-uint32_t        wifiTick       = 0;
-uint32_t        APFallbackTick = 0; // Tick set at init before falling in AP mode in case of unsuccessfull client mode
-
+uint32_t        wifiTick       = WIFI_CHECK_PERIOD; // Init with its value to avoid an execution on the first run of wifi_main()
+uint32_t        APFallbackTick = 0;                 // Tick set at init before falling in AP mode in case of unsuccessfull client mode
+bool            isAPConfigToDo;
 /**
  * We need some compiler tricks here
  * See: https://pcbartists.com/firmware/esp32-firmware/designator-outside-aggregate-initializer-solved/
@@ -80,10 +80,16 @@ static void wifi_fallback_as_ap(void)
 static int wifi_ap_init(void)
 {
 	WiFi.mode(WIFI_AP);
+
 	WiFi.softAP(wifiHandle->ap.ssid, wifiHandle->ap.password, wifiHandle->ap.channel, wifiHandle->ap.isHidden, wifiHandle->ap.maxConnection);
+
 	/** This line does magic, keep it here */
 	WiFi.persistent(false);
-	WiFi.softAPConfig(wifiHandle->ap.ip, wifiHandle->ap.gateway, wifiHandle->ap.subnet);
+
+	// We have to wait at least 100ms after WiFi.softAP() before calling WiFi.softAPConfig()
+	// so we moved this call into the main function with the flag isAPConfigToDo
+	// More info : https://github.com/espressif/arduino-esp32/issues/985#issuecomment-359157428
+	isAPConfigToDo = true;
 	return 0;
 }
 
@@ -108,7 +114,7 @@ static int wifi_client_init(void)
  *
  * @return boolean
  */
-static bool wifi_is_handle_valid(wifi_handle_t * pWifiHandle, String &reason)
+static bool wifi_is_handle_valid(wifi_handle_t * pWifiHandle, String & reason)
 {
 	if (pWifiHandle->userMode >= MODE_MAX) {
 		reason = "Mauvais mode wifi";
@@ -159,13 +165,13 @@ wifi_handle_t * wifi_get_handle(void)
  * @brief Use new settings for wifi module
  * @details Store them in flash after validation check
  */
-int32_t wifi_use_new_settings(wifi_handle_t * pWifiHandle, String &reason)
+int32_t wifi_use_new_settings(wifi_handle_t * pWifiHandle, String & reason)
 {
 	if (wifi_is_handle_valid(pWifiHandle, reason)) {
 		// Copy new data to handle
 		memcpy(wifiHandle, pWifiHandle, sizeof(wifi_handle_t));
 		wifiHandle->forcedMode = MODE_NONE;
-		wifiHandle->mode = MODE_NONE;
+		wifiHandle->mode       = MODE_NONE;
 
 		// Save handle to flash
 		return flash_write();
@@ -211,7 +217,7 @@ int wifi_init(void)
 		ret = wifi_ap_init();
 
 		// In AP, we are ready to print now
-		wifi_print();
+		//wifi_print();
 	} else if (wifiHandle->mode == MODE_CLIENT) {
 		ret = wifi_client_init();
 		wifi_print();
@@ -239,6 +245,13 @@ void wifi_main(void)
 		wifiTick = tick + WIFI_CHECK_PERIOD;
 
 		if (wifiHandle->mode == MODE_AP) {
+			// We have to wait a bit before calling WiFi.softAPConfig()
+			// so do it here 1 time after one WIFI_CHECK_PERIOD
+			if (isAPConfigToDo) {
+				isAPConfigToDo = false;
+				WiFi.softAPConfig(wifiHandle->ap.ip, wifiHandle->ap.gateway, wifiHandle->ap.subnet);
+			}
+
 			if (WiFi.softAPgetStationNum() <= 0) {
 				_unset(STATUS_WIFI, STATUS_WIFI_DEVICE_CO);
 			} else {
