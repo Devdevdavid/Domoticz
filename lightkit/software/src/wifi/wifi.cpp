@@ -217,7 +217,7 @@ int wifi_init(void)
 		ret = wifi_ap_init();
 
 		// In AP, we are ready to print now
-		//wifi_print();
+		wifi_print();
 	} else if (wifiHandle->mode == MODE_CLIENT) {
 		ret = wifi_client_init();
 		wifi_print();
