@@ -23,13 +23,15 @@
 #define WIFI_SSID_MAX_LEN     30
 #define WIFI_PASSWORD_MAX_LEN 30
 
+#define IP_TO_U32(a, b, c, d) ((uint32_t)((d << 24) | (c << 16) | (b << 8) | a))
+
 #define WIFI_DEFAULT_SSID              "LightKit_SSID"
 #define WIFI_DEFAULT_PASSWORD          "bravo42beta"
 #define WIFI_DEFAULT_CHANNEL           1
 #define WIFI_DEFAULT_MAXCO             1
-#define WIFI_DEFAULT_IP                192, 168, 4, 1
-#define WIFI_DEFAULT_GATEWAY           192, 168, 4, 254
-#define WIFI_DEFAULT_SUBNET            255, 255, 255, 0
+#define WIFI_DEFAULT_IP                IP_TO_U32(192, 168, 4, 1)
+#define WIFI_DEFAULT_GATEWAY           IP_TO_U32(192, 168, 4, 254)
+#define WIFI_DEFAULT_SUBNET            IP_TO_U32(255, 255, 255, 0)
 #define WIFI_DEFAULT_DELAY_AP_FALLBACK 10000
 
 // Structures and enums
@@ -54,14 +56,14 @@ typedef struct {
 
 	// WIFI_MODE_AP
 	struct {
-		char      ssid[WIFI_SSID_MAX_LEN];
-		char      password[WIFI_PASSWORD_MAX_LEN];
-		uint8_t   channel;       // Wifi Channel [1-13] (Default = 1)
-		uint8_t   maxConnection; // Max connection supported by AP
-		uint8_t   isHidden : 1;  // Tell if SSID is hidden
-		IPAddress ip;            // Local ip address
-		IPAddress gateway;       // Gateway address
-		IPAddress subnet;        // Netmask of the network
+		char     ssid[WIFI_SSID_MAX_LEN];
+		char     password[WIFI_PASSWORD_MAX_LEN];
+		uint8_t  channel;       // Wifi Channel [1-13] (Default = 1)
+		uint8_t  maxConnection; // Max connection supported by AP
+		uint8_t  isHidden : 1;  // Tell if SSID is hidden
+		uint32_t ip;            // Local ip address
+		uint32_t gateway;       // Gateway address
+		uint32_t subnet;        // Netmask of the network
 	} ap;
 
 	// WIFI_MODE_CLIENT
@@ -75,9 +77,9 @@ typedef struct {
 
 // PROTOTYPES
 wifi_handle_t * wifi_get_handle(void);
-int32_t wifi_use_new_settings(wifi_handle_t * pWifiHandle, String &reason);
-int32_t wifi_use_default_settings(void);
-int  wifi_init(void);
-void wifi_main(void);
+int32_t         wifi_use_new_settings(wifi_handle_t * pWifiHandle, String & reason);
+int32_t         wifi_use_default_settings(void);
+int             wifi_init(void);
+void            wifi_main(void);
 
 #endif /* WIFI_WIFI_HPP */

@@ -33,9 +33,9 @@ wifi_handle_t defaultWifiSettings = {
 		.channel = WIFI_DEFAULT_CHANNEL,
 		.maxConnection = WIFI_DEFAULT_MAXCO,
 		.isHidden = false,
-		{ .ip = IPAddress(WIFI_DEFAULT_IP) },
-		{ .gateway = IPAddress(WIFI_DEFAULT_GATEWAY) },
-		{ .subnet = IPAddress(WIFI_DEFAULT_SUBNET) }
+		.ip = WIFI_DEFAULT_IP,
+		.gateway = WIFI_DEFAULT_GATEWAY,
+		.subnet = WIFI_DEFAULT_SUBNET
 	},
 	.client = {
 		{ .ssid = P_WIFI_CLIENT_SSID },
@@ -91,6 +91,11 @@ static int wifi_ap_init(void)
 	// More info : https://github.com/espressif/arduino-esp32/issues/985#issuecomment-359157428
 	isAPConfigToDo = true;
 	return 0;
+}
+
+static void wifi_ap_init_later(void)
+{
+	WiFi.softAPConfig(IPAddress(wifiHandle->ap.ip), IPAddress(wifiHandle->ap.gateway), IPAddress(wifiHandle->ap.subnet));
 }
 
 static int wifi_client_init(void)
@@ -249,7 +254,7 @@ void wifi_main(void)
 			// so do it here 1 time after one WIFI_CHECK_PERIOD
 			if (isAPConfigToDo) {
 				isAPConfigToDo = false;
-				WiFi.softAPConfig(wifiHandle->ap.ip, wifiHandle->ap.gateway, wifiHandle->ap.subnet);
+				wifi_ap_init_later();
 			}
 
 			if (WiFi.softAPgetStationNum() <= 0) {

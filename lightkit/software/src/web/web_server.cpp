@@ -11,10 +11,9 @@
 #else
 #include <ESP8266WebServer.h>
 #endif
-#include <string>
 #include <ArduinoJson.h>
+#include <string>
 
-#include "wifi/wifi.hpp"
 #include "cmd/cmd.hpp"
 #include "file_sys/file_sys.hpp"
 #include "global.hpp"
@@ -22,6 +21,7 @@
 #include "script/script.hpp"
 #include "stripled/stripled.hpp"
 #include "web_server.hpp"
+#include "wifi/wifi.hpp"
 
 #ifdef MODULE_WEBSERVER
 
@@ -390,23 +390,26 @@ void handle_get_display_info(void)
  */
 void handle_get_wifi_settings(void)
 {
-	wifi_handle_t * wifiHandle;
+	wifi_handle_t *     wifiHandle;
 	DynamicJsonDocument json(1024);
-	String jsonString;
+	String              jsonString = "";
 
 	wifiHandle = wifi_get_handle();
 
-	json["userMode"] = wifiHandle->userMode;
-	json["ap"]["ssid"] = wifiHandle->ap.ssid;
-	json["ap"]["password"] = wifiHandle->ap.password;
-	json["ap"]["channel"] = wifiHandle->ap.channel;
-	json["ap"]["maxConnection"] = wifiHandle->ap.maxConnection;
-	json["ap"]["isHidden"] = wifiHandle->ap.isHidden == 1;
-	json["ap"]["ip"] = wifiHandle->ap.ip.toString();
-	json["ap"]["gateway"] = wifiHandle->ap.gateway.toString();
-	json["ap"]["subnet"] = wifiHandle->ap.subnet.toString();
-	json["client"]["ssid"] = wifiHandle->client.ssid;
-	json["client"]["password"] = wifiHandle->client.password;
+	json["userMode"]                          = wifiHandle->userMode;
+	json["ap"]["ssid"]                        = wifiHandle->ap.ssid;
+	json["ap"]["password"]                    = wifiHandle->ap.password;
+	json["ap"]["channel"]                     = wifiHandle->ap.channel;
+	json["ap"]["maxConnection"]               = wifiHandle->ap.maxConnection;
+	json["ap"]["isHidden"]                    = wifiHandle->ap.isHidden == 1;
+	IPAddress ip                              = IPAddress(wifiHandle->ap.ip);
+	json["ap"]["ip"]                          = ip.toString();
+	IPAddress gateway                         = IPAddress(wifiHandle->ap.gateway);
+	json["ap"]["gateway"]                     = gateway.toString();
+	IPAddress subnet                          = IPAddress(wifiHandle->ap.subnet);
+	json["ap"]["subnet"]                      = subnet.toString();
+	json["client"]["ssid"]                    = wifiHandle->client.ssid;
+	json["client"]["password"]                = wifiHandle->client.password;
 	json["client"]["delayBeforeAPFallbackMs"] = wifiHandle->client.delayBeforeAPFallbackMs;
 
 	serializeJson(json, jsonString);
@@ -418,10 +421,13 @@ void handle_get_wifi_settings(void)
  */
 void handle_set_wifi_settings(void)
 {
-	String reason = "";
-	int32_t ret = 0;
-	wifi_handle_t wifiHandleTmp;
+	String              reason = "";
+	int32_t             ret    = 0;
+	wifi_handle_t       wifiHandleTmp;
 	DynamicJsonDocument json(1024);
+	IPAddress           ip;
+	IPAddress           gateway;
+	IPAddress           subnet;
 
 	if (!server.hasArg("v")) {
 		handle_bad_parameter();
@@ -433,18 +439,24 @@ void handle_set_wifi_settings(void)
 	if (json["use_default"] == true) {
 		ret = wifi_use_default_settings();
 	} else {
+
 		// Copy data
 		wifiHandleTmp.userMode = json["userMode"];
-		strncpy(wifiHandleTmp.ap.ssid, json["ap"]["ssid"].as<char*>(), WIFI_SSID_MAX_LEN);
-		strncpy(wifiHandleTmp.ap.password, json["ap"]["password"].as<char*>(), WIFI_PASSWORD_MAX_LEN);
-		wifiHandleTmp.ap.channel = json["ap"]["channel"];
+		strncpy(wifiHandleTmp.ap.ssid, json["ap"]["ssid"].as<char *>(), WIFI_SSID_MAX_LEN);
+		strncpy(wifiHandleTmp.ap.password, json["ap"]["password"].as<char *>(), WIFI_PASSWORD_MAX_LEN);
+		wifiHandleTmp.ap.channel       = json["ap"]["channel"];
 		wifiHandleTmp.ap.maxConnection = json["ap"]["maxConnection"];
-		wifiHandleTmp.ap.isHidden = json["ap"]["isHidden"].as<bool>();
-		wifiHandleTmp.ap.ip.fromString(json["ap"]["ip"].as<char*>());
-		wifiHandleTmp.ap.gateway.fromString(json["ap"]["gateway"].as<char*>());
-		wifiHandleTmp.ap.subnet.fromString(json["ap"]["subnet"].as<char*>());
-		strncpy(wifiHandleTmp.client.ssid, json["client"]["ssid"].as<char*>(), WIFI_PASSWORD_MAX_LEN);
-		strncpy(wifiHandleTmp.client.password, json["client"]["password"].as<char*>(), WIFI_SSID_MAX_LEN);
+		wifiHandleTmp.ap.isHidden      = json["ap"]["isHidden"].as<bool>();
+
+		ip.fromString(json["ap"]["ip"].as<char *>());
+		wifiHandleTmp.ap.ip = (uint32_t) ip;
+		gateway.fromString(json["ap"]["gateway"].as<char *>());
+		wifiHandleTmp.ap.gateway = (uint32_t) gateway;
+		subnet.fromString(json["ap"]["subnet"].as<char *>());
+		wifiHandleTmp.ap.subnet = (uint32_t) subnet;
+
+		strncpy(wifiHandleTmp.client.ssid, json["client"]["ssid"].as<char *>(), WIFI_PASSWORD_MAX_LEN);
+		strncpy(wifiHandleTmp.client.password, json["client"]["password"].as<char *>(), WIFI_SSID_MAX_LEN);
 		wifiHandleTmp.client.delayBeforeAPFallbackMs = json["client"]["delayBeforeAPFallbackMs"];
 
 		ret = wifi_use_new_settings(&wifiHandleTmp, reason);
