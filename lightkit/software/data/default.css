@@ -95,3 +95,32 @@ h2 {
   color: gray;
   font-size: 13px;
 }
+
+#wifiScanList {
+  padding: 5px;
+}
+
+#wifiScanList > div {
+  cursor: pointer;
+  padding: 5px 0px;
+  border-bottom: 1px solid gray;
+  display: flex;
+}
+#wifiScanList > div:nth-child(1) {
+  border-top: 1px solid gray;
+}
+#wifiScanList > div:hover {
+  background-color: rgb(55, 55, 55);
+}
+
+#wifiScanList span {
+  flex: 1;
+}
+
+#wifiScanList img {
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+
