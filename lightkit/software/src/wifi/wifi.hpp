@@ -19,9 +19,11 @@
 #endif
 
 // Constants
-#define WIFI_CHECK_PERIOD     1000
-#define WIFI_SSID_MAX_LEN     30
-#define WIFI_PASSWORD_MAX_LEN 30
+#define WIFI_CHECK_PERIOD         1000
+#define WIFI_SSID_MAX_LEN         30
+#define WIFI_PASSWORD_MAX_LEN     30
+#define WIFI_DELAYED_CONFIG_MS    100
+#define WIFI_SCAN_MIN_INTERVAL_MS 5000
 
 #define IP_TO_U32(a, b, c, d) ((uint32_t)((d << 24) | (c << 16) | (b << 8) | a))
 
@@ -32,7 +34,7 @@
 #define WIFI_DEFAULT_IP                IP_TO_U32(192, 168, 4, 1)
 #define WIFI_DEFAULT_GATEWAY           IP_TO_U32(192, 168, 4, 254)
 #define WIFI_DEFAULT_SUBNET            IP_TO_U32(255, 255, 255, 0)
-#define WIFI_DEFAULT_DELAY_AP_FALLBACK 10000
+#define WIFI_DEFAULT_DELAY_AP_FALLBACK 20000
 
 // Structures and enums
 typedef enum
@@ -40,6 +42,7 @@ typedef enum
 	MODE_NONE = 0,
 	MODE_AP,
 	MODE_CLIENT,
+	MODE_SCAN,
 
 	MODE_MAX
 } WIFI_MODE_E;
@@ -79,6 +82,7 @@ typedef struct {
 wifi_handle_t * wifi_get_handle(void);
 int32_t         wifi_use_new_settings(wifi_handle_t * pWifiHandle, String & reason);
 int32_t         wifi_use_default_settings(void);
+int32_t         wifi_start_scan_req(void);
 int             wifi_init(void);
 void            wifi_main(void);
 

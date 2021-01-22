@@ -414,6 +414,8 @@ void handle_get_wifi_settings(void)
 
 	serializeJson(json, jsonString);
 	server.send(200, "text/plain", jsonString);
+
+	wifi_start_scan_req();
 }
 
 /**

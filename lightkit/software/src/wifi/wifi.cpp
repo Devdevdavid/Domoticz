@@ -13,10 +13,16 @@ extern uint32_t         tick;
 extern flash_settings_t flashSettings;
 
 // Internals
-wifi_handle_t * wifiHandle     = NULL;
-uint32_t        wifiTick       = WIFI_CHECK_PERIOD; // Init with its value to avoid an execution on the first run of wifi_main()
-uint32_t        APFallbackTick = 0;                 // Tick set at init before falling in AP mode in case of unsuccessfull client mode
-bool            isAPConfigToDo;
+wifi_handle_t * wifiHandle = NULL;
+
+uint32_t wifiTick = 0;
+// Tick set at init before falling in AP mode in case of unsuccessfull client mode
+uint32_t    APFallbackTick     = UINT32_MAX;
+uint32_t    isAPConfigToDoTick = UINT32_MAX; // Tick use to end AP config after a delay
+uint32_t    isScanToStartTick  = UINT32_MAX; // Tick use to start a scan
+uint32_t    lastScanTick       = 0;          // Tick use to save the instant of the last scan
+WIFI_MODE_E modeBeforeScan     = MODE_NONE;
+
 /**
  * We need some compiler tricks here
  * See: https://pcbartists.com/firmware/esp32-firmware/designator-outside-aggregate-initializer-solved/
@@ -81,7 +87,11 @@ static int wifi_ap_init(void)
 {
 	WiFi.mode(WIFI_AP);
 
-	WiFi.softAP(wifiHandle->ap.ssid, wifiHandle->ap.password, wifiHandle->ap.channel, wifiHandle->ap.isHidden, wifiHandle->ap.maxConnection);
+	WiFi.softAP(wifiHandle->ap.ssid,
+				wifiHandle->ap.password,
+				wifiHandle->ap.channel,
+				wifiHandle->ap.isHidden,
+				wifiHandle->ap.maxConnection);
 
 	/** This line does magic, keep it here */
 	WiFi.persistent(false);
@@ -89,7 +99,7 @@ static int wifi_ap_init(void)
 	// We have to wait at least 100ms after WiFi.softAP() before calling WiFi.softAPConfig()
 	// so we moved this call into the main function with the flag isAPConfigToDo
 	// More info : https://github.com/espressif/arduino-esp32/issues/985#issuecomment-359157428
-	isAPConfigToDo = true;
+	isAPConfigToDoTick = tick + WIFI_DELAYED_CONFIG_MS;
 	return 0;
 }
 
@@ -158,6 +168,72 @@ static bool wifi_is_handle_valid(wifi_handle_t * pWifiHandle, String & reason)
 	return true;
 }
 
+static void printScanResult(int networksFound)
+{
+	Serial.printf("%d network(s) found\n", networksFound);
+	for (int i = 0; i < networksFound; i++) {
+		Serial.printf("%d: %s, Ch:%d (%ddBm) %s\n", i + 1,
+					  WiFi.SSID(i).c_str(), WiFi.channel(i), WiFi.RSSI(i),
+					  WiFi.encryptionType(i) == ENC_TYPE_NONE ? "open" : "");
+	}
+}
+
+static int32_t wifi_end_scan(uint32_t count)
+{
+	int32_t ret = -1;
+
+	// Check if not scanning
+	if (wifiHandle->mode != MODE_SCAN) {
+		return -1;
+	}
+
+	wifiHandle->mode = modeBeforeScan;
+	modeBeforeScan   = MODE_NONE;
+
+	printScanResult(count);
+
+	// Re-init
+	if (wifiHandle->mode == MODE_AP) {
+		ret = wifi_ap_init();
+	} else if (wifiHandle->mode == MODE_CLIENT) {
+		ret = wifi_client_init();
+	} else {
+		// Don't panic and do something
+		wifi_fallback_as_ap();
+	}
+
+	return ret;
+}
+
+static int32_t wifi_start_scan(void)
+{
+	// Check if already scanning
+	if (wifiHandle->mode == MODE_SCAN) {
+		return -1;
+	}
+
+	// Check if it is too soon to ask for a new scan
+	if ((tick - lastScanTick) < WIFI_SCAN_MIN_INTERVAL_MS) {
+		return -2;
+	}
+
+	log_info("Starting wifi scan");
+
+	lastScanTick     = tick;
+	modeBeforeScan   = wifiHandle->mode;
+	wifiHandle->mode = MODE_SCAN;
+
+	WiFi.mode(WIFI_STA);
+	WiFi.disconnect();
+
+	delay(100);
+
+	// Start the scan
+	WiFi.scanNetworksAsync(wifi_end_scan);
+
+	return 0;
+}
+
 /**
  * @brief Provide a pointer to handle for other modules
  */
@@ -194,6 +270,12 @@ int32_t wifi_use_default_settings(void)
 	return wifi_use_new_settings(&defaultWifiSettings, reason);
 }
 
+int32_t wifi_start_scan_req(void)
+{
+	isScanToStartTick = tick + WIFI_DELAYED_CONFIG_MS;
+	return 0;
+}
+
 int wifi_init(void)
 {
 	int ret = -1;
@@ -220,12 +302,8 @@ int wifi_init(void)
 	// Init wifi according to mode
 	if (wifiHandle->mode == MODE_AP) {
 		ret = wifi_ap_init();
-
-		// In AP, we are ready to print now
-		wifi_print();
 	} else if (wifiHandle->mode == MODE_CLIENT) {
 		ret = wifi_client_init();
-		wifi_print();
 	} else {
 		log_error("Wifi mode not supported: %d", wifiHandle->mode);
 
@@ -233,6 +311,9 @@ int wifi_init(void)
 		// Use default for next reset
 		wifi_use_default_settings();
 	}
+
+	// Print settings
+	wifi_print();
 
 	// Check error
 	if (ret) {
@@ -252,8 +333,8 @@ void wifi_main(void)
 		if (wifiHandle->mode == MODE_AP) {
 			// We have to wait a bit before calling WiFi.softAPConfig()
 			// so do it here 1 time after one WIFI_CHECK_PERIOD
-			if (isAPConfigToDo) {
-				isAPConfigToDo = false;
+			if (tick > isAPConfigToDoTick) {
+				isAPConfigToDoTick = UINT32_MAX;
 				wifi_ap_init_later();
 			}
 
@@ -278,5 +359,10 @@ void wifi_main(void)
 				}
 			}
 		}
+	}
+
+	if (tick > isScanToStartTick) {
+		isScanToStartTick = UINT32_MAX;
+		wifi_start_scan();
 	}
 }
