@@ -84,9 +84,14 @@
             <label for="wifiClientSSID">SSID :</label><br>
             <input type="text" id="wifiClientSSID" name="wifiClientSSID" autocomplete="off" placeholder="Ex: BBox-787B9C"><br>
 
-            <br><span>Réseaux découverts:</span>
+            <br>
+            <div class="spanned_img">
+              <span>Réseaux découverts:</span>
+              <img id="loadingIcon" src="loading.gif">
+            </div>
+
+            <!-- The list of SSIDs -->
             <div id="wifiScanList">
-              <div>OPTICNERVE</div>
             </div>
 
             <br>
@@ -184,7 +189,7 @@
       var params = 'v=' + JSON.stringify(json);
       cgi_request('/set_wifi_settings', params, function(textReply) {
         if (textReply == "ok") {
-          set_message('ok', 'Paramètres sauvegardés !<br>Redémarrez pour prendre en compte');
+          set_message('ok', 'Paramètres sauvegardés !<br>LightKit va redémarrer');
         } else {
           set_message('error', textReply);
         }
@@ -195,21 +200,45 @@
     {
       scanList = document.getElementById('wifiScanList');
 
+      if (json["scanCount"] < 0) {
+        // Scan is not finished, try to get results in 5s
+        setTimeout(function() { refresh_scan_list() }, 5000);
+        return;
+      }
+
+      // We got a non null result, hide loading icon
+      document.getElementById('loadingIcon').style.visibility = 'hidden';
+
       // Clear list
       scanList.innerHTML = "";
 
-      for (var i = 0; i < json["scans"].length; i++) {
-          var scan = json["scans"][i];
+      // For each result
+      for (var i = 0; i < json["scanCount"]; i++) {
 
-          var icoIndex = scan["rssi"];
+          var icoIndex = 0;
 
-          var entry = "<div onclick=\"scanListClick(\'" + scan["ssid"] + "\')\">";
-              entry += "<span>" + scan["ssid"] + "</span>";
+          // Thresholds for signal integrity icon
+          if (json["rssi"][i] > -80) {
+            icoIndex = 2;
+          } else if (json["rssi"][i] > -85) {
+            icoIndex = 1;
+          }
+
+          var entry = "<div class=\"spanned_img\" onclick=\"scanListClick(\'" + json["ssid"][i] + "\')\">";
+              entry += "<span>" + json["ssid"][i] + "</span>";
               entry += "<img src=\"wifi_" + icoIndex + ".png\">";
               entry += "</div>";
 
           scanList.innerHTML += entry;
       }
+
+      // Manage empty case
+      if (json["scanCount"] == 0) {
+        scanList.innerHTML = "<span>Aucun réseau</span>";
+      }
+
+      // We got a result, request a refresh in 20s
+      setTimeout(function() { refresh_scan_list() }, 20000);
     }
 
     function scanListClick(ssid)
@@ -225,20 +254,19 @@
 
       var params = 'v=' + JSON.stringify(json);
       cgi_request('/set_wifi_settings', params, function(textReply) {
-        set_message('ok', 'Paramètres sauvegardés !<br>Redémarrez pour prendre en compte');
+        set_message('ok', 'Paramètres sauvegardés !<br>LightKit va redémarrer');
       });
     }
 
     function refresh_scan_list()
     {
-      textReply = '{"scans":[{"ssid":"OPTICNERV", "rssi":2}, {"ssid":"OPTICNERVE", "rssi":1}, {"ssid":"OPTICNERVE", "rssi":0}]}'
-      var json = JSON.parse(textReply);
-      write_scan_list(json);
+      // Each request of the list show up loading icon
+      document.getElementById('loadingIcon').style.visibility = 'visible';
 
       cgi_request('/get_wifi_scans', '', function(textReply) {
+        var json = JSON.parse(textReply);
+        write_scan_list(json);
       });
-
-      //setTimeout(function() { refresh_scan_list() }, 10000);
     }
 
     /**

@@ -87,6 +87,9 @@ int web_server_init(void)
 	server.on("/set_wifi_settings", HTTP_GET, []() {
 		handle_set_wifi_settings();
 	});
+	server.on("/get_wifi_scans", HTTP_GET, []() {
+		handle_get_wifi_scans();
+	});
 
 	// --- File management ---
 	server.onNotFound([]() {
@@ -414,8 +417,6 @@ void handle_get_wifi_settings(void)
 
 	serializeJson(json, jsonString);
 	server.send(200, "text/plain", jsonString);
-
-	wifi_start_scan_req();
 }
 
 /**
@@ -471,6 +472,36 @@ void handle_set_wifi_settings(void)
 		log_info("Failed to update wifi settings: %s", reason.c_str());
 		server.send(200, "text/plain", reason);
 	}
+}
+
+/**
+ * @brief Receive new wifi settings
+ */
+void handle_get_wifi_scans(void)
+{
+	DynamicJsonDocument json(1024);
+	String              jsonString = "";
+	int32_t             scanCount, i;
+	JsonArray           ssidList, rssiList;
+
+	scanCount = wifi_start_scan_req();
+
+	if (scanCount >= 0) {
+		json["scanCount"] = scanCount;
+
+		ssidList = json.createNestedArray("ssid");
+		rssiList = json.createNestedArray("rssi");
+
+		for (i = 0; i < scanCount; ++i) {
+			ssidList.add(WiFi.SSID(i));
+			rssiList.add(WiFi.RSSI(i));
+		}
+	} else {
+		json["scanCount"] = -1;
+	}
+
+	serializeJson(json, jsonString);
+	server.send(200, "text/plain", jsonString);
 }
 
 #endif /* MODULE_WEBSERVER */

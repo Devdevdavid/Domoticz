@@ -37,5 +37,6 @@ void handle_set_color(void);
 void handle_get_display_info(void);
 void handle_get_wifi_settings(void);
 void handle_set_wifi_settings(void);
+void handle_get_wifi_scans(void);
 
 #endif /* WEB_WEB_SERVER_HPP */

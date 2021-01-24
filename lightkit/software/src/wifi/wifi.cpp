@@ -17,11 +17,12 @@ wifi_handle_t * wifiHandle = NULL;
 
 uint32_t wifiTick = 0;
 // Tick set at init before falling in AP mode in case of unsuccessfull client mode
-uint32_t    APFallbackTick     = UINT32_MAX;
-uint32_t    isAPConfigToDoTick = UINT32_MAX; // Tick use to end AP config after a delay
-uint32_t    isScanToStartTick  = UINT32_MAX; // Tick use to start a scan
-uint32_t    lastScanTick       = 0;          // Tick use to save the instant of the last scan
-WIFI_MODE_E modeBeforeScan     = MODE_NONE;
+uint32_t APFallbackTick     = UINT32_MAX;
+uint32_t isAPConfigToDoTick = UINT32_MAX; // Tick use to end AP config after a delay
+uint32_t isScanToStartTick  = UINT32_MAX; // Tick use to start a scan
+uint32_t lastScanTick       = 0;          // Tick use to save the instant of the last scan
+
+wifi_fast_reconnect_t wifiFastReconnect = { 0 };
 
 /**
  * We need some compiler tricks here
@@ -67,6 +68,7 @@ static void wifi_print(void)
 		log_info("SSID       : %s", wifiHandle->client.ssid);
 		log_info("Mac address: %s", WiFi.macAddress().c_str());
 		log_info("IP         : %s", WiFi.localIP().toString().c_str());
+		log_info("Channel    : %d", WiFi.channel());
 	}
 	if (_isset(STATUS_WIFI, STATUS_WIFI_USING_FORCED_MODE)) {
 		log_info("Wifi is using a FORCED MODE");
@@ -113,7 +115,18 @@ static int wifi_client_init(void)
 	WiFi.mode(WIFI_STA);
 	WiFi.setAutoReconnect(true);
 	log_info("Trying to connect to %s...", wifiHandle->client.ssid);
-	WiFi.begin(wifiHandle->client.ssid, wifiHandle->client.password);
+
+	if (wifiFastReconnect.isValid) {
+		// Use reconnect settings (Faster)
+		WiFi.begin(wifiHandle->client.ssid,
+				   wifiHandle->client.password,
+				   wifiFastReconnect.channel,
+				   wifiFastReconnect.bssid,
+				   true);
+	} else {
+		// Connect with channel scanning (Longer)
+		WiFi.begin(wifiHandle->client.ssid, wifiHandle->client.password);
+	}
 
 	APFallbackTick = tick + wifiHandle->client.delayBeforeAPFallbackMs;
 	return 0;
@@ -168,16 +181,6 @@ static bool wifi_is_handle_valid(wifi_handle_t * pWifiHandle, String & reason)
 	return true;
 }
 
-static void printScanResult(int networksFound)
-{
-	Serial.printf("%d network(s) found\n", networksFound);
-	for (int i = 0; i < networksFound; i++) {
-		Serial.printf("%d: %s, Ch:%d (%ddBm) %s\n", i + 1,
-					  WiFi.SSID(i).c_str(), WiFi.channel(i), WiFi.RSSI(i),
-					  WiFi.encryptionType(i) == ENC_TYPE_NONE ? "open" : "");
-	}
-}
-
 static int32_t wifi_end_scan(uint32_t count)
 {
 	int32_t ret = -1;
@@ -187,10 +190,9 @@ static int32_t wifi_end_scan(uint32_t count)
 		return -1;
 	}
 
-	wifiHandle->mode = modeBeforeScan;
-	modeBeforeScan   = MODE_NONE;
+	log_info("Wifi scan done (%d discovered)", count);
 
-	printScanResult(count);
+	wifiHandle->mode = wifiFastReconnect.mode;
 
 	// Re-init
 	if (wifiHandle->mode == MODE_AP) {
@@ -199,8 +201,13 @@ static int32_t wifi_end_scan(uint32_t count)
 		ret = wifi_client_init();
 	} else {
 		// Don't panic and do something
+		log_error("Unknown wifi mode after scan ended: %d", wifiHandle->mode);
 		wifi_fallback_as_ap();
 	}
+
+	// Disable fastReconnect
+	wifiFastReconnect.isValid = false;
+	wifiFastReconnect.mode    = MODE_NONE;
 
 	return ret;
 }
@@ -213,19 +220,31 @@ static int32_t wifi_start_scan(void)
 	}
 
 	// Check if it is too soon to ask for a new scan
-	if ((tick - lastScanTick) < WIFI_SCAN_MIN_INTERVAL_MS) {
+	if ((lastScanTick != 0) && ((tick - lastScanTick) < WIFI_SCAN_MIN_INTERVAL_MS)) {
 		return -2;
 	}
 
 	log_info("Starting wifi scan");
 
-	lastScanTick     = tick;
-	modeBeforeScan   = wifiHandle->mode;
-	wifiHandle->mode = MODE_SCAN;
+	// Save current time
+	lastScanTick = tick;
 
+	// If in client mode, copy some settings to speed up reconnection
+	if (wifiHandle->mode == MODE_CLIENT) {
+		wifiFastReconnect.isValid = true;
+		wifiFastReconnect.channel = WiFi.channel();
+		memcpy(wifiFastReconnect.bssid, WiFi.BSSID(), sizeof(wifiFastReconnect.bssid));
+	}
+
+	// Save current mode for reconnection
+	wifiFastReconnect.mode = wifiHandle->mode;
+	wifiHandle->mode       = MODE_SCAN;
+
+	// Disconnect wifi to start scan
 	WiFi.mode(WIFI_STA);
 	WiFi.disconnect();
 
+	// This is really bad but it makes life pretty easier though
 	delay(100);
 
 	// Start the scan
@@ -248,6 +267,8 @@ wifi_handle_t * wifi_get_handle(void)
  */
 int32_t wifi_use_new_settings(wifi_handle_t * pWifiHandle, String & reason)
 {
+	int32_t ret;
+
 	if (wifi_is_handle_valid(pWifiHandle, reason)) {
 		// Copy new data to handle
 		memcpy(wifiHandle, pWifiHandle, sizeof(wifi_handle_t));
@@ -255,7 +276,12 @@ int32_t wifi_use_new_settings(wifi_handle_t * pWifiHandle, String & reason)
 		wifiHandle->mode       = MODE_NONE;
 
 		// Save handle to flash
-		return flash_write();
+		ret = flash_write();
+
+		// Resetting with new configuration
+		script_delayed_reset(1000);
+
+		return ret;
 	} else {
 		return -1;
 	}
@@ -270,10 +296,29 @@ int32_t wifi_use_default_settings(void)
 	return wifi_use_new_settings(&defaultWifiSettings, reason);
 }
 
+/**
+ * @brief Either trigger a new scan or tell caller we can read
+ * scan with WiFi.___()
+ * @return -1: Scan have been trigger, call latter for result
+ */
 int32_t wifi_start_scan_req(void)
 {
-	isScanToStartTick = tick + WIFI_DELAYED_CONFIG_MS;
-	return 0;
+	// Check if there is result we can use and if they are not too old
+	if ((WiFi.scanComplete() >= 0) && ((tick - lastScanTick) < WIFI_SCAN_MIN_INTERVAL_MS)) {
+		// Use previous results
+		return WiFi.scanComplete();
+	}
+
+	// A scan is already pending, just wait it
+	if (isScanToStartTick != UINT32_MAX) {
+		return -1;
+	}
+
+	log_info("Wifi scan requested, starting in %ds", WIFI_DELAYED_SCAN_MS / 1000);
+
+	// Trigger a new scan
+	isScanToStartTick = tick + WIFI_DELAYED_SCAN_MS;
+	return -1;
 }
 
 int wifi_init(void)

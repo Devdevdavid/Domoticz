@@ -96,6 +96,20 @@ h2 {
   font-size: 13px;
 }
 
+.spanned_img {
+  display: flex;
+}
+
+.spanned_img span {
+  flex: 1;
+}
+
+.spanned_img img {
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
 #wifiScanList {
   padding: 5px;
 }
@@ -104,7 +118,6 @@ h2 {
   cursor: pointer;
   padding: 5px 0px;
   border-bottom: 1px solid gray;
-  display: flex;
 }
 #wifiScanList > div:nth-child(1) {
   border-top: 1px solid gray;
@@ -113,14 +126,5 @@ h2 {
   background-color: rgb(55, 55, 55);
 }
 
-#wifiScanList span {
-  flex: 1;
-}
-
-#wifiScanList img {
-  height: 18px;
-  vertical-align: middle;
-  margin-right: 5px;
-}
 
 
