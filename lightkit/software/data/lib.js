@@ -23,12 +23,18 @@ function set_message(type, msg)
 /**
  * Send params to url and call callback when response is ok
  */
-function cgi_request(url, params, callback)
+function cgi_request(url, params, callback, onErrorCallback)
 {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      callback(xhttp.responseText);
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+        callback(xhttp.responseText);
+      } else {
+        if (onErrorCallback) {
+          onErrorCallback();
+        }
+      }
     }
   };
   xhttp.open('GET', url + '?' + params, true);

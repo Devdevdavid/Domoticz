@@ -91,7 +91,7 @@ static int wifi_ap_init(void)
 
 	WiFi.softAP(wifiHandle->ap.ssid,
 				wifiHandle->ap.password,
-				wifiHandle->ap.channel,
+				-1, // We don't use wifiHandle->ap.channel, it will use default
 				wifiHandle->ap.isHidden,
 				wifiHandle->ap.maxConnection);
 
