@@ -181,7 +181,7 @@ static bool wifi_is_handle_valid(wifi_handle_t * pWifiHandle, String & reason)
 	return true;
 }
 
-static int32_t wifi_end_scan(uint32_t count)
+static int32_t wifi_end_scan(void)
 {
 	int32_t ret = -1;
 
@@ -190,7 +190,7 @@ static int32_t wifi_end_scan(uint32_t count)
 		return -1;
 	}
 
-	log_info("Wifi scan done (%d discovered)", count);
+	log_info("Wifi scan done (%d discovered)", WiFi.scanComplete());
 
 	wifiHandle->mode = wifiFastReconnect.mode;
 
@@ -247,8 +247,8 @@ static int32_t wifi_start_scan(void)
 	// This is really bad but it makes life pretty easier though
 	delay(100);
 
-	// Start the scan
-	WiFi.scanNetworksAsync(wifi_end_scan);
+	// Start the scan with async=true
+	WiFi.scanNetworks(true);
 
 	return 0;
 }
@@ -409,5 +409,12 @@ void wifi_main(void)
 	if (tick > isScanToStartTick) {
 		isScanToStartTick = UINT32_MAX;
 		wifi_start_scan();
+	}
+
+	// Poll for scan results
+	if (wifiHandle->mode == MODE_SCAN) {
+		if (WiFi.scanComplete() >= 0) {
+			wifi_end_scan();
+		}
 	}
 }
