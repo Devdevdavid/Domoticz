@@ -165,12 +165,12 @@ static bool wifi_is_handle_valid(wifi_handle_t * pWifiHandle, String & reason)
 		reason = "[AP] Connexion max. invalide [1-16]";
 		return false;
 	}
-	if (strlen(pWifiHandle->client.ssid) < 8) {
-		reason = "[Client] SSID trop court (8 car.)";
+	if (strlen(pWifiHandle->client.ssid) < 5) {
+		reason = "[Client] SSID trop court (5 car.)";
 		return false;
 	}
-	if (strlen(pWifiHandle->client.password) < 8) {
-		reason = "[Client] Mot de passe trop court (8 car.)";
+	if (strlen(pWifiHandle->client.password) < 5) {
+		reason = "[Client] Mot de passe trop court (5 car.)";
 		return false;
 	}
 	if ((pWifiHandle->client.delayBeforeAPFallbackMs <= 0) || (pWifiHandle->client.delayBeforeAPFallbackMs > 60000)) {
