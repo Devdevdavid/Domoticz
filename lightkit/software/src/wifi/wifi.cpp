@@ -114,7 +114,6 @@ static int wifi_client_init(void)
 {
 	WiFi.mode(WIFI_STA);
 	WiFi.setAutoReconnect(true);
-	log_info("Trying to connect to %s...", wifiHandle->client.ssid);
 
 	if (wifiFastReconnect.isValid) {
 		// Use reconnect settings (Faster)
@@ -181,6 +180,23 @@ static bool wifi_is_handle_valid(wifi_handle_t * pWifiHandle, String & reason)
 	return true;
 }
 
+static int32_t wifi_init_with_mode(void)
+{
+	int32_t ret;
+
+	// Init wifi according to mode
+	if (wifiHandle->mode == MODE_AP) {
+		ret = wifi_ap_init();
+	} else if (wifiHandle->mode == MODE_CLIENT) {
+		ret = wifi_client_init();
+	} else {
+		log_error("Wifi mode not supported: %d", wifiHandle->mode);
+		return -1;
+	}
+
+	return ret;
+}
+
 static int32_t wifi_end_scan(void)
 {
 	int32_t ret = -1;
@@ -195,11 +211,7 @@ static int32_t wifi_end_scan(void)
 	wifiHandle->mode = wifiFastReconnect.mode;
 
 	// Re-init
-	if (wifiHandle->mode == MODE_AP) {
-		ret = wifi_ap_init();
-	} else if (wifiHandle->mode == MODE_CLIENT) {
-		ret = wifi_client_init();
-	} else {
+	if (wifi_init_with_mode()) {
 		// Don't panic and do something
 		log_error("Unknown wifi mode after scan ended: %d", wifiHandle->mode);
 		wifi_fallback_as_ap();
@@ -229,8 +241,8 @@ static int32_t wifi_start_scan(void)
 	// Save current time
 	lastScanTick = tick;
 
-	// If in client mode, copy some settings to speed up reconnection
-	if (wifiHandle->mode == MODE_CLIENT) {
+	// If in connected client mode, copy some settings to speed up reconnection
+	if ((wifiHandle->mode == MODE_CLIENT) && (WiFi.status() == WL_CONNECTED)) {
 		wifiFastReconnect.isValid = true;
 		wifiFastReconnect.channel = WiFi.channel();
 		memcpy(wifiFastReconnect.bssid, WiFi.BSSID(), sizeof(wifiFastReconnect.bssid));
@@ -299,9 +311,10 @@ int32_t wifi_use_default_settings(void)
 /**
  * @brief Either trigger a new scan or tell caller we can read
  * scan with WiFi.___()
+ * @param delay : delay in tick before starting scan request
  * @return -1: Scan have been trigger, call latter for result
  */
-int32_t wifi_start_scan_req(void)
+int32_t wifi_start_scan_req(uint32_t delay)
 {
 	// Check if there is result we can use and if they are not too old
 	if ((WiFi.scanComplete() >= 0) && ((tick - lastScanTick) < WIFI_SCAN_MIN_INTERVAL_MS)) {
@@ -314,17 +327,15 @@ int32_t wifi_start_scan_req(void)
 		return -1;
 	}
 
-	log_info("Wifi scan requested, starting in %ds", WIFI_DELAYED_SCAN_MS / 1000);
+	log_info("Wifi scan requested, starting in %ds", delay / 1000);
 
 	// Trigger a new scan
-	isScanToStartTick = tick + WIFI_DELAYED_SCAN_MS;
-	return -1;
+	isScanToStartTick = tick + delay;
+	return 0;
 }
 
 int wifi_init(void)
 {
-	int ret = -1;
-
 	// Get Handle from flash
 	wifiHandle = &flashSettings.wifiHandle;
 
@@ -344,27 +355,19 @@ int wifi_init(void)
 		wifiHandle->mode = wifiHandle->userMode;
 	}
 
-	// Init wifi according to mode
-	if (wifiHandle->mode == MODE_AP) {
-		ret = wifi_ap_init();
-	} else if (wifiHandle->mode == MODE_CLIENT) {
-		ret = wifi_client_init();
-	} else {
-		log_error("Wifi mode not supported: %d", wifiHandle->mode);
-
+	// Test mode
+	if (wifi_init_with_mode()) {
 		// Somehow, we managed to save a wrong configuration
 		// Use default for next reset
 		wifi_use_default_settings();
 	}
 
-	// Print settings
 	wifi_print();
 
-	// Check error
-	if (ret) {
-		log_error("Wifi init failed !");
-		return -1;
-	}
+	// Scan wifi after startup (2s delay)
+	// Scan cannot be trigger right now because
+	// OTA and web server requieres WiFi to be up
+	wifi_start_scan_req(2000);
 
 	return 0;
 }
@@ -406,6 +409,7 @@ void wifi_main(void)
 		}
 	}
 
+	// Check is a wifi scan is requested
 	if (tick > isScanToStartTick) {
 		isScanToStartTick = UINT32_MAX;
 		wifi_start_scan();

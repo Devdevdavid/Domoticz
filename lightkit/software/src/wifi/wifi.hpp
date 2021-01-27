@@ -23,8 +23,7 @@
 #define WIFI_SSID_MAX_LEN         30
 #define WIFI_PASSWORD_MAX_LEN     30
 #define WIFI_DELAYED_CONFIG_MS    100
-#define WIFI_DELAYED_SCAN_MS      1000
-#define WIFI_SCAN_MIN_INTERVAL_MS 15000
+#define WIFI_SCAN_MIN_INTERVAL_MS (24 * 60 * 60 * 1000)
 
 #define IP_TO_U32(a, b, c, d) ((uint32_t)((d << 24) | (c << 16) | (b << 8) | a))
 
@@ -90,7 +89,7 @@ typedef struct {
 wifi_handle_t * wifi_get_handle(void);
 int32_t         wifi_use_new_settings(wifi_handle_t * pWifiHandle, String & reason);
 int32_t         wifi_use_default_settings(void);
-int32_t         wifi_start_scan_req(void);
+int32_t         wifi_start_scan_req(uint32_t delay);
 int             wifi_init(void);
 void            wifi_main(void);
 

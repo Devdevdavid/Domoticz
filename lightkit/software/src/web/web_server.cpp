@@ -484,7 +484,9 @@ void handle_get_wifi_scans(void)
 	int32_t             scanCount, i;
 	JsonArray           ssidList, rssiList;
 
-	scanCount = wifi_start_scan_req();
+	// Start scan in 1s if no result ready yet to let
+	// time to http server to send the reply below
+	scanCount = wifi_start_scan_req(1000);
 
 	if (scanCount >= 0) {
 		json["scanCount"] = scanCount;
