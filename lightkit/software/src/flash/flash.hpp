@@ -9,7 +9,7 @@
 #define FLASH_FLASH_HPP
 
 #include "global.hpp"
-#include "stripLed/stripLed.hpp"
+#include "stripled/stripled.hpp"
 #include "wifi/wifi.hpp"
 
 /** EEPROM used size in bytes */

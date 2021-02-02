@@ -46,11 +46,10 @@ typedef struct {
 } stripled_params_t;
 
 // StripLed
-void    brightness_set(uint8_t brightness);
-void    brightness_auto_set(void);
-void    nb_led_set(uint8_t nbLed);
-void    color_set(const rgba_u * color);
-int32_t set_animation(uint8_t animID);
+void    stripled_brightness_set(uint8_t brightness);
+void    stripled_nb_led_set(uint8_t nbLed);
+void    stripled_color_set(const rgba_u * color);
+int32_t stripled_set_animation(uint8_t animID);
 void    stripled_set_demo_mode(bool isDemoModeEn);
 void    stripled_set_state(bool isOn);
 

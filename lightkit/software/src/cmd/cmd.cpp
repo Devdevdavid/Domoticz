@@ -75,7 +75,7 @@ void cmd_set_brightness_auto(bool newValue)
 void cmd_set_brightness(uint8_t newValue)
 {
 	if (newValue > 0 && newValue <= 100) {
-		brightness_set(((uint16_t)(newValue * 255)) / 100);
+		stripled_brightness_set(((uint16_t)(newValue * 255)) / 100);
 		cmd_set_brightness_auto(false);
 	}
 }
@@ -100,7 +100,7 @@ uint8_t cmd_get_brightness(void)
 void cmd_set_nb_led(uint8_t newValue)
 {
 	if (newValue >= 1 && newValue <= STRIPLED_MAX_NB_PIXELS) {
-		nb_led_set(newValue);
+		stripled_nb_led_set(newValue);
 	}
 }
 #endif
@@ -130,7 +130,7 @@ void cmd_set_color(uint32_t newValue)
 		// Handle conversion
 		color.u32 = newValue;
 
-		color_set(&color);
+		stripled_color_set(&color);
 		cmd_set_state(true);
 		cmd_set_demo_mode(false);
 		cmd_set_animation(0); // 0: Static
@@ -209,14 +209,14 @@ uint8_t cmd_get_animation(void)
 #endif
 
 /**
- * Call set_animation()
+ * Call stripled_set_animation()
  * @param  animID The animation ID to use
- * @return          See set_animation()
+ * @return          See stripled_set_animation()
  */
 #ifdef MODULE_STRIPLED
 int32_t cmd_set_animation(uint8_t animID)
 {
-	return set_animation(animID);
+	return stripled_set_animation(animID);
 }
 #endif
 

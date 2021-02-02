@@ -43,7 +43,7 @@ static inline void refresh_now(void)
 	refreshTick = 0;
 }
 
-void brightness_set(uint8_t brightness)
+void stripled_brightness_set(uint8_t brightness)
 {
 	stripledParams->brightness = brightness;
 
@@ -56,7 +56,7 @@ void brightness_set(uint8_t brightness)
 	refresh_now();
 }
 
-void nb_led_set(uint8_t nbLed)
+void stripled_nb_led_set(uint8_t nbLed)
 {
 	stripledParams->nbLed = nbLed;
 
@@ -72,7 +72,7 @@ void nb_led_set(uint8_t nbLed)
 	refresh_now();
 }
 
-void color_set(const rgba_u * color)
+void stripled_color_set(const rgba_u * color)
 {
 	stripledParams->color = *color;
 
@@ -94,7 +94,7 @@ void color_set(const rgba_u * color)
  * @param  animID   ID of the animation to Show
  * @return          0: OK, -1: Wrong AnimID
  */
-int32_t set_animation(uint8_t animID)
+int32_t stripled_set_animation(uint8_t animID)
 {
 	// Check animID
 	if (animID >= ws2812fx.getModeCount()) {
@@ -192,7 +192,7 @@ int stripled_init(void)
 
 	// Configure demo mode
 	stripled_set_state(true);
-	set_animation(stripledParams->animID);
+	stripled_set_animation(stripledParams->animID);
 	stripled_set_demo_mode(stripledParams->isInDemoMode);
 
 	ws2812fx.start();
@@ -222,9 +222,9 @@ void stripled_main(void)
 			demoTick = tick + STRIPLED_DEMO_MODE_PERIOD;
 
 			if (stripledParams->animID == (ws2812fx.getModeCount() - 1)) {
-				set_animation(0);
+				stripled_set_animation(0);
 			} else {
-				set_animation(stripledParams->animID + 1);
+				stripled_set_animation(stripledParams->animID + 1);
 			}
 		}
 	}
