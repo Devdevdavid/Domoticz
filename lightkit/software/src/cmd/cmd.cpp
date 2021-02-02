@@ -36,7 +36,6 @@ void cmd_print_status(void)
 {
 	log_raw("APPLI:   0x%02X\n", STATUS_APPLI);
 	log_raw("WIFI:    0x%02X\n", STATUS_WIFI);
-	log_raw("LEVEL:   %d\n", STATUS_BRIGHT_LVL);
 }
 
 #ifdef MODULE_STATUS_LED

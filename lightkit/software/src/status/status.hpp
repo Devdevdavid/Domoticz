@@ -10,7 +10,7 @@
 
 #include "global.hpp"
 
-#define NB_STATUS 5
+#define NB_STATUS 4
 
 #ifdef STATUS_CPP
 uint8_t boardStatus[NB_STATUS];
@@ -19,11 +19,10 @@ extern uint8_t boardStatus[NB_STATUS];
 #endif
 
 /* STATUS LIST */
-#define STATUS_APPLI      boardStatus[0] /** Flag on application status */
-#define STATUS_WIFI       boardStatus[1] /** Flag on wifi connection  */
-#define STATUS_BRIGHT_LVL boardStatus[2] /** Level of brightness currently set */
-#define STATUS_SCRIPT     boardStatus[3] /** Script values */
-#define STATUS_TEMP       boardStatus[4] /** Flag for temp module */
+#define STATUS_APPLI  boardStatus[0] /** Flag on application status */
+#define STATUS_WIFI   boardStatus[1] /** Flag on wifi connection  */
+#define STATUS_SCRIPT boardStatus[2] /** Script values */
+#define STATUS_TEMP   boardStatus[3] /** Flag for temp module */
 
 /* STATUS_APPLI */
 #define STATUS_APPLI_STATUS_LED  0x01
