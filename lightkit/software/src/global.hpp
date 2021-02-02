@@ -312,14 +312,8 @@
     /* MODULE_STRIPLED */
     #define STRIPLED_PIN                            2                     /** Output pin for the strip command */
     #define STRIPLED_NB_PIXELS                      12                    /** Number of Pixel on the strip lamp Ikea mini (12) Ikea classic = 24 */
-    #define STRIPLED_NB_BRIGHT_LEVEL                10                    /** Number of level in the brightness table */
-    #define STRIPLED_BRIGHT_HYSTERESIS              10                    /** Hysteresis value between two levels (Base 1023) */
-    #define STRIPLED_AUTO_BRIGHT_UPDATE_PERIOD      2000                  /** Period of update of the auto brightness (in ms) */
-    #define STRIPLED_DEFAULT_BRIGHTNESS_VALUE       32                    /** Brightness level used at startup [0-255] */
-    #define STRIPLED_DEFAULT_ANIMATION_ID           10                    /** ID of the animation used at startup */
     #define STRIPLED_DEMO_MODE_PERIOD               5000                  /** Delay betwwen two animation in demo mode (in ms) */
     #define STRIPLED_MAX_NB_PIXELS                  100                   /** Maximum number of LED that can be supported */
-    #define LIGHT_SENSOR_PIN                        -1                    /** Pin for Light sensor used to ajust output light level (-1 if not used) */
 
     /* MODULE_INPUTS */
     #define INPUTS_COUNT                           4                     /** Number of inputs managed by the module */
@@ -377,14 +371,9 @@
     /* MODULE_STRIPLED */
     #define STRIPLED_PIN                            2                     /** Output pin for the strip command */
     #define STRIPLED_NB_PIXELS                      140                   /** Number of Pixel on the strip */
-    #define STRIPLED_NB_BRIGHT_LEVEL                10                    /** Number of level in the brightness table */
-    #define STRIPLED_BRIGHT_HYSTERESIS              10                    /** Hysteresis value between two levels (Base 1023) */
-    #define STRIPLED_AUTO_BRIGHT_UPDATE_PERIOD      2000                  /** Period of update of the auto brightness (in ms) */
     #define STRIPLED_DEFAULT_BRIGHTNESS_VALUE       32                    /** Brightness level used at startup [0-255] */
-    #define STRIPLED_DEFAULT_ANIMATION_ID           10                    /** ID of the animation used at startup */
     #define STRIPLED_DEMO_MODE_PERIOD               5000                  /** Delay betwwen two animation in demo mode (in ms) */
     #define STRIPLED_MAX_NB_PIXELS                  140                   /** Maximum number of LED that can be supported */
-    #define LIGHT_SENSOR_PIN                        -1                    /** Pin for Light sensor used to ajust output light level (-1 if not used) */
 
 #endif /* BOARD_NEOPIXEL_WEB_THIERRY */
 
@@ -422,14 +411,8 @@
     /* MODULE_STRIPLED */
     #define STRIPLED_PIN                            2                     /** Output pin for the strip command */
     #define STRIPLED_NB_PIXELS                      140                   /** Number of Pixel on the strip */
-    #define STRIPLED_NB_BRIGHT_LEVEL                10                    /** Number of level in the brightness table */
-    #define STRIPLED_BRIGHT_HYSTERESIS              10                    /** Hysteresis value between two levels (Base 1023) */
-    #define STRIPLED_AUTO_BRIGHT_UPDATE_PERIOD      2000                  /** Period of update of the auto brightness (in ms) */
-    #define STRIPLED_DEFAULT_BRIGHTNESS_VALUE       32                    /** Brightness level used at startup [0-255] */
-    #define STRIPLED_DEFAULT_ANIMATION_ID           10                    /** ID of the animation used at startup */
     #define STRIPLED_DEMO_MODE_PERIOD               5000                  /** Delay betwwen two animation in demo mode (in ms) */
     #define STRIPLED_MAX_NB_PIXELS                  140                   /** Maximum number of LED that can be supported */
-    #define LIGHT_SENSOR_PIN                        -1                    /** Pin for Light sensor used to ajust output light level (-1 if not used) */
 
 #endif /* BOARD_NEOPIXEL_WEB */
 
@@ -467,13 +450,8 @@
     /* MODULE_STRIPLED */
     #define STRIPLED_PIN                            D2                    /** Output pin for the strip command */
     #define STRIPLED_NB_PIXELS                      60                    /** Number of Pixel on the strip */
-    #define STRIPLED_NB_BRIGHT_LEVEL                10                    /** Number of level in the brightness table */
-    #define STRIPLED_BRIGHT_HYSTERESIS              10                    /** Hysteresis value between two levels (Base 1023) */
-    #define STRIPLED_DEFAULT_BRIGHTNESS_VALUE       32                    /** Brightness level used at startup [0-255] */
-    #define STRIPLED_DEFAULT_ANIMATION_ID           10                    /** ID of the animation used at startup */
     #define STRIPLED_DEMO_MODE_PERIOD               5000                  /** Delay betwwen two animation in demo mode (in ms) */
     #define STRIPLED_MAX_NB_PIXELS                  60                    /** Maximum number of LED that can be supported */
-    #define LIGHT_SENSOR_PIN                        -1                    /** Pin for Light sensor used to ajust output light level (-1 if not used) */
 
 #endif /* BOARD_LIGHTKITV2_DAVID */
 

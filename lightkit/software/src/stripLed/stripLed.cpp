@@ -21,9 +21,6 @@ stripled_params_t * stripledParams = NULL;
 // Instanciate the library
 WS2812FX ws2812fx = WS2812FX(STRIPLED_NB_PIXELS, STRIPLED_PIN, NEO_GRB + NEO_KHZ800);
 
-// Create the brightness table and animation Table
-struct brightLevel_t brightTable[STRIPLED_NB_BRIGHT_LEVEL];
-
 // Next tick of animation change and brightness update
 uint32_t refreshTick;
 uint32_t demoTick;
@@ -90,29 +87,6 @@ void color_set(const rgba_u * color)
 	refreshPeriod = STRIPLED_LOWPOWER_REFRESH_PERIOD;
 	refresh_now();
 }
-
-#if (LIGHT_SENSOR_PIN != -1)
-/**
- * Read the sensor value and determine which
- * brightness level is approriate
- */
-void brightness_auto_set(void)
-{
-	uint32_t val;
-
-	val = 1023 - analogRead(LIGHT_SENSOR_PIN);
-
-	while (val > brightTable[STATUS_BRIGHT_LVL].high) {
-		++STATUS_BRIGHT_LVL;
-	}
-	while (val < brightTable[STATUS_BRIGHT_LVL].low) {
-		--STATUS_BRIGHT_LVL;
-	}
-
-	brightness_set(brightTable[STATUS_BRIGHT_LVL].output);
-	refresh_now();
-}
-#endif
 
 /**
  * Define the animation to show with specific PARAMETERS
@@ -182,25 +156,6 @@ void stripled_set_state(bool isOn)
  ********************************/
 
 /**
- * Init the brightness table
- */
-void brightness_table_init(void)
-{
-	for (uint8_t index = 0; index < STRIPLED_NB_BRIGHT_LEVEL; index++) {
-		brightTable[index].output = 10 + (index * 245) / (STRIPLED_NB_BRIGHT_LEVEL - 1);
-		brightTable[index].low    = (index * 1023) / (STRIPLED_NB_BRIGHT_LEVEL - 1);
-		if (index > 0) {
-			brightTable[index].low -= STRIPLED_BRIGHT_HYSTERESIS / 2;
-		}
-		brightTable[index].high = ((1 + index) * 1023) / (STRIPLED_NB_BRIGHT_LEVEL - 1);
-		if (index < (STRIPLED_NB_BRIGHT_LEVEL - 1)) {
-			brightTable[index].high += STRIPLED_BRIGHT_HYSTERESIS / 2;
-		}
-	}
-	STATUS_BRIGHT_LVL = 0;
-}
-
-/**
  * Custom show functions which will use the RMT hardware to drive the LEDs.
  */
 #ifdef ESP32
@@ -221,8 +176,6 @@ int stripled_init(void)
 {
 	// Get pointer to data in flash
 	stripledParams = &flashSettings.stripledParams;
-
-	brightness_table_init();
 
 	/** Init the led driver */
 	ws2812fx.init();
@@ -277,18 +230,6 @@ void stripled_main(void)
 			}
 		}
 	}
-
-#if (LIGHT_SENSOR_PIN != -1)
-	// Update brightness level
-	if (tick >= autoBrightTick) {
-		autoBrightTick = tick + AUTO_BRIGHT_UPDATE_PERIOD;
-
-		// Update the brightness if AUTOLUMIN is set
-		if (_isset(STATUS_APPLI, STATUS_APPLI_AUTOLUM)) {
-			brightness_auto_set();
-		}
-	}
-#endif
 }
 
 #endif /* MODULE_STRIPLED */

@@ -51,7 +51,6 @@ int32_t set_animation(uint8_t animID);
 void    stripled_set_demo_mode(bool isDemoModeEn);
 void    stripled_set_state(bool isOn);
 
-void brightness_table_init(void);
 int  stripled_init(void);
 void stripled_main(void);
 
