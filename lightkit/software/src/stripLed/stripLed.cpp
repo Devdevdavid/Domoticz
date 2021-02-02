@@ -16,7 +16,8 @@
 #ifdef MODULE_STRIPLED
 
 // Internals
-stripled_params_t * stripledParams = NULL;
+// Pointer is constant but value isn't
+stripled_params_t * const stripledParams = &flashSettings.stripledParams;
 
 // Instanciate the library
 WS2812FX ws2812fx = WS2812FX(STRIPLED_NB_PIXELS, STRIPLED_PIN, NEO_GRB + NEO_KHZ800);
@@ -174,9 +175,6 @@ void stripled_rmt_show(void)
  */
 int stripled_init(void)
 {
-	// Get pointer to data in flash
-	stripledParams = &flashSettings.stripledParams;
-
 	/** Init the led driver */
 	ws2812fx.init();
 	ws2812fx.setSpeed(500);
