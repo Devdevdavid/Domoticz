@@ -8,6 +8,7 @@
 #include "term.hpp"
 #include "cmd.hpp"
 #include "global.hpp"
+#include "relay/relay.hpp"
 #include "serial.hpp"
 #include "telnet.hpp"
 
