@@ -52,9 +52,9 @@ int flash_use_default(void)
 	memset(&flashSettings, 0, sizeof(flash_settings_t));
 	memcpy(&flashSettings.wifiHandle, &defaultWifiSettings, sizeof(defaultWifiSettings));
 #ifdef MODULE_STRIPLED
-	flashSettings.stripNbLed     = STRIPLED_NB_PIXELS;
-	flashSettings.lastColor.r    = 255;
-	flashSettings.lastBrightness = 128;
+	flashSettings.stripledParams.nbLed      = STRIPLED_NB_PIXELS;
+	flashSettings.stripledParams.color.u32  = 0xFFFFFFFF;
+	flashSettings.stripledParams.brightness = 128;
 #endif
 	return flash_write();
 }
@@ -77,13 +77,6 @@ int flash_init(void)
 		log_error("Flash have been corrupted ! Using default values.");
 		flash_use_default();
 	}
-
-	// Read data from flash only at boot
-	STATUS_NB_LED     = flashSettings.stripNbLed;
-	STATUS_COLOR_R    = flashSettings.lastColor.r;
-	STATUS_COLOR_G    = flashSettings.lastColor.g;
-	STATUS_COLOR_B    = flashSettings.lastColor.b;
-	STATUS_BRIGHTNESS = flashSettings.lastBrightness;
 
 	return 0;
 }

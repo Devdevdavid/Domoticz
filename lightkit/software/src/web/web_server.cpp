@@ -341,8 +341,13 @@ void handle_set_nb_led(void)
  */
 void handle_get_color(void)
 {
-	uint32_t color    = cmd_get_color();
-	String   hexColor = String(color, HEX);
+	uint32_t color = cmd_get_color();
+	String   hexColor;
+
+	// Remove alpha channel
+	color &= ~(0xFF000000);
+
+	hexColor = String(color, HEX);
 
 	// Add leading zeros
 	while (hexColor.length() < 6) {
@@ -363,6 +368,9 @@ void handle_set_color(void)
 	}
 
 	uint32_t color = (uint32_t) strtol(server.arg("v").c_str(), 0, 16);
+
+	// Append alpha channel with max value
+	color |= 0xFF000000;
 
 	cmd_set_color(color);
 	handle_get_color();

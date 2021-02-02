@@ -36,14 +36,7 @@ void cmd_print_status(void)
 {
 	log_raw("APPLI:   0x%02X\n", STATUS_APPLI);
 	log_raw("WIFI:    0x%02X\n", STATUS_WIFI);
-	log_raw("BRIGHT:  %d%%", (STATUS_BRIGHTNESS * 100) / 255);
-	if (_isset(STATUS_APPLI, STATUS_APPLI_AUTOLUM)) {
-		log_raw(" AUTO\n");
-	} else {
-		log_raw("\n");
-	}
 	log_raw("LEVEL:   %d\n", STATUS_BRIGHT_LVL);
-	log_raw("ANIM:    %d\n", STATUS_ANIM);
 }
 
 #ifdef MODULE_STATUS_LED
@@ -96,7 +89,7 @@ void cmd_set_brightness(uint8_t newValue)
 #ifdef MODULE_STRIPLED
 uint8_t cmd_get_brightness(void)
 {
-	return ((uint16_t)(STATUS_BRIGHTNESS * 100)) / 255;
+	return ((uint16_t)(flashSettings.stripledParams.brightness * 100)) / 255;
 }
 #endif
 
@@ -120,7 +113,7 @@ void cmd_set_nb_led(uint8_t newValue)
 #ifdef MODULE_STRIPLED
 uint8_t cmd_get_nb_led(void)
 {
-	return STATUS_NB_LED;
+	return flashSettings.stripledParams.nbLed;
 }
 #endif
 
@@ -131,8 +124,14 @@ uint8_t cmd_get_nb_led(void)
 #ifdef MODULE_STRIPLED
 void cmd_set_color(uint32_t newValue)
 {
-	if (newValue > 0 && newValue <= 0xFFFFFF) {
-		color_set(newValue);
+	rgba_u color;
+
+	// We do not accept black color
+	if ((newValue & 0xFFFFFF) > 0) {
+		// Handle conversion
+		color.u32 = newValue;
+
+		color_set(&color);
 		cmd_set_state(true);
 		cmd_set_demo_mode(false);
 		cmd_set_animation(0); // 0: Static
@@ -142,12 +141,12 @@ void cmd_set_color(uint32_t newValue)
 
 /**
  * Get the color currently configured
- * @return nbLed [0x0; 0xFFFFFF]
+ * @return nbLed [0x0; 0xFFFFFFFF]
  */
 #ifdef MODULE_STRIPLED
 uint32_t cmd_get_color(void)
 {
-	return (STATUS_COLOR_R << 16) | (STATUS_COLOR_G << 8) | (STATUS_COLOR_B);
+	return flashSettings.stripledParams.color.u32;
 }
 #endif
 
@@ -158,7 +157,7 @@ uint32_t cmd_get_color(void)
 #ifdef MODULE_STRIPLED
 bool cmd_get_state(void)
 {
-	return _isset(STATUS_APPLI, STATUS_APPLI_LED_IS_ON);
+	return flashSettings.stripledParams.isOn;
 }
 #endif
 
@@ -182,19 +181,19 @@ int32_t cmd_set_state(bool state)
 #ifdef MODULE_STRIPLED
 bool cmd_get_demo_mode(void)
 {
-	return _isset(STATUS_APPLI, STATUS_APPLI_DEMO_MODE);
+	return flashSettings.stripledParams.isInDemoMode;
 }
 #endif
 
 /**
  * Set the demo mode of LED
- * @param  isDemoMode    bool
+ * @param  isInDemoMode    bool
  * @return          [description]
  */
 #ifdef MODULE_STRIPLED
-int32_t cmd_set_demo_mode(bool isDemoMode)
+int32_t cmd_set_demo_mode(bool isInDemoMode)
 {
-	stripled_set_demo_mode(isDemoMode);
+	stripled_set_demo_mode(isInDemoMode);
 	return 0;
 }
 #endif
@@ -206,7 +205,7 @@ int32_t cmd_set_demo_mode(bool isDemoMode)
 #ifdef MODULE_STRIPLED
 uint8_t cmd_get_animation(void)
 {
-	return STATUS_ANIM;
+	return flashSettings.stripledParams.animID;
 }
 #endif
 

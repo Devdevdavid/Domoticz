@@ -9,8 +9,7 @@
 #include "script/script.hpp"
 
 // Externals
-extern uint32_t         tick;
-extern flash_settings_t flashSettings;
+extern uint32_t tick;
 
 // Internals
 wifi_handle_t * wifiHandle = NULL;

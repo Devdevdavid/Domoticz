@@ -19,10 +19,8 @@
 #define FLASH_STRUCT_VERSION 2
 
 typedef struct {
-	uint8_t       stripNbLed;
-	rgb_t         lastColor;
-	uint8_t       lastBrightness;
-	wifi_handle_t wifiHandle;
+	wifi_handle_t     wifiHandle;
+	stripled_params_t stripledParams;
 
 	// -- Used for flash purpose --
 	uint8_t crc;
@@ -34,5 +32,9 @@ static_assert(sizeof(flash_settings_t) < EEPROM_USED_SIZE, "flash_settings_t is 
 int flash_use_default(void);
 int flash_init(void);
 int flash_write(void);
+
+#ifndef FLASH_FLASH_CPP
+extern flash_settings_t flashSettings;
+#endif
 
 #endif /* FLASH_FLASH_HPP */

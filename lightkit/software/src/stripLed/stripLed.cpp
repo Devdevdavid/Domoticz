@@ -15,8 +15,8 @@
 #endif
 #ifdef MODULE_STRIPLED
 
-// Get the tick from main
-extern uint32_t tick;
+// Internals
+stripled_params_t * stripledParams = NULL;
 
 // Instanciate the library
 WS2812FX ws2812fx = WS2812FX(STRIPLED_NB_PIXELS, STRIPLED_PIN, NEO_GRB + NEO_KHZ800);
@@ -32,11 +32,14 @@ uint32_t autoBrightTick;
 /** Indicate the period in tick between two stripled refresh */
 uint32_t refreshPeriod = STRIPLED_MAX_REFRESH_PERIOD;
 
+// Externals
+extern uint32_t tick;
+
 /********************************
  *          Tools
  ********************************/
 
-static inline void refresh_now()
+static inline void refresh_now(void)
 {
 	// Refresh now
 	refreshTick = 0;
@@ -44,7 +47,7 @@ static inline void refresh_now()
 
 void brightness_set(uint8_t brightness)
 {
-	STATUS_BRIGHTNESS = brightness;
+	stripledParams->brightness = brightness;
 
 	// Apply new value
 	ws2812fx.setBrightness(brightness);
@@ -57,13 +60,13 @@ void brightness_set(uint8_t brightness)
 
 void nb_led_set(uint8_t nbLed)
 {
-	STATUS_NB_LED = nbLed;
+	stripledParams->nbLed = nbLed;
 
 	// Clear all the pixel before changing length
 	ws2812fx.strip_off();
 
 	// Apply new value
-	ws2812fx.setLength(STATUS_NB_LED);
+	ws2812fx.setLength(nbLed);
 
 	// Save settings in flash
 	flash_write();
@@ -71,16 +74,14 @@ void nb_led_set(uint8_t nbLed)
 	refresh_now();
 }
 
-void color_set(uint32_t color)
+void color_set(const rgba_u * color)
 {
-	STATUS_COLOR_R = (color >> 16) & 0xFF;
-	STATUS_COLOR_G = (color >> 8) & 0xFF;
-	STATUS_COLOR_B = color & 0xFF;
+	stripledParams->color = *color;
 
-	log_info("Setting color to %02X - %02X - %02X", STATUS_COLOR_R, STATUS_COLOR_G, STATUS_COLOR_B);
+	log_info("Setting color to %02X - %02X - %02X", color->rgba.r, color->rgba.g, color->rgba.b);
 
-	// Apply new value
-	ws2812fx.setColor(color);
+	// Apply new value without alpha channel
+	ws2812fx.setColor(color->u32 & 0x00FFFFFF);
 
 	// Save settings in flash
 	flash_write();
@@ -129,13 +130,18 @@ int32_t set_animation(uint8_t animID)
 	ws2812fx.setMode(animID);
 
 	// Define this animation as current
-	STATUS_ANIM = animID;
+	stripledParams->animID = animID;
+
+	// Save settings in flash only if demo mode is disabled
+	if (stripledParams->isInDemoMode == false) {
+		flash_write();
+	}
 
 	// High refresh needed for smooth animations
 	refreshPeriod = STRIPLED_MAX_REFRESH_PERIOD;
 	refresh_now();
 
-	return OK;
+	return 0;
 }
 
 /**
@@ -144,13 +150,14 @@ int32_t set_animation(uint8_t animID)
  */
 void stripled_set_demo_mode(bool isDemoModeEn)
 {
-	if (isDemoModeEn) {
-		_set(STATUS_APPLI, STATUS_APPLI_DEMO_MODE);
-		// Force refresh to now
-		demoTick = 0;
-	} else {
-		_unset(STATUS_APPLI, STATUS_APPLI_DEMO_MODE);
-	}
+	// Force refresh to now
+	demoTick = 0;
+
+	stripledParams->isInDemoMode = isDemoModeEn;
+
+	// Save in flash
+	flash_write();
+
 	refresh_now();
 }
 
@@ -160,10 +167,11 @@ void stripled_set_demo_mode(bool isDemoModeEn)
 void stripled_set_state(bool isOn)
 {
 	log_info("Stripled is now %s", isOn ? "on" : "off");
-	if (isOn) {
-		_set(STATUS_APPLI, STATUS_APPLI_LED_IS_ON);
-	} else {
-		_unset(STATUS_APPLI, STATUS_APPLI_LED_IS_ON);
+
+	// We don't flash_write() since this setting
+	// is forced to true on startup
+	stripledParams->isOn = isOn;
+	if (isOn == false) {
 		ws2812fx.strip_off();
 	}
 	refresh_now();
@@ -211,6 +219,9 @@ void stripled_rmt_show(void)
  */
 int stripled_init(void)
 {
+	// Get pointer to data in flash
+	stripledParams = &flashSettings.stripledParams;
+
 	brightness_table_init();
 
 	/** Init the led driver */
@@ -221,17 +232,17 @@ int stripled_init(void)
 	rmt_tx_int(RMT_CHANNEL_0, ws2812fx.getPin()); // assign ws2812fx1 to RMT channel 0
 	ws2812fx.setCustomShow(stripled_rmt_show);    // set the custom show function to overwrite the NeoPixel's
 #endif
-	ws2812fx.setColor(STATUS_COLOR_R, STATUS_COLOR_G, STATUS_COLOR_B);
-	ws2812fx.setLength(STATUS_NB_LED);
-	ws2812fx.setBrightness(STATUS_BRIGHTNESS);
+	ws2812fx.setColor(stripledParams->color.u32);
+	ws2812fx.setLength(stripledParams->nbLed);
+	ws2812fx.setBrightness(stripledParams->brightness);
 
 	// Brightness
 	autoBrightTick = tick;
 
-	// Go into demo mode at startup
+	// Configure demo mode
 	stripled_set_state(true);
-	set_animation(STRIPLED_DEFAULT_ANIMATION_ID);
-	//stripled_set_demo_mode(true);
+	set_animation(stripledParams->animID);
+	stripled_set_demo_mode(stripledParams->isInDemoMode);
 
 	ws2812fx.start();
 
@@ -244,7 +255,7 @@ int stripled_init(void)
  */
 void stripled_main(void)
 {
-	if (_isset(STATUS_APPLI, STATUS_APPLI_LED_IS_ON)) {
+	if (stripledParams->isOn) {
 		if (tick >= refreshTick) {
 			// Program the next refresh
 			refreshTick = tick + refreshPeriod;
@@ -255,14 +266,14 @@ void stripled_main(void)
 	}
 
 	// Update demo mode
-	if (_isset(STATUS_APPLI, STATUS_APPLI_DEMO_MODE)) {
+	if (stripledParams->isInDemoMode) {
 		if (tick >= demoTick) {
 			demoTick = tick + STRIPLED_DEMO_MODE_PERIOD;
 
-			if (STATUS_ANIM == (ws2812fx.getModeCount() - 1)) {
+			if (stripledParams->animID == (ws2812fx.getModeCount() - 1)) {
 				set_animation(0);
 			} else {
-				set_animation(STATUS_ANIM + 1);
+				set_animation(stripledParams->animID + 1);
 			}
 		}
 	}
