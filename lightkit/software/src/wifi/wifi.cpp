@@ -12,7 +12,8 @@
 extern uint32_t tick;
 
 // Internals
-wifi_handle_t * wifiHandle = NULL;
+// Pointer is constant but value isn't
+wifi_handle_t * const wifiHandle = &flashSettings.wifiHandle;
 
 uint32_t wifiTick = 0;
 // Tick set at init before falling in AP mode in case of unsuccessfull client mode
@@ -335,9 +336,6 @@ int32_t wifi_start_scan_req(uint32_t delay)
 
 int wifi_init(void)
 {
-	// Get Handle from flash
-	wifiHandle = &flashSettings.wifiHandle;
-
 	// Choose wich mode setting we use
 	if (wifiHandle->forcedMode != MODE_NONE) {
 		// Use forced mode
