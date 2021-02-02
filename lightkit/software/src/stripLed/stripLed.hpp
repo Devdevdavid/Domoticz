@@ -14,6 +14,9 @@
 #define STRIPLED_MAX_REFRESH_PERIOD      0
 #define STRIPLED_LOWPOWER_REFRESH_PERIOD (10 * 1000)
 
+/** Maximum number of LED that can be supported */
+#define STRIPLED_MAX_NB_PIXELS 140
+
 /** Data structure for a level */
 struct brightLevel_t {
 	uint8_t  output; /** Output intensity (O-255) */
