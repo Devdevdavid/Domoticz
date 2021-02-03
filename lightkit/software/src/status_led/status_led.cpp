@@ -79,9 +79,12 @@ void status_led_main(void)
 	}
 
 	/* FAULT LED */
-	if (_isunset(STATUS_WIFI, STATUS_WIFI_IS_CO) || _isset(STATUS_WIFI, STATUS_WIFI_USING_FORCED_MODE)) {
-		status_led[1].timeOn  = 300;
-		status_led[1].timeOff = 500;
+	if (_isset(STATUS_WIFI, STATUS_WIFI_USING_FORCED_MODE)) {
+		status_led[1].timeOn  = 100;
+		status_led[1].timeOff = 400;
+	} else if (_isunset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
+		status_led[1].timeOn  = 100;
+		status_led[1].timeOff = 900;
 	} else if (_isset(STATUS_TEMP, STATUS_TEMP_1_FAULT | STATUS_TEMP_2_FAULT)) {
 		status_led[1].timeOn  = 200;
 		status_led[1].timeOff = 1800;
@@ -180,7 +183,12 @@ void status_led_main(void)
 		status_led[0].timeOn  = 100;
 		status_led[0].timeOff = 900;
 		status_led[0].color   = 'r';
-	} else if (_isset(STATUS_WIFI, STATUS_WIFI_DOMOTICZ_FAULT) || _isunset(STATUS_WIFI, STATUS_WIFI_IS_CO) || _isset(STATUS_WIFI, STATUS_WIFI_USING_FORCED_MODE)) {
+	} else if (_isset(STATUS_WIFI, STATUS_WIFI_USING_FORCED_MODE)) {
+		// Wireless forced
+		status_led[0].timeOn  = 100;
+		status_led[0].timeOff = 400;
+		status_led[0].color   = 'b';
+	} else if (_isset(STATUS_WIFI, STATUS_WIFI_DOMOTICZ_FAULT) || _isunset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
 		// Wireless fault
 		status_led[0].timeOn  = 100;
 		status_led[0].timeOff = 900;

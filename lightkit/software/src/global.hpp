@@ -17,7 +17,7 @@
 // This template system avoid leaking password on Github
 #include "private.hpp"
 
-#define APP_VERSION           "LightKit v2.0.0"
+#define APP_VERSION           "LightKit v2.0.1"
 #define BUILD_DATE            __DATE__ " " __TIME__
 #define LIGHTKIT_VERSION      APP_VERSION " build " BUILD_DATE
 
@@ -84,13 +84,12 @@
     #undef MODULE_WEBSERVER
     #undef MODULE_STRIPLED
     #define MODULE_SERIAL
-    #undef MODULE_TELNET
+    #define MODULE_TELNET
     #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_CLIENT_SSID    /** SSID of the Access point/network to connect */
     #define WIFI_PWD                                P_WIFI_CLIENT_PWD     /** Password of the Access point/network to connect */
-    #undef  WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 
     /* MODULE TEMPERATURE */
     #define TEMP_1_WIRE_PIN                         2
@@ -199,13 +198,12 @@
     #undef MODULE_WEBSERVER
     #undef MODULE_STRIPLED
     #define MODULE_SERIAL
-    #undef MODULE_TELNET
+    #define MODULE_TELNET
     #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_CLIENT_SSID   /** SSID of the Access point/network to connect */
     #define WIFI_PWD                                P_WIFI_CLIENT_PWD    /** Password of the Access point/network to connect */
-    #undef  WIFI_IS_IN_AP_MODE                                           /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 
     /* MODULE TEMPERATURE */
     #define TEMP_1_WIRE_PIN                         D4
@@ -297,13 +295,12 @@
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
     #define MODULE_SERIAL
-    #undef MODULE_TELNET
+    #define MODULE_TELNET
     #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID/** SSID of the Access point/network to connect */
     #define WIFI_PWD                                P_WIFI_LAMPE_IKEA_PWD /** Password of the Access point/network to connect */
-    #define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
     // WIFI configuration for AP Mode
     #define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
     #define WIFI_AP_GATEWAY                         192,168,4,254         /** IP Address of the Gateway */
@@ -326,7 +323,6 @@
     #define INPUTS_PIR_DETECTOR_DELAY              3                     /** Analog input to set the detector duration */
 
     /** CUSTOM DEFINE for this board */
-    #define WIFI_IS_IN_AP_MODE                                                /** Define wether the ESP is in Access point or in connected to a network */
     #define DETECTOR_MAX_DURATION_MIN              20                    /** Maximum duration of the ON State after detector found someone (in minute) */
     #define DETECTOR_INVERSE_POLARITY              0                     /** Inverse the polarity of the detector input: 0 -> goes HIGH on trigger, 1 -> goes LOW on trigger */
 
@@ -355,13 +351,12 @@
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
     #define MODULE_SERIAL
-    #undef MODULE_TELNET
+    #define MODULE_TELNET
     #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LEDRGB_SSID    /** SSID of the Access point/network to connect */
     #define WIFI_PWD                                P_WIFI_LEDRGB_PWD     /** Password of the Access point/network to connect */
-    #define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
     // WIFI configuration for AP Mode
     #define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
     #define WIFI_AP_GATEWAY                         192,168,4,254         /** IP Address of the Gateway */
@@ -394,13 +389,12 @@
     #define MODULE_WEBSERVER
     #define MODULE_STRIPLED
     #define MODULE_SERIAL
-    #undef MODULE_TELNET
+    #define MODULE_TELNET
     #define MODULE_TERM
 
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID /** SSID of the Access point/network to connect */
     #define WIFI_PWD                                P_WIFI_LAMPE_IKEA_PWD /** Password of the Access point/network to connect */
-    #define WIFI_IS_IN_AP_MODE                                            /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
     // WIFI configuration for AP Mode
     #define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
     #define WIFI_AP_GATEWAY                         192,168,4,254         /** IP Address of the Gateway */
@@ -442,7 +436,6 @@
     /** MODULE WIFI (Always ON) */
     #define WIFI_SSID                               P_WIFI_CLIENT_SSID    /** SSID of the Access point/network to connect */
     #define WIFI_PWD                                P_WIFI_CLIENT_PWD     /** Password of the Access point/network to connect */
-    #undef WIFI_IS_IN_AP_MODE                                             /** define/undef: Tell if the wifi module is set as Access Point or should try to connect to a network */
 
     /* MODULE_STRIPLED */
     #define STRIPLED_PIN                            D2                    /** Output pin for the strip command */
