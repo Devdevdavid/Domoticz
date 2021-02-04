@@ -60,6 +60,9 @@ static void term_execute_command(void)
 	case 'H':
 		cmd_print_help();
 		break;
+	case 'I':
+		cmd_reset_module();
+		break;
 	case 'T':
 		cmd_print_status();
 		break;

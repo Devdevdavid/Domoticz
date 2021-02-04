@@ -11,6 +11,7 @@
 #include <Arduino.h>
 
 void     cmd_print_help(void);
+void     cmd_reset_module(void);
 void     cmd_print_status(void);
 void     cmd_set_status_led(uint8_t isEnabled);
 void     cmd_set_brightness_auto(bool newValue);

@@ -9,13 +9,16 @@
 #include "flash/flash.hpp"
 #include "global.hpp"
 #include "relay/relay.hpp"
+#include "script/script.hpp"
 #include "status_led/status_led.hpp"
 #include "stripled/stripled.hpp"
+#include "wifi/wifi.hpp"
 
 void cmd_print_help(void)
 {
 	log_raw("=== " FIRMWARE_VERSION " ===\n");
 	log_raw("H                         This help\n");
+	log_raw("I                         Reset the module\n");
 	log_raw("T                         Print board status\n");
 	log_raw("F                         Reset flash setting to default\n");
 #ifdef MODULE_STATUS_LED
@@ -32,10 +35,17 @@ void cmd_print_help(void)
 #endif
 }
 
+void cmd_reset_module(void)
+{
+	// Resetting with new configuration
+	script_delayed_reset(1000);
+}
+
 void cmd_print_status(void)
 {
 	log_raw("APPLI:   0x%02X\n", STATUS_APPLI);
 	log_raw("WIFI:    0x%02X\n", STATUS_WIFI);
+	wifi_print();
 }
 
 #ifdef MODULE_STATUS_LED

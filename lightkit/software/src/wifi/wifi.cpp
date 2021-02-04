@@ -56,25 +56,6 @@ wifi_handle_t defaultWifiSettings = {
 // STATIC FUNCTIONS
 // =====================
 
-static void wifi_print(void)
-{
-	if (wifiHandle->mode == MODE_AP) {
-		log_info("Wifi mode  : Access Point");
-		log_info("SSID       : %s", wifiHandle->ap.ssid);
-		log_info("Mac address: %s", WiFi.softAPmacAddress().c_str());
-		log_info("IP         : %s", WiFi.softAPIP().toString().c_str());
-	} else if (wifiHandle->mode == MODE_CLIENT) {
-		log_info("Wifi mode  : Client");
-		log_info("SSID       : %s", wifiHandle->client.ssid);
-		log_info("Mac address: %s", WiFi.macAddress().c_str());
-		log_info("IP         : %s", WiFi.localIP().toString().c_str());
-		log_info("Channel    : %d", WiFi.channel());
-	}
-	if (_isset(STATUS_WIFI, STATUS_WIFI_USING_FORCED_MODE)) {
-		log_info("Wifi is using a FORCED MODE");
-	}
-}
-
 static void wifi_fallback_as_ap(void)
 {
 	log_warn("Falling back to AP mode !");
@@ -263,6 +244,29 @@ static int32_t wifi_start_scan(void)
 	WiFi.scanNetworks(true);
 
 	return 0;
+}
+
+// =====================
+// PUBLIC FUNCTIONS
+// =====================
+
+void wifi_print(void)
+{
+	if (wifiHandle->mode == MODE_AP) {
+		log_info("Wifi mode  : Access Point");
+		log_info("SSID       : %s", wifiHandle->ap.ssid);
+		log_info("Mac address: %s", WiFi.softAPmacAddress().c_str());
+		log_info("IP         : %s", WiFi.softAPIP().toString().c_str());
+	} else if (wifiHandle->mode == MODE_CLIENT) {
+		log_info("Wifi mode  : Client");
+		log_info("SSID       : %s", wifiHandle->client.ssid);
+		log_info("Mac address: %s", WiFi.macAddress().c_str());
+		log_info("IP         : %s", WiFi.localIP().toString().c_str());
+		log_info("Channel    : %d", WiFi.channel());
+	}
+	if (_isset(STATUS_WIFI, STATUS_WIFI_USING_FORCED_MODE)) {
+		log_info("Wifi is using a FORCED MODE");
+	}
 }
 
 /**

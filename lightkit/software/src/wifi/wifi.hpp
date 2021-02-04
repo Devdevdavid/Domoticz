@@ -86,6 +86,7 @@ typedef struct {
 } wifi_fast_reconnect_t;
 
 // PROTOTYPES
+void            wifi_print(void);
 wifi_handle_t * wifi_get_handle(void);
 int32_t         wifi_use_new_settings(wifi_handle_t * pWifiHandle, String & reason);
 int32_t         wifi_use_default_settings(void);
