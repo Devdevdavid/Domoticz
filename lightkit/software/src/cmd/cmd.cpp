@@ -41,6 +41,35 @@ void cmd_reset_module(void)
 	script_delayed_reset(1000);
 }
 
+/**
+ * @brief Set the module name used for mDNS
+ *
+ * @param newName The new name to use (len < MODULE_NAME_SIZE_MAX)
+ * @return OK: 0, Too short: -1
+ */
+int cmd_set_module_name(String newName)
+{
+	// Copy the new name
+	strncpy(flashSettings.moduleName, newName.c_str(), MODULE_NAME_SIZE_MAX);
+
+	// Always terminate the string
+	flashSettings.moduleName[MODULE_NAME_SIZE_MAX - 1] = '\0';
+
+	flash_write();
+
+	return 0;
+}
+
+/**
+ * @brief Get the current module name
+ *
+ * @return The module name as a String
+ */
+String cmd_get_module_name(void)
+{
+	return String(flashSettings.moduleName);
+}
+
 void cmd_print_status(void)
 {
 	log_raw("APPLI:   0x%02X\n", STATUS_APPLI);

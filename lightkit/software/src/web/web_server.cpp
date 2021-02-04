@@ -431,6 +431,24 @@ static void handle_get_wifi_scans(void)
 	server.send(200, "text/plain", jsonString);
 }
 
+static void handle_get_module_name(void)
+{
+	server.send(200, "text/plain", cmd_get_module_name());
+}
+
+static void handle_set_module_name(void)
+{
+	if (!server.hasArg("v")) {
+		handle_bad_parameter();
+		return;
+	}
+
+	log_info("Using \"%s\" as new module name", server.arg("v"));
+
+	cmd_set_module_name(server.arg("v"));
+	handle_get_module_name();
+}
+
 int web_server_init(void)
 {
 	server.begin();
@@ -490,6 +508,12 @@ int web_server_init(void)
 	});
 	server.on("/get_wifi_scans", HTTP_GET, []() {
 		handle_get_wifi_scans();
+	});
+	server.on("/set_module_name", HTTP_GET, []() {
+		handle_set_module_name();
+	});
+	server.on("/get_module_name", HTTP_GET, []() {
+		handle_get_module_name();
 	});
 
 	// --- File management ---

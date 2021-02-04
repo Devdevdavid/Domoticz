@@ -12,6 +12,8 @@
 
 void     cmd_print_help(void);
 void     cmd_reset_module(void);
+int      cmd_set_module_name(String newName);
+String   cmd_get_module_name(void);
 void     cmd_print_status(void);
 void     cmd_set_status_led(uint8_t isEnabled);
 void     cmd_set_brightness_auto(bool newValue);

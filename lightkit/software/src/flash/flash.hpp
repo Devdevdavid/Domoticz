@@ -16,11 +16,12 @@
 #define EEPROM_USED_SIZE 256
 
 /** Increment this each time flash_settings_t is incompatible with previous version */
-#define FLASH_STRUCT_VERSION 2
+#define FLASH_STRUCT_VERSION 3
 
 typedef struct {
 	wifi_handle_t     wifiHandle;
 	stripled_params_t stripledParams;
+	char              moduleName[MODULE_NAME_SIZE_MAX];
 
 	// -- Used for flash purpose --
 	uint8_t crc;

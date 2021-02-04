@@ -19,12 +19,21 @@
   <h1 id="title">Lightkit</h1>
   <div id="content">
     <p id="status_msg" class="message_box">Erreur</p>
-    <div id="part_select_file">
+    <div id="part_config_wifi">
       <h2>Wifi</h2>
       <p>
         Configuration des paramètres pour la connexion wifi.
       </p>
       <form id="wifi_form" class="classic_form">
+
+        <div class="frame">
+          <label for="wifiModuleName">Nom du module :</label><br>
+          <input type="text" id="wifiModuleName" name="wifiModuleName" autocomplete="off" maxlength="15" placeholder="Ex: Lightkit"><br>
+          <p class="classic_form_help">
+            Permet d'accéder à ce site web en tapant le nom du module dans un navigateur.<br>
+            (ex: "Lightkit.local")
+          </p>
+        </div>
 
         <div class="frame">
           <label>Mode :</label><br>
@@ -280,6 +289,15 @@
       });
     }
 
+    function send_module_name()
+    {
+      var params = 'v=' + document.getElementById('wifiModuleName').value;
+
+      cgi_request('/set_module_name', params, function(textReply) {
+        // Nothing here
+      });
+    }
+
     /**
      * Start function to load the page
      */
@@ -291,12 +309,18 @@
 
       document.getElementById('wifiFormSubmit').onclick = function(event) {
         event.preventDefault()
+        send_module_name();
         read_wifi_form();
       }
       document.getElementById('wifiFormDefault').onclick = function(event) {
         event.preventDefault()
+        send_module_name();
         use_default();
       }
+
+      cgi_request('/get_module_name', '', function(textReply) {
+        document.getElementById('wifiModuleName').value = textReply;
+      });
 
       cgi_request('/get_wifi_settings', '', function(textReply) {
         var json = JSON.parse(textReply);
@@ -308,7 +332,6 @@
         // Refresh scans only after getting settings
         refresh_scan_list();
       });
-
     }
   </script>
 </body>

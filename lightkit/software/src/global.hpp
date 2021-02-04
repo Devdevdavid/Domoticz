@@ -48,6 +48,9 @@
 #define I_U                                         1                       /** Input pull-up */
 #define I_A                                         2                       /** Input analog */
 
+/** Maximum size of module name ('\0' included) */
+#define MODULE_NAME_SIZE_MAX 16
+
 /**
  * This is the configuration for the board
  * TEMP_DOMOTICZ

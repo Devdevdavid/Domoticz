@@ -8,14 +8,31 @@
 #include <ArduinoOTA.h>
 
 #include "file_sys/file_sys.hpp"
+#include "flash/flash.hpp"
 #include "global.hpp"
 #include "ota.hpp"
 
 extern uint32_t tick;
 uint32_t        otaTick = 0;
 
+static int ota_configure_mdns(void)
+{
+	// Check if module name is set
+	if (flashSettings.moduleName[0] == '\0') {
+		return -1;
+	}
+
+	log_info("Using \"%s\" as module name", flashSettings.moduleName);
+
+	// mDNS is enabled by default in both ESP32 and ESP8266 libraries
+	ArduinoOTA.setHostname(flashSettings.moduleName);
+	return 0;
+}
+
 int ota_init(void)
 {
+	ota_configure_mdns();
+
 	ArduinoOTA.setPort(OTA_PORT);
 	ArduinoOTA.setPassword(OTA_PWD);
 
