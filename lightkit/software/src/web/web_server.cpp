@@ -443,7 +443,7 @@ static void handle_set_module_name(void)
 		return;
 	}
 
-	log_info("Using \"%s\" as new module name", server.arg("v"));
+	log_info("Using \"%s\" as new module name", server.arg("v").c_str());
 
 	cmd_set_module_name(server.arg("v"));
 	handle_get_module_name();
