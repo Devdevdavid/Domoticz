@@ -64,9 +64,6 @@ static int init_modules(void)
 #ifdef MODULE_SERIAL
 	CHECK_CALL(serial_init())
 #endif
-#ifdef MODULE_TELNET
-	CHECK_CALL(telnet_init())
-#endif
 #ifdef MODULE_TERM
 	CHECK_CALL(term_init())
 #endif
@@ -86,6 +83,9 @@ static int init_modules(void)
 	CHECK_CALL(status_led_init())
 #endif
 	CHECK_CALL(wifi_init())
+#ifdef MODULE_TELNET /* Needs to be after wifi init */
+	CHECK_CALL(telnet_init())
+#endif
 	CHECK_CALL(ota_init())
 #ifdef MODULE_WEBSERVER
 	CHECK_CALL(web_server_init())

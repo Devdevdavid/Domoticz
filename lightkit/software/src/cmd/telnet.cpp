@@ -15,7 +15,9 @@ WiFiClient telnetClient;
 
 void telnet_write(uint8_t byte)
 {
-	telnetClient.write(&byte, 1);
+	if (telnetClient.connected()) {
+		telnetClient.write(&byte, 1);
+	}
 }
 
 int telnet_init(void)
