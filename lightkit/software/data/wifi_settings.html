@@ -199,7 +199,8 @@
       json["client"]["delayBeforeAPFallbackMs"] = document.getElementById('wifiClientDelayBeforeAPFallbackMs').value * 1000;
 
       var params = 'v=' + JSON.stringify(json);
-      set_wifi_settings(params);
+
+      return set_wifi_settings(params);
     }
 
     function write_scan_list(json)
@@ -243,8 +244,9 @@
         scanList.innerHTML = "<span>Aucun réseau</span>";
       }
 
-      // We got a result, request a refresh in 20s
-      setTimeout(function() { refresh_scan_list() }, 20000);
+      // Wifi is now scanned only 1 time at boot, refreshing results
+      // will not provide new discovered networks
+      //setTimeout(function() { refresh_scan_list() }, 20000);
     }
 
     function scanListClick(ssid)
@@ -259,7 +261,7 @@
       json["use_default"] = true;
 
       var params = 'v=' + JSON.stringify(json);
-      set_wifi_settings(params);
+      return set_wifi_settings(params);
     }
 
     function refresh_scan_list()
@@ -284,18 +286,21 @@
         } else {
           set_message('ok', 'Paramètres sauvegardés !<br>LightKit va redémarrer');
           wifi_mode_changed(true);
-          setTimeout(function() { location.reload(); }, 5000);
+          // Wifi is now scanned only 1 time at boot, refreshing results
+          // will not provide new discovered networks
+          setTimeout(function() { location.reload(); }, 7000);
         }
       });
+      return 0;
     }
 
     function send_module_name()
     {
       var moduleName = document.getElementById('wifiModuleName').value;
 
-      if (moduleName.contains(" ")) {
+      if (moduleName.includes(" ")) {
         set_message('error', "Le nom du module ne doit pas contenir d'espace !");
-        return;
+        return -1;
       }
 
       var params = 'v=' + moduleName;
@@ -303,6 +308,8 @@
       cgi_request('/set_module_name', params, function(textReply) {
         // Nothing here
       });
+
+      return 0;
     }
 
     /**
@@ -316,13 +323,12 @@
 
       document.getElementById('wifiFormSubmit').onclick = function(event) {
         event.preventDefault()
-        send_module_name();
-        read_wifi_form();
+        if (send_module_name()) { return; }
+        if (read_wifi_form()) { return; }
       }
       document.getElementById('wifiFormDefault').onclick = function(event) {
         event.preventDefault()
-        send_module_name();
-        use_default();
+        if (use_default()) { return; }
       }
 
       cgi_request('/get_module_name', '', function(textReply) {

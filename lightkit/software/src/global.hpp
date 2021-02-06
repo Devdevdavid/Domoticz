@@ -51,6 +51,9 @@
 /** Maximum size of module name ('\0' included) */
 #define MODULE_NAME_SIZE_MAX 16
 
+/** The name used by default to find the module without IP */
+#define MODULE_NAME_DEFAULT  "LightKit"
+
 /**
  * This is the configuration for the board
  * TEMP_DOMOTICZ
@@ -89,10 +92,6 @@
     #define MODULE_SERIAL
     #define MODULE_TELNET
     #define MODULE_TERM
-
-    /** MODULE WIFI (Always ON) */
-    #define WIFI_SSID                               P_WIFI_CLIENT_SSID    /** SSID of the Access point/network to connect */
-    #define WIFI_PWD                                P_WIFI_CLIENT_PWD     /** Password of the Access point/network to connect */
 
     /* MODULE TEMPERATURE */
     #define TEMP_1_WIRE_PIN                         2
@@ -204,10 +203,6 @@
     #define MODULE_TELNET
     #define MODULE_TERM
 
-    /** MODULE WIFI (Always ON) */
-    #define WIFI_SSID                               P_WIFI_CLIENT_SSID   /** SSID of the Access point/network to connect */
-    #define WIFI_PWD                                P_WIFI_CLIENT_PWD    /** Password of the Access point/network to connect */
-
     /* MODULE TEMPERATURE */
     #define TEMP_1_WIRE_PIN                         D4
     #define TEMP_SENSOR_RESOLUTION                  10
@@ -301,14 +296,6 @@
     #define MODULE_TELNET
     #define MODULE_TERM
 
-    /** MODULE WIFI (Always ON) */
-    #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID/** SSID of the Access point/network to connect */
-    #define WIFI_PWD                                P_WIFI_LAMPE_IKEA_PWD /** Password of the Access point/network to connect */
-    // WIFI configuration for AP Mode
-    #define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
-    #define WIFI_AP_GATEWAY                         192,168,4,254         /** IP Address of the Gateway */
-    #define WIFI_AP_SUBNET                          255,255,255,0         /** IP Mask */
-
     /* MODULE_STRIPLED */
     #define STRIPLED_PIN                            2                     /** Output pin for the strip command */
     #define STRIPLED_NB_PIXELS                      12                    /** Number of Pixel on the strip lamp Ikea mini (12) Ikea classic = 24 */
@@ -357,14 +344,6 @@
     #define MODULE_TELNET
     #define MODULE_TERM
 
-    /** MODULE WIFI (Always ON) */
-    #define WIFI_SSID                               P_WIFI_LEDRGB_SSID    /** SSID of the Access point/network to connect */
-    #define WIFI_PWD                                P_WIFI_LEDRGB_PWD     /** Password of the Access point/network to connect */
-    // WIFI configuration for AP Mode
-    #define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
-    #define WIFI_AP_GATEWAY                         192,168,4,254         /** IP Address of the Gateway */
-    #define WIFI_AP_SUBNET                          255,255,255,0         /** IP Mask */
-
     /* MODULE_STRIPLED */
     #define STRIPLED_PIN                            2                     /** Output pin for the strip command */
     #define STRIPLED_NB_PIXELS                      140                   /** Number of Pixel on the strip */
@@ -394,14 +373,6 @@
     #define MODULE_SERIAL
     #define MODULE_TELNET
     #define MODULE_TERM
-
-    /** MODULE WIFI (Always ON) */
-    #define WIFI_SSID                               P_WIFI_LAMPE_IKEA_SSID /** SSID of the Access point/network to connect */
-    #define WIFI_PWD                                P_WIFI_LAMPE_IKEA_PWD /** Password of the Access point/network to connect */
-    // WIFI configuration for AP Mode
-    #define WIFI_AP_LOCAL_IP                        192,168,4,1           /** IP Address of the board */
-    #define WIFI_AP_GATEWAY                         192,168,4,254         /** IP Address of the Gateway */
-    #define WIFI_AP_SUBNET                          255,255,255,0         /** IP Mask */
 
     /* MODULE_STRIPLED */
     #define STRIPLED_PIN                            2                     /** Output pin for the strip command */
@@ -435,10 +406,6 @@
     #define MODULE_SERIAL
     #define MODULE_TELNET
     #define MODULE_TERM
-
-    /** MODULE WIFI (Always ON) */
-    #define WIFI_SSID                               P_WIFI_CLIENT_SSID    /** SSID of the Access point/network to connect */
-    #define WIFI_PWD                                P_WIFI_CLIENT_PWD     /** Password of the Access point/network to connect */
 
     /* MODULE_STRIPLED */
     #define STRIPLED_PIN                            D2                    /** Output pin for the strip command */

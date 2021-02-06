@@ -31,22 +31,22 @@ wifi_fast_reconnect_t wifiFastReconnect = { 0 };
 // clang-format off
 wifi_handle_t defaultWifiSettings = {
 	.mode       = MODE_NONE,
-	.userMode   = MODE_CLIENT,
+	.userMode   = WIFI_DEFAULT_MODE,
 	.forcedMode = MODE_NONE,
 
 	.ap = {
-		{ .ssid = WIFI_DEFAULT_SSID },
-		{ .password = WIFI_DEFAULT_PASSWORD },
-		.channel = WIFI_DEFAULT_CHANNEL,
-		.maxConnection = WIFI_DEFAULT_MAXCO,
+		{ .ssid = WIFI_DEFAULT_AP_SSID },
+		{ .password = WIFI_DEFAULT_AP_PASSWORD },
+		.channel = WIFI_DEFAULT_AP_CHANNEL,
+		.maxConnection = WIFI_DEFAULT_AP_MAXCO,
 		.isHidden = false,
-		.ip = WIFI_DEFAULT_IP,
-		.gateway = WIFI_DEFAULT_GATEWAY,
-		.subnet = WIFI_DEFAULT_SUBNET
+		.ip = WIFI_DEFAULT_AP_IP,
+		.gateway = WIFI_DEFAULT_AP_GATEWAY,
+		.subnet = WIFI_DEFAULT_AP_SUBNET
 	},
 	.client = {
-		{ .ssid = P_WIFI_CLIENT_SSID },
-		{ .password = P_WIFI_CLIENT_PWD },
+		{ .ssid = WIFI_DEFAULT_CLIENT_SSID },
+		{ .password = WIFI_DEFAULT_CLIENT_PASSWORD },
 		.delayBeforeAPFallbackMs = WIFI_DEFAULT_DELAY_AP_FALLBACK
 	}
 };

@@ -56,6 +56,8 @@ int flash_use_default(void)
 	flashSettings.stripledParams.color.u32  = 0xFFFFFFFF;
 	flashSettings.stripledParams.brightness = 128;
 #endif
+	strncpy(flashSettings.moduleName, MODULE_NAME_DEFAULT, MODULE_NAME_SIZE_MAX);
+
 	return flash_write();
 }
 

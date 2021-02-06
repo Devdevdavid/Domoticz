@@ -27,13 +27,16 @@
 
 #define IP_TO_U32(a, b, c, d) ((uint32_t)((d << 24) | (c << 16) | (b << 8) | a))
 
-#define WIFI_DEFAULT_SSID              "LightKit_SSID"
-#define WIFI_DEFAULT_PASSWORD          "bravo42beta"
-#define WIFI_DEFAULT_CHANNEL           1
-#define WIFI_DEFAULT_MAXCO             1
-#define WIFI_DEFAULT_IP                IP_TO_U32(192, 168, 4, 1)
-#define WIFI_DEFAULT_GATEWAY           IP_TO_U32(192, 168, 4, 254)
-#define WIFI_DEFAULT_SUBNET            IP_TO_U32(255, 255, 255, 0)
+#define WIFI_DEFAULT_MODE              MODE_AP
+#define WIFI_DEFAULT_AP_SSID           "LightKit_SSID"
+#define WIFI_DEFAULT_AP_PASSWORD       "bravo42beta"
+#define WIFI_DEFAULT_AP_CHANNEL        1
+#define WIFI_DEFAULT_AP_MAXCO          1
+#define WIFI_DEFAULT_AP_IP             IP_TO_U32(192, 168, 4, 1)
+#define WIFI_DEFAULT_AP_GATEWAY        IP_TO_U32(192, 168, 4, 254)
+#define WIFI_DEFAULT_AP_SUBNET         IP_TO_U32(255, 255, 255, 0)
+#define WIFI_DEFAULT_CLIENT_SSID       P_WIFI_CLIENT_SSID
+#define WIFI_DEFAULT_CLIENT_PASSWORD   P_WIFI_CLIENT_PWD
 #define WIFI_DEFAULT_DELAY_AP_FALLBACK 20000
 
 // Structures and enums
