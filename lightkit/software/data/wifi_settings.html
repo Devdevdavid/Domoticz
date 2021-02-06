@@ -31,7 +31,7 @@
           <input type="text" id="wifiModuleName" name="wifiModuleName" autocomplete="off" maxlength="15" placeholder="Ex: Lightkit"><br>
           <p class="classic_form_help">
             Permet d'accéder à ce site web en tapant le nom du module dans un navigateur.<br>
-            (ex: "Lightkit.local")
+            Ex: "Lightkit.local" (Note: Ne fonctionne pas avec tous les appareils)
           </p>
         </div>
 
@@ -291,7 +291,14 @@
 
     function send_module_name()
     {
-      var params = 'v=' + document.getElementById('wifiModuleName').value;
+      var moduleName = document.getElementById('wifiModuleName').value;
+
+      if (moduleName.contains(" ")) {
+        set_message('error', "Le nom du module ne doit pas contenir d'espace !");
+        return;
+      }
+
+      var params = 'v=' + moduleName;
 
       cgi_request('/set_module_name', params, function(textReply) {
         // Nothing here
