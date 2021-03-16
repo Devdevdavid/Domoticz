@@ -16,12 +16,28 @@
       <h2>Firmware</h2>
       <p>
         Version actuelle:<br>
-        <span id="current_version">-<!-- Filled by JS --></span>
+        <span id="firmware_Version">-<!-- Filled by JS --></span>
       </p>
       <form method='POST' id="firmware_file_form">
         <input type='file' name='firmware_file' id='firmware_file'>
         <button type='submit' class="theme">Mettre à jour</button>
-        <div id='progress_bar_container'>
+        <div id='firmware_progress_bar'>
+          <span id="progress_bar_label"></span>
+          <div id='progress_bar'></div>
+        </div>
+      </form>
+      <a href="index.html" class="theme">< Retour</a>
+    </div>
+    <div id="part_select_file">
+      <h2>Web Serveur</h2>
+      <p>
+        Version actuelle:<br>
+        <span id="webserver_version">-<!-- Filled by JS --></span>
+      </p>
+      <form method='POST' id="webserver_file_form">
+        <input type='file' name='webserver_file' id='webserver_file'>
+        <button type='submit' class="theme">Mettre à jour</button>
+        <div id='webserver_progress_bar'>
           <span id="progress_bar_label"></span>
           <div id='progress_bar'></div>
         </div>
@@ -50,11 +66,11 @@
       xhttp.send();
     }
 
-    function upload_file(file) {
+    function upload_file(location, file) {
       let xhr = new XMLHttpRequest();
       var formData = new FormData();
 
-      formData.append("update", file);
+      formData.append(location, file);
 
       set_message("ok", "Envoi en cours...");
 
@@ -81,8 +97,26 @@
           set_message("error", "Erreur lors de l'envoi: code=" + xhr.responseText);
         }
       };
-      xhr.open("POST", "/firmware_upload");
+      xhr.open("POST", "/update");
       xhr.send(formData);
+    }
+
+    function add_file_listener(selector, location) {
+      const form = document.querySelector(selector + '_form');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const files = document.querySelector(selector).files;
+
+        if (files.length != 1) {
+          set_message("error", "Veillez selectionner un fichier");
+          return;
+        }
+
+        // Do the actual upload
+        upload_file(location, files[0]);
+      });
     }
 
     /**
@@ -95,23 +129,11 @@
       // Hide the box
       set_message("hide");
 
-      // Handle form validation
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const files = document.querySelector('[type=file]').files;
-
-        if (files.length != 1) {
-          set_message("error", "Veillez selectionner un fichier");
-          return;
-        }
-
-        // Do the actual upload
-        upload_file(files[0]);
-      });
+      add_file_listener('#firmware_file', 'firmware');
+      add_file_listener('#webserver_file', 'filesystem');
 
       cgi_request('/get_version', '', function(textReply) {
-        document.getElementById('current_version').innerHTML = textReply;
+        document.getElementById('firmware_Version').innerHTML = textReply;
       });
     }
   </script>

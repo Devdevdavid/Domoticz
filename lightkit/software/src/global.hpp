@@ -21,6 +21,7 @@
 #define BUILD_DATE            __DATE__ " " __TIME__
 #define LIGHTKIT_VERSION      APP_VERSION " build " BUILD_DATE
 
+
 /* ===========================
  * COMMON TO ALL BOARDS
  * ===========================

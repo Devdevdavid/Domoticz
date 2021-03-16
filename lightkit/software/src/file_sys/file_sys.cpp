@@ -6,13 +6,6 @@
   */
 
 #include "file_sys.hpp"
-#include "global.hpp"
-
-#ifdef ESP32
-#include "SPIFFS.h"
-#else
-#include "LittleFS.h"
-#endif
 
 int file_sys_init(void)
 {
@@ -35,6 +28,25 @@ int file_sys_init(void)
 retError:
 	_set(STATUS_APPLI, STATUS_APPLI_FILESYSTEM);
 	return -1;
+}
+
+uint32_t file_sys_get_max_size(void)
+{
+#if defined(FS_IS_LITTLEFS)
+
+	FSInfo info;
+	G_FileSystem.info(info);
+	return info.totalBytes;
+
+#elif defined(FS_IS_SPIFFS)
+
+	return G_FileSystem.totalBytes();
+
+#else
+
+	return 0;
+
+#endif
 }
 
 bool file_sys_exist(String & path)

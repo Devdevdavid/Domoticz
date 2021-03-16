@@ -12,6 +12,7 @@
 #include <ESP8266WebServer.h>
 #endif
 #include <ArduinoJson.h>
+#include <StreamString.h>
 #include <string>
 
 #include "cmd/cmd.hpp"
@@ -27,6 +28,9 @@
 
 // Main handle for webserver
 G_WebServer server(WEB_SERVER_HTTP_PORT);
+
+// Internals
+static String updaterError;
 
 static String getContentType(String filename)
 {
@@ -80,43 +84,75 @@ static void handle_bad_parameter(void)
 	server.send(200, "text/plain", "Bad parameter");
 }
 
-static void handle_firmware_upload(void)
+static void handle_update_done(void)
 {
+	// if (!_authenticated)
+	//     return server.requestAuthentication();
+	server.client().setNoDelay(true);
 	String msg = String(Update.getError());
 	server.sendHeader("Connection", "close");
 	server.send(200, "text/plain", msg);
+
+	if (!Update.hasError()) {
+		delay(100);
+		server.client().stop();
+
+		// Reset to apply in 1s to let time to send HTTP response
+		script_delayed_reset(1000);
+	}
 }
 
-static void handle_firmware_data(void)
+static void handle_update_data_progress(uint32_t progress, uint32_t size)
 {
-	HTTPUpload & upload = server.upload();
+	log_info("Uploading : %d%% (%d kB)", (progress * 100) / size, progress / 1000);
+}
+
+static void handle_update_error()
+{
+	StreamString str;
+	Update.printError(str);
+	updaterError = str.c_str();
+}
+
+static void handle_update_data(void)
+{
+	// handler for the file upload, get's the sketch bytes, and writes
+	// them through the Update object
+	HTTPUpload & upload         = server.upload();
+	uint32_t     maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+	uint32_t     maxFSSpace     = file_sys_get_max_size();
 
 	if (upload.status == UPLOAD_FILE_START) {
-		log_info("upload.totalSize = %d", upload.totalSize);
+		updaterError.clear();
 
-		// Warning : contentLength is not the file length :
-		// size of entire post request, file size + headers and other request data.
-		// But it gives a good estimation of the amount of data needed.
-		// Using max size will overwrite filesystem and therefore break the webserver
-		// log_info("Starting update with: %s (%d kB)", upload.filename.c_str(), upload.contentLength / 1000);
-		// if (!Update.begin(upload.contentLength)) {
-		// 	Update.printError(Serial);
-		// }
-	} else if (upload.status == UPLOAD_FILE_WRITE) {
-		// Write the buffer (2048 bytes max)
-		// if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-		// 	Update.printError(Serial);
-		// }
-	} else if (upload.status == UPLOAD_FILE_END) {
-		if (Update.end(true)) { // true: to set the size to the current progress
-			log_info("Firmware update DONE");
+		log_info("Update: %s (%s)\n", upload.filename.c_str(), upload.name.c_str());
 
-			// Reset to apply in 1s to let time to send HTTP response
-			script_delayed_reset(1000);
+		if (upload.name == "filesystem") {
+			if (!Update.begin(maxFSSpace, U_CMD_FS)) { //start with max available size
+				handle_update_error();
+			}
 		} else {
-			Update.printError(Serial);
+			if (!Update.begin(maxSketchSpace, U_FLASH)) { //start with max available size
+				handle_update_error();
+			}
 		}
+	} else if (upload.status == UPLOAD_FILE_WRITE && !updaterError.length()) {
+		handle_update_data_progress(upload.totalSize, maxSketchSpace);
+
+		if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+			handle_update_error();
+		}
+	} else if (upload.status == UPLOAD_FILE_END && !updaterError.length()) {
+		if (Update.end(true)) { //true to set the size to the current progress
+			log_info("Update Success: %ukB\n", upload.totalSize / 1000);
+		} else {
+			handle_update_error();
+		}
+	} else if (upload.status == UPLOAD_FILE_ABORTED) {
+		Update.end();
+		log_warn("Update was aborted");
 	}
+	delay(0);
 }
 
 /**
@@ -455,7 +491,7 @@ int web_server_init(void)
 
 	// --- Firmware Upload ---
 	server.on(
-	"/firmware_upload", HTTP_POST, []() { handle_firmware_upload(); }, []() { handle_firmware_data(); });
+	"/update", HTTP_POST, []() { handle_update_done(); }, []() { handle_update_data(); });
 
 	// --- Get/Set interface ---
 	server.on("/get_version", HTTP_GET, []() {
