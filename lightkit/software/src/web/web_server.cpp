@@ -30,7 +30,8 @@
 G_WebServer server(WEB_SERVER_HTTP_PORT);
 
 // Internals
-static String updaterError;
+static String   updaterError;
+static uint32_t updateBufferMaxSpace = 0;
 
 static String getContentType(String filename)
 {
@@ -102,9 +103,17 @@ static void handle_update_done(void)
 	}
 }
 
+/**
+ * @brief Show usage information on buffer usage
+ * @details We don't have the actual file size
+ * information so we display usage instead
+ *
+ * @param progress 	Size received
+ * @param size 		Max size of the buffer
+ */
 static void handle_update_data_progress(uint32_t progress, uint32_t size)
 {
-	log_info("Uploading : %d%% (%d kB)", (progress * 100) / size, progress / 1000);
+	log_info("Buffer usage: %d%% (%d kB)", (progress * 100) / size, progress / 1000);
 }
 
 static void handle_update_error()
@@ -118,9 +127,7 @@ static void handle_update_data(void)
 {
 	// handler for the file upload, get's the sketch bytes, and writes
 	// them through the Update object
-	HTTPUpload & upload         = server.upload();
-	uint32_t     maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
-	uint32_t     maxFSSpace     = file_sys_get_max_size();
+	HTTPUpload & upload = server.upload();
 
 	if (upload.status == UPLOAD_FILE_START) {
 		updaterError.clear();
@@ -128,16 +135,20 @@ static void handle_update_data(void)
 		log_info("Update: %s (%s)\n", upload.filename.c_str(), upload.name.c_str());
 
 		if (upload.name == "filesystem") {
-			if (!Update.begin(maxFSSpace, U_CMD_FS)) { //start with max available size
+			updateBufferMaxSpace = file_sys_get_max_size();
+
+			if (!Update.begin(updateBufferMaxSpace, U_CMD_FS)) {
 				handle_update_error();
 			}
 		} else {
-			if (!Update.begin(maxSketchSpace, U_FLASH)) { //start with max available size
+			updateBufferMaxSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+
+			if (!Update.begin(updateBufferMaxSpace, U_FLASH)) {
 				handle_update_error();
 			}
 		}
 	} else if (upload.status == UPLOAD_FILE_WRITE && !updaterError.length()) {
-		handle_update_data_progress(upload.totalSize, maxSketchSpace);
+		handle_update_data_progress(upload.totalSize, updateBufferMaxSpace);
 
 		if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
 			handle_update_error();

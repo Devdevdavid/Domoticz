@@ -16,17 +16,12 @@
       <h2>Firmware</h2>
       <p>
         Version actuelle:<br>
-        <span id="firmware_Version">-<!-- Filled by JS --></span>
+        <span id="firmware_version">-<!-- Filled by JS --></span>
       </p>
       <form method='POST' id="firmware_file_form">
         <input type='file' name='firmware_file' id='firmware_file'>
         <button type='submit' class="theme">Mettre à jour</button>
-        <div id='firmware_progress_bar'>
-          <span id="progress_bar_label"></span>
-          <div id='progress_bar'></div>
-        </div>
       </form>
-      <a href="index.html" class="theme">< Retour</a>
     </div>
     <div id="part_select_file">
       <h2>Web Serveur</h2>
@@ -37,13 +32,10 @@
       <form method='POST' id="webserver_file_form">
         <input type='file' name='webserver_file' id='webserver_file'>
         <button type='submit' class="theme">Mettre à jour</button>
-        <div id='webserver_progress_bar'>
-          <span id="progress_bar_label"></span>
-          <div id='progress_bar'></div>
-        </div>
       </form>
-      <a href="index.html" class="theme">< Retour</a>
     </div>
+    <br>
+    <a href="index.html" class="theme">< Retour</a>
   </div>
   <div id="footer">
     Hardware - Pascal RONDANE<br>
@@ -73,16 +65,6 @@
       formData.append(location, file);
 
       set_message("ok", "Envoi en cours...");
-
-      // track upload progress
-      xhr.upload.onprogress = function(evt) {
-        if (evt.lengthComputable) {
-          var per = evt.loaded / evt.total * 100;
-          console.log("Uploading: " + per + "%");
-          //$('#progress_bar_label').html('Uploading: ' + Math.round(per*100) + '%');
-          //$('#progress_bar').css('width',Math.round(per*100) + '%');
-        }
-      };
 
       // track completion: both successful or not
       xhr.onloadend = function() {
@@ -133,8 +115,9 @@
       add_file_listener('#webserver_file', 'filesystem');
 
       cgi_request('/get_version', '', function(textReply) {
-        document.getElementById('firmware_Version').innerHTML = textReply;
+        document.getElementById('firmware_version').innerHTML = textReply;
       });
+      document.getElementById('webserver_version').innerHTML = "v" + get_version();
     }
   </script>
 </body>

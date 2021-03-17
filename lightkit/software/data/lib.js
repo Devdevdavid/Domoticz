@@ -1,3 +1,8 @@
+function get_version()
+{
+  return "1.0.1";
+}
+
 /**
  * @brief Set error message in box id=status_msg
  */
