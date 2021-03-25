@@ -6,6 +6,7 @@
 
 #include "wifi.hpp"
 #include "flash/flash.hpp"
+#include "ota/ota.hpp"
 #include "script/script.hpp"
 
 // Externals
@@ -362,7 +363,7 @@ int32_t wifi_start_scan_req(uint32_t delay)
 		return -1;
 	}
 
-	log_info("Wifi scan requested, starting in %ds", delay / 1000);
+	log_info("Wifi scan requested, starting in %d ms", delay);
 
 	// Trigger a new scan
 	isScanToStartTick = tick + delay;
@@ -396,10 +397,10 @@ int wifi_init(void)
 
 	wifi_print();
 
-	// Scan wifi after startup (2s delay)
+	// Scan wifi after startup (50ms delay)
 	// Scan cannot be trigger right now because
 	// OTA and web server requieres WiFi to be up
-	wifi_start_scan_req(2000);
+	wifi_start_scan_req(50);
 
 	return 0;
 }
@@ -438,6 +439,7 @@ void wifi_main(void)
 					_set(STATUS_WIFI, STATUS_WIFI_IS_CO);
 					wifi_print();
 					wifi_save_current_ip();
+					ota_configure_mdns();
 				}
 			}
 		}

@@ -12,10 +12,20 @@
 #include "global.hpp"
 #include "ota.hpp"
 
+#ifdef ESP32
+#include <ESPmDNS.h>
+#else
+#include <ESP8266mDNS.h>
+#endif
+
 extern uint32_t tick;
 uint32_t        otaTick = 0;
 
-static int ota_configure_mdns(void)
+/**
+ * @brief Set the hostname for MDNS
+ * @return 0: OK, -1: error
+ */
+int ota_configure_mdns(void)
 {
 	// Check if module name is set
 	if (flashSettings.moduleName[0] == '\0') {
@@ -24,15 +34,25 @@ static int ota_configure_mdns(void)
 
 	log_info("Using \"%s\" as module name", flashSettings.moduleName);
 
-	// mDNS is enabled by default in both ESP32 and ESP8266 libraries
-	ArduinoOTA.setHostname(flashSettings.moduleName);
+	// Clear MDNS before starting
+#ifdef ESP32
+	MDNS.end();
+#else
+	MDNS.close();
+#endif
+
+	// Start the service
+	if (!MDNS.begin(flashSettings.moduleName)) {
+		log_error("mDNS failed to start !");
+		return -1;
+	}
+	MDNS.enableArduino(OTA_PORT);
+	MDNS.addService("http", "tcp", 80);
 	return 0;
 }
 
 int ota_init(void)
 {
-	ota_configure_mdns();
-
 	ArduinoOTA.setPort(OTA_PORT);
 	ArduinoOTA.setPassword(OTA_PWD);
 
@@ -78,7 +98,14 @@ int ota_init(void)
 		else if (error == OTA_END_ERROR)
 			log_error("End Failed");
 	});
+
+#ifdef ESP32
+	ArduinoOTA.setMdnsEnabled(false);
 	ArduinoOTA.begin();
+#else
+	// false : don't do mdns, we do it ourself
+	ArduinoOTA.begin(false);
+#endif
 
 	return 0;
 }
@@ -86,4 +113,8 @@ int ota_init(void)
 void ota_main(void)
 {
 	ArduinoOTA.handle();
+
+#if !defined(ESP32)
+	MDNS.update();
+#endif
 }

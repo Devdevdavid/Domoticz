@@ -14,6 +14,7 @@
 #define OTA_PWD  P_OTA_PWD
 
 // OTA
+int  ota_configure_mdns(void);
 int  ota_init(void);
 void ota_main(void);
 
