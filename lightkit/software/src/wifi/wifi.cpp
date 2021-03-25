@@ -47,7 +47,8 @@ wifi_handle_t defaultWifiSettings = {
 	.client = {
 		{ .ssid = WIFI_DEFAULT_CLIENT_SSID },
 		{ .password = WIFI_DEFAULT_CLIENT_PASSWORD },
-		.delayBeforeAPFallbackMs = WIFI_DEFAULT_DELAY_AP_FALLBACK
+		.delayBeforeAPFallbackMs = WIFI_DEFAULT_DELAY_AP_FALLBACK,
+		.lastIp = IP_TO_U32(0, 0, 0, 0)
 	}
 };
 // clang-format on
@@ -246,6 +247,36 @@ static int32_t wifi_start_scan(void)
 	return 0;
 }
 
+/**
+ * @brief Check the current IP address of Client mode
+ * and save it to flash if this is a new one
+ * @return 0: OK, -1: error
+ */
+static int32_t wifi_save_current_ip(void)
+{
+	uint32_t  curIp;
+	IPAddress lastIp = IPAddress(wifiHandle->client.lastIp);
+
+	// Do nothing if not client
+	if (wifiHandle->mode != MODE_CLIENT) {
+		return -1;
+	}
+
+	// Get current ip adress and compare
+	curIp = (uint32_t) WiFi.localIP();
+	if (curIp == wifiHandle->client.lastIp) {
+		return 0;
+	}
+
+	log_info("Saving new IP Address: %s (Previous was %s)",
+			 WiFi.localIP().toString().c_str(),
+			 lastIp.toString().c_str());
+
+	// Save it in flash
+	wifiHandle->client.lastIp = curIp;
+	return flash_write();
+}
+
 // =====================
 // PUBLIC FUNCTIONS
 // =====================
@@ -402,9 +433,11 @@ void wifi_main(void)
 					wifi_fallback_as_ap();
 				}
 			} else {
+				// Did we just get connected ?
 				if (_isunset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
 					_set(STATUS_WIFI, STATUS_WIFI_IS_CO);
 					wifi_print();
+					wifi_save_current_ip();
 				}
 			}
 		}

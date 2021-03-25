@@ -386,6 +386,8 @@ static void handle_get_wifi_settings(void)
 	json["client"]["ssid"]                    = wifiHandle->client.ssid;
 	json["client"]["password"]                = wifiHandle->client.password;
 	json["client"]["delayBeforeAPFallbackMs"] = wifiHandle->client.delayBeforeAPFallbackMs;
+	IPAddress lastIp                          = IPAddress(wifiHandle->client.lastIp);
+	json["client"]["lastIp"]                  = lastIp.toString();
 
 	serializeJson(json, jsonString);
 	server.send(200, "text/plain", jsonString);

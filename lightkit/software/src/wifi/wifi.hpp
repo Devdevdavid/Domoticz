@@ -78,6 +78,7 @@ typedef struct {
 		char password[WIFI_PASSWORD_MAX_LEN];
 
 		uint32_t delayBeforeAPFallbackMs; // Number of ms when cannot connect as client after boot before rebooting in AP mode
+		uint32_t lastIp;                  // Last valid IP address used last time we got a successful connection as client
 	} client;
 } wifi_handle_t;
 

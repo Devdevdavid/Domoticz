@@ -16,7 +16,7 @@
 #define EEPROM_USED_SIZE 256
 
 /** Increment this each time flash_settings_t is incompatible with previous version */
-#define FLASH_STRUCT_VERSION 3
+#define FLASH_STRUCT_VERSION 4
 
 typedef struct {
 	wifi_handle_t     wifiHandle;

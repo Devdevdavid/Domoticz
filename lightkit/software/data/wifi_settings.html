@@ -114,6 +114,12 @@
               Si le module ne parvient pas à se connecter au réseau existant avec les paramètres fournis, il basculera en mode Point d'Accès après le délais indiqué ci-dessus.
             </p>
 
+            <label for="wifiClientLastIP">Dernière IP :</label><br>
+            <input type="text" id="wifiClientLastIP" name="wifiClientLastIP" autocomplete="off" placeholder="Aucune IP enregistrée" readonly><br>
+            <p class="classic_form_help">
+              IP attribuée au module lors de sa dernière connexion en tant que client.
+            </p>
+
           </div>
         </div>
 
@@ -169,6 +175,7 @@
       document.getElementById('wifiClientSSID').value = json["client"]["ssid"];
       document.getElementById('wifiClientPassword').value = json["client"]["password"];
       document.getElementById('wifiClientDelayBeforeAPFallbackMs').value = json["client"]["delayBeforeAPFallbackMs"] / 1000;
+      document.getElementById('wifiClientLastIP').value = json["client"]["lastIp"];
     }
 
     function read_wifi_form(json)
@@ -197,6 +204,7 @@
       json["client"]["ssid"] = document.getElementById('wifiClientSSID').value;
       json["client"]["password"] = document.getElementById('wifiClientPassword').value;
       json["client"]["delayBeforeAPFallbackMs"] = document.getElementById('wifiClientDelayBeforeAPFallbackMs').value * 1000;
+      // wifiClientLastIP is readonly
 
       var params = 'v=' + JSON.stringify(json);
 
