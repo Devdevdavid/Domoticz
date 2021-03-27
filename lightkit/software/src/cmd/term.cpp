@@ -8,6 +8,7 @@
 #include "term.hpp"
 #include "cmd.hpp"
 #include "global.hpp"
+#include "prompt.hpp"
 #include "relay/relay.hpp"
 #include "serial.hpp"
 #include "telnet.hpp"
@@ -45,6 +46,19 @@ static void term_abort(void)
 {
 	term_print("\nABORT\n");
 	term_reset();
+}
+
+static void term_cursor_kill_line(void)
+{
+	term_print("\x1B[;0H");
+	term_print("\x1B[K");
+}
+
+static void term_cursor_update_pos(void)
+{
+	char text[12];
+	snprintf(text, sizeof(text), "\x1B[80;%02dH", prompt_get_cursor_pos());
+	term_print(text);
 }
 
 static void term_execute_command(void)
@@ -215,27 +229,37 @@ void term_rx(uint8_t byte)
 {
 	char inChar;
 
-	inChar = toupper(byte);
-
-	// Transform all \r into \n (to support screen unix command)
-	if (inChar == '\r') {
-		inChar = '\n';
+	if (prompt_rx(byte) == 0) {
+		term_print("\n\r");
+		log_info("The command is \"%s\"", prompt_get_line().c_str());
 	}
 
-	if (inChar == TERM_END_CMD) {
-		termPort.isInCmdValid = true;
-	} else if (inChar == TERM_ABORT_CMD) {
-		term_abort();
-	} else {
-		if (termPort.rxLength < TERM_RX_BUFFER_SIZE) {
-			termPort.rxBuffer[termPort.rxLength++] = inChar;
-		} else {
-			_term_ack(ERROR_BUFF_OVERRUN);
-			term_abort();
-		}
-	}
+	// Clear line
+	term_cursor_kill_line();
+	term_print("> ");
+	term_print(prompt_get_line().c_str());
+	term_print(" ");
+	term_cursor_update_pos();
 
-	term_echo(inChar);
+	// // Transform all \r into \n (to support screen unix command)
+	// if (inChar == '\r') {
+	// 	inChar = '\n';
+	// }
+
+	// if (inChar == TERM_END_CMD) {
+	// 	termPort.isInCmdValid = true;
+	// } else if (inChar == TERM_ABORT_CMD) {
+	// 	term_abort();
+	// } else {
+	// 	if (termPort.rxLength < TERM_RX_BUFFER_SIZE) {
+	// 		termPort.rxBuffer[termPort.rxLength++] = inChar;
+	// 	} else {
+	// 		_term_ack(ERROR_BUFF_OVERRUN);
+	// 		term_abort();
+	// 	}
+	// }
+
+	// log_info("You typed : 0x%02X, %d, \'%c\'", byte, byte, byte);
 }
 
 void term_print(String str)
@@ -251,6 +275,7 @@ void term_print(String str)
 int term_init(void)
 {
 	term_reset();
+	prompt_init();
 	return 0;
 }
 

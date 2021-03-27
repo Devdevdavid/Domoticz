@@ -17,9 +17,17 @@
 #define ERROR_WRONG_VALUE  5
 #define ERROR_INTERNAL     6
 
-#define TERM_RX_BUFFER_SIZE 64
-#define TERM_END_CMD        '\n'
-#define TERM_ABORT_CMD      0x08 // Backspace
+#define TERM_RX_BUFFER_SIZE   64
+#define TERM_END_CMD          '\n'
+#define TERM_KEY_BACKSPACE    0x08 // Backspace
+#define TERM_KEY_ENTER        0x0D
+#define TERM_KEY_ESC          0x1B
+#define TERM_KEY_OPEN_BRACKET 0x5B // '['
+#define TERM_CODE_ARROW_UP    0x41 // 'A'
+#define TERM_CODE_ARROW_DOWN  0x42 // 'B'
+#define TERM_CODE_ARROW_RIGHT 0x43 // 'C'
+#define TERM_CODE_ARROW_LEFT  0x44 // 'D'
+#define TERM_ABORT_CMD        TERM_KEY_BACKSPACE
 
 void term_rx(uint8_t byte);
 void term_print(String str);
