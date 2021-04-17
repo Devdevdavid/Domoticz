@@ -145,9 +145,6 @@ void loop(void)
 #ifdef MODULE_TELNET
 		telnet_main();
 #endif
-#ifdef MODULE_TERM
-		term_main();
-#endif
 #ifdef MODULE_STATUS_LED
 		status_led_main();
 #endif

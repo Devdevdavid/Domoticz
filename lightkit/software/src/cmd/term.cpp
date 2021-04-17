@@ -8,59 +8,89 @@
 #include "term.hpp"
 #include "cmd.hpp"
 #include "global.hpp"
-#include "prompt.hpp"
 #include "relay/relay.hpp"
 #include "serial.hpp"
 #include "telnet.hpp"
 
-#ifdef MODULE_TERM
+extern "C" {
+#include "cli.h"
+}
 
-struct term_t {
-	char     rxBuffer[TERM_RX_BUFFER_SIZE];
-	uint16_t rxLength;
-	bool     isInCmdValid;
-};
-struct term_t termPort;
+#ifdef MODULE_TERM
 
 //========================
 //	  STATIC FUNCTIONS
 //========================
 
-static void term_reset(void)
+/**
+ * @brief Default callback for leaf tokens
+ *
+ * @param argc Argument count
+ * @param argv Argument values
+ *
+ * @return The status of the function
+ */
+int print_args(uint8_t argc, char * argv[])
 {
-	termPort.isInCmdValid = false;
-	termPort.rxLength     = 0;
-}
-
-#define _term_ack(errorCode) term_ack(#errorCode, errorCode)
-static void term_ack(const char errorCodeStr[], uint8_t errorCode)
-{
-	if (errorCode == OK) {
-		term_print("CMD OK\n");
-	} else {
-		term_print("CMD ERROR: Code = " + String(errorCode) + " (" + errorCodeStr + ")\n");
+	printf("print_args() Found %d args:\n\r", argc);
+	for (uint8_t i = 0; i < argc; ++i) {
+		printf("\t%s\n\r", argv[i]);
 	}
+	return 0;
 }
 
-static void term_abort(void)
+/**
+ * @brief Create the command line interface
+ */
+static int term_create_cli_commands(void)
 {
-	term_print("\nABORT\n");
-	term_reset();
+	cli_token * tokRoot = cli_get_root_token();
+	cli_token * tokLan;
+	cli_token * tokIpSet;
+	cli_token * curTok;
+
+	// Create commands
+	curTok = cli_add_token("exit", "Exit application");
+	cli_set_callback(curTok, &print_args);
+	cli_add_children(tokRoot, curTok);
+
+	tokLan = cli_add_token("lan", "LAN configuration");
+	{
+		curTok = cli_add_token("show", "[interface] Show configuration");
+		cli_set_callback(curTok, &print_args);
+		cli_set_argc(curTok, 0, 1);
+		cli_add_children(tokLan, curTok);
+
+		tokIpSet = cli_add_token("set", "Define new configuration");
+		{
+			curTok = cli_add_token("ip", "<address> Set IP adress");
+			cli_set_callback(curTok, &print_args);
+			cli_set_argc(curTok, 1, 0);
+			cli_add_children(tokIpSet, curTok);
+
+			curTok = cli_add_token("gateway", "<address> Set gateway adress");
+			cli_set_callback(curTok, &print_args);
+			cli_set_argc(curTok, 1, 0);
+			cli_add_children(tokIpSet, curTok);
+
+			curTok = cli_add_token("mask", "<address> Set network mask");
+			cli_set_callback(curTok, &print_args);
+			cli_set_argc(curTok, 1, 0);
+			cli_add_children(tokIpSet, curTok);
+
+			curTok =
+			cli_add_token("proxy", "<address> <port> Set the proxy location");
+			cli_set_callback(curTok, &print_args);
+			cli_set_argc(curTok, 2, 0);
+			cli_add_children(tokIpSet, curTok);
+		}
+		cli_add_children(tokLan, tokIpSet);
+	}
+	cli_add_children(tokRoot, tokLan);
+	return 0;
 }
 
-static void term_cursor_kill_line(void)
-{
-	term_print("\x1B[;0H");
-	term_print("\x1B[K");
-}
-
-static void term_cursor_update_pos(void)
-{
-	char text[12];
-	snprintf(text, sizeof(text), "\x1B[80;%02dH", prompt_get_cursor_pos());
-	term_print(text);
-}
-
+#ifdef DISABLEDNONO
 static void term_execute_command(void)
 {
 	// If command is empty, display help menu
@@ -199,92 +229,35 @@ static void term_execute_command(void)
 		break;
 	}
 }
-
-/**
- * @brief Do echo only on the interfaces
- * that don't have local echo
- */
-static void term_echo(uint8_t byte)
-{
-#ifdef MODULE_SERIAL
-	serial_write(byte);
 #endif
-}
-
-static void term_tx(uint8_t byte)
-{
-#ifdef MODULE_SERIAL
-	serial_write(byte);
-#endif
-#ifdef MODULE_TELNET
-	telnet_write(byte);
-#endif
-}
 
 //========================
 //	  PUBLIC FUNCTIONS
 //========================
 
+int term_init(void)
+{
+	cli_init();
+	term_create_cli_commands();
+	return 0;
+}
+
 void term_rx(uint8_t byte)
 {
-	char inChar;
-
-	if (prompt_rx(byte) == 0) {
-		term_print("\n\r");
-		log_info("The command is \"%s\"", prompt_get_line().c_str());
-	}
-
-	// Clear line
-	term_cursor_kill_line();
-	term_print("> ");
-	term_print(prompt_get_line().c_str());
-	term_print(" ");
-	term_cursor_update_pos();
-
-	// // Transform all \r into \n (to support screen unix command)
-	// if (inChar == '\r') {
-	// 	inChar = '\n';
-	// }
-
-	// if (inChar == TERM_END_CMD) {
-	// 	termPort.isInCmdValid = true;
-	// } else if (inChar == TERM_ABORT_CMD) {
-	// 	term_abort();
-	// } else {
-	// 	if (termPort.rxLength < TERM_RX_BUFFER_SIZE) {
-	// 		termPort.rxBuffer[termPort.rxLength++] = inChar;
-	// 	} else {
-	// 		_term_ack(ERROR_BUFF_OVERRUN);
-	// 		term_abort();
-	// 	}
-	// }
-
-	// log_info("You typed : 0x%02X, %d, \'%c\'", byte, byte, byte);
+	cli_rx(byte);
 }
 
 void term_print(String str)
 {
-	uint32_t len = str.length();
+	uint32_t  len  = str.length();
+	uint8_t * data = (uint8_t *) str.c_str();
 
-	// Send data one by one
-	for (uint32_t i = 0; i < len; ++i) {
-		term_tx(str[i]);
-	}
-}
-
-int term_init(void)
-{
-	term_reset();
-	prompt_init();
-	return 0;
-}
-
-void term_main(void)
-{
-	if (termPort.isInCmdValid == true) {
-		term_execute_command();
-		term_reset();
-	}
+#ifdef MODULE_SERIAL
+	serial_write(data, len);
+#endif
+#ifdef MODULE_TELNET
+	telnet_write(data, len);
+#endif
 }
 
 #endif /* MODULE_TERM */

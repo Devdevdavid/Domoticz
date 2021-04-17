@@ -11,12 +11,9 @@
 
 #ifdef MODULE_SERIAL
 
-void serial_write(uint8_t byte)
+void serial_write(uint8_t * data, uint8_t len)
 {
-	Serial.write(byte);
-	if (byte == '\n') {
-		Serial.write('\r');
-	}
+	Serial.write(data, len);
 }
 
 int serial_init(void)
