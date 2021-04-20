@@ -5,8 +5,8 @@
   * @date   12/08/2017
   */
 
-#include "global.hpp"
 #include "log.hpp"
+#include "global.hpp"
 
 #include <stdlib.h>
 #include <string.h>
@@ -21,12 +21,14 @@ static const char * level_names[] = {
 	"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
 };
 
+// C Declaration is needed because log_raw() is
+// used in cli_config.h wich is compiled with C Compiler
+extern "C" {
 void log_raw(const char * fmt, ...)
 {
 	va_list args;
 
 	/* Log to console */
-
 	va_start(args, fmt);
 	vsprintf(argsString, fmt, args);
 	va_end(args);
@@ -37,13 +39,13 @@ void log_raw(const char * fmt, ...)
 	term_print(message);
 #endif
 }
+}
 
 void log_log(int level, const char * file, int line, const char * fmt, ...)
 {
 	va_list args;
 
 	/* Log to console */
-
 	va_start(args, fmt);
 	vsprintf(argsString, fmt, args);
 	va_end(args);

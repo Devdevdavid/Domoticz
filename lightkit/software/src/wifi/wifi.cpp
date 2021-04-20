@@ -4,6 +4,8 @@
  * settings (AP and client)
  */
 
+#define WIFI_CPP
+
 #include "wifi.hpp"
 #include "flash/flash.hpp"
 #include "ota/ota.hpp"
@@ -139,12 +141,12 @@ static bool wifi_is_handle_valid(wifi_handle_t * pWifiHandle, String & reason)
 		reason = "[AP] Mot de passe trop court (8 car.)";
 		return false;
 	}
-	if ((pWifiHandle->ap.channel <= 0) || (pWifiHandle->ap.channel > 16)) {
-		reason = "[AP] Canal invalide: " + String(pWifiHandle->ap.channel) + " [1-16]";
+	if ((pWifiHandle->ap.channel < WIFI_CHANNEL_MIN) || (pWifiHandle->ap.channel > WIFI_CHANNEL_MAX)) {
+		reason = "[AP] Canal invalide: " + String(pWifiHandle->ap.channel) + " [" + String(WIFI_CHANNEL_MIN) + "-" + String(WIFI_CHANNEL_MAX) + "]";
 		return false;
 	}
-	if ((pWifiHandle->ap.maxConnection <= 0) || (pWifiHandle->ap.maxConnection > 3)) {
-		reason = "[AP] Connexion max. invalide [1-16]";
+	if ((pWifiHandle->ap.maxConnection < WIFI_MAX_CO_MIN) || (pWifiHandle->ap.maxConnection > WIFI_MAX_CO_MAX)) {
+		reason = "[AP] Connexion max. invalide [" + String(WIFI_MAX_CO_MIN) + "-" + String(WIFI_MAX_CO_MAX) + "]";
 		return false;
 	}
 	if (strlen(pWifiHandle->client.ssid) < 5) {
@@ -278,6 +280,14 @@ static int32_t wifi_save_current_ip(void)
 	return flash_write();
 }
 
+static const char * wifi_get_mode_str(WIFI_MODE_E mode)
+{
+	if (mode > MODE_MAX) {
+		return outOfRangeStr;
+	}
+	return wifiModeStr[(int) mode];
+}
+
 // =====================
 // PUBLIC FUNCTIONS
 // =====================
@@ -299,6 +309,32 @@ void wifi_print(void)
 	if (_isset(STATUS_WIFI, STATUS_WIFI_USING_FORCED_MODE)) {
 		log_info("Wifi is using a FORCED MODE");
 	}
+}
+
+void wifi_print_config(wifi_handle_t * pHandle)
+{
+	// Use current if null specified
+	if (pHandle == NULL) {
+		pHandle = wifiHandle;
+	}
+
+	log_raw("mode:            %s\n\r", wifi_get_mode_str(pHandle->mode));
+	log_raw("userMode:        %s\n\r", wifi_get_mode_str(pHandle->userMode));
+	log_raw("forcedMode:      %s\n\r", wifi_get_mode_str(pHandle->forcedMode));
+	log_raw("AP:\n\r");
+	log_raw("\tssid:          %s\n\r", pHandle->ap.ssid);
+	log_raw("\tpassord:       <not displayed>\n\r");
+	log_raw("\tchannel:       %d\n\r", pHandle->ap.channel);
+	log_raw("\tmaxCo:         %d\n\r", pHandle->ap.maxConnection);
+	log_raw("\tisHidden:      %s\n\r", pHandle->ap.isHidden ? "on" : "off");
+	log_raw("\tip:            %s\n\r", IPAddress(pHandle->ap.ip).toString().c_str());
+	log_raw("\tgateway:       %s\n\r", IPAddress(pHandle->ap.gateway).toString().c_str());
+	log_raw("\tsubnet:        %s\n\r", IPAddress(pHandle->ap.subnet).toString().c_str());
+	log_raw("Client:\n\r");
+	log_raw("\tssid:          %s\n\r", pHandle->client.ssid);
+	log_raw("\tpassord:       <not displayed>\n\r");
+	log_raw("\tdelayBeforeAP: %ds\n\r", pHandle->client.delayBeforeAPFallbackMs / 1000);
+	log_raw("\tlastIp:        %s\n\r", IPAddress(pHandle->client.lastIp).toString().c_str());
 }
 
 /**

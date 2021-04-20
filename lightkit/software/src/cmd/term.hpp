@@ -10,20 +10,8 @@
 
 #include <Arduino.h>
 
-#define ERROR_UNKNOWN_CMD  1
-#define ERROR_WRONG_LENGTH 2
-#define ERROR_BUFF_OVERRUN 3
-#define ERROR_SPURIOUS     4
-#define ERROR_WRONG_VALUE  5
-#define ERROR_INTERNAL     6
-
-#define TERM_RX_BUFFER_SIZE 64
-#define TERM_END_CMD        '\n'
-#define TERM_ABORT_CMD      0x08 // Backspace
-
 void term_rx(uint8_t byte);
 void term_print(String str);
 int  term_init(void);
-void term_main(void);
 
 #endif /* CMD_TERM_HPP */

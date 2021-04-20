@@ -10,7 +10,7 @@
 
 #include <Arduino.h>
 
-void serial_write(uint8_t byte);
+void serial_write(uint8_t * data, uint8_t len);
 int  serial_init(void);
 void serial_main(void);
 
