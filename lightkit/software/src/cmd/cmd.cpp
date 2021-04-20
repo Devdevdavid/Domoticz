@@ -14,27 +14,6 @@
 #include "stripled/stripled.hpp"
 #include "wifi/wifi.hpp"
 
-void cmd_print_help(void)
-{
-	log_raw("=== " FIRMWARE_VERSION " ===\n");
-	log_raw("H                         This help\n");
-	log_raw("I                         Reset the module\n");
-	log_raw("T                         Print board status\n");
-	log_raw("F                         Reset flash setting to default\n");
-#ifdef MODULE_STATUS_LED
-	log_raw("L[State]                  Toggle or set Led Visu Visibility\n");
-#endif
-#ifdef MODULE_STRIPLED
-	log_raw("B[Value]                  Set brightness, no value = Auto\n");
-	log_raw("S[1/0: State]             Set the LED ON or OFF\n");
-	log_raw("D[1/0: State]             Set the demo mode ON or OFF\n");
-	log_raw("A<animID>                 Set animation 0 to 55\n");
-#endif
-#ifdef MODULE_RELAY
-	log_raw("R[1/0: State]             Toggle or Set Relay On or Off\n");
-#endif
-}
-
 void cmd_reset_module(void)
 {
 	// Resetting with new configuration

@@ -5,10 +5,10 @@
 extern void log_raw(const char * fmt, ...);
 
 /* CLI */
-#define CLI_MAX_CHILDS      4  /**< Maximum number of childs for a token */
+#define CLI_MAX_CHILDS      8  /**< Maximum number of childs for a token */
 #define CLI_MAX_TEXT_LEN    13 /**< Maximum length of the token's text attribute */
 #define CLI_MAX_DESC_LEN    50 /**< Maximum length og the token's description attribute */
-#define CLI_MAX_TOKEN_COUNT 30 /**< Maximum number of tokens */
+#define CLI_MAX_TOKEN_COUNT 40 /**< Maximum number of tokens */
 #define CLI_CMD_MAX_TOKEN   5  /**< Maximum number of cmdText in a line (including tokens and arguments) */
 
 #define CLI_PRINTF(...) log_raw(__VA_ARGS__); /**< Standard output */

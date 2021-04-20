@@ -19,11 +19,16 @@
 #endif
 
 // Constants
-#define WIFI_CHECK_PERIOD         1000
-#define WIFI_SSID_MAX_LEN         30
-#define WIFI_PASSWORD_MAX_LEN     30
-#define WIFI_DELAYED_CONFIG_MS    100
-#define WIFI_SCAN_MIN_INTERVAL_MS (24 * 60 * 60 * 1000)
+#define WIFI_CHECK_PERIOD          1000
+#define WIFI_SSID_MAX_LEN          30
+#define WIFI_PASSWORD_MAX_LEN      30
+#define WIFI_DELAYED_CONFIG_MS     100
+#define WIFI_SCAN_MIN_INTERVAL_MS  (24 * 60 * 60 * 1000)
+#define WIFI_MAX_CO_MIN            1
+#define WIFI_MAX_CO_MAX            3
+#define WIFI_CHANNEL_MIN           1
+#define WIFI_CHANNEL_MAX           13
+#define WIFI_DELAY_AP_FALLBACK_MIN 5000
 
 #define IP_TO_U32(a, b, c, d) ((uint32_t)((d << 24) | (c << 16) | (b << 8) | a))
 
@@ -50,6 +55,17 @@ typedef enum
 	MODE_MAX
 } WIFI_MODE_E;
 
+#ifdef WIFI_CPP
+static const char outOfRangeStr[]  = "<unknown>";
+static const char wifiModeStr[][7] = {
+	"NONE",
+	"AP",
+	"CLIENT",
+	"SCAN",
+	"MAX"
+};
+#endif
+
 /**
  * Store all wifi settings for AP and Client mode
  * @warning : Don't forget to increment FLASH_STRUCT_VERSION
@@ -64,7 +80,7 @@ typedef struct {
 	struct {
 		char     ssid[WIFI_SSID_MAX_LEN];
 		char     password[WIFI_PASSWORD_MAX_LEN];
-		uint8_t  channel;       // Wifi Channel [1-13] (Default = 1)
+		uint8_t  channel;       // Wifi Channel [WIFI_CHANNEL_MIN; WIFI_CHANNEL_MAX] (Default = WIFI_CHANNEL_MIN)
 		uint8_t  maxConnection; // Max connection supported by AP
 		uint8_t  isHidden : 1;  // Tell if SSID is hidden
 		uint32_t ip;            // Local ip address
@@ -91,6 +107,7 @@ typedef struct {
 
 // PROTOTYPES
 void            wifi_print(void);
+void            wifi_print_config(wifi_handle_t * pHandle);
 wifi_handle_t * wifi_get_handle(void);
 int32_t         wifi_use_new_settings(wifi_handle_t * pWifiHandle, String & reason);
 int32_t         wifi_use_default_settings(void);
