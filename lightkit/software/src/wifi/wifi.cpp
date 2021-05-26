@@ -20,10 +20,11 @@ wifi_handle_t * const wifiHandle = &flashSettings.wifiHandle;
 
 uint32_t wifiTick = 0;
 // Tick set at init before falling in AP mode in case of unsuccessfull client mode
-uint32_t APFallbackTick     = UINT32_MAX;
-uint32_t isAPConfigToDoTick = UINT32_MAX; // Tick use to end AP config after a delay
-uint32_t isScanToStartTick  = UINT32_MAX; // Tick use to start a scan
-uint32_t lastScanTick       = 0;          // Tick use to save the instant of the last scan
+uint32_t APFallbackTick       = UINT32_MAX;
+uint32_t isAPConfigToDoTick   = UINT32_MAX; // Tick use to end AP config after a delay
+uint32_t isScanToStartTick    = UINT32_MAX; // Tick use to start a scan
+uint32_t lastScanTick         = 0;          // Tick use to save the instant of the last scan
+bool     clientConfigSucceded = false;      // Tell if current client config worked at least one time
 
 wifi_fast_reconnect_t wifiFastReconnect = { 0 };
 
@@ -97,6 +98,8 @@ static void wifi_ap_init_later(void)
 
 static int wifi_client_init(void)
 {
+	clientConfigSucceded = false;
+
 	WiFi.mode(WIFI_STA);
 	WiFi.setAutoReconnect(true);
 
@@ -464,8 +467,10 @@ void wifi_main(void)
 			if (WiFi.status() != WL_CONNECTED) {
 				_unset(STATUS_WIFI, STATUS_WIFI_IS_CO);
 
-				// If couldn't connect as client after some time, reboot in AP mode
-				if (tick >= APFallbackTick) {
+				/* If couldn't connect as client after some time, reboot in AP mode
+				 * Checking if client config worked before avoid fallback during
+				 * temporary network down time */
+				if ((tick >= APFallbackTick) && (clientConfigSucceded == false)) {
 					APFallbackTick = UINT32_MAX;
 					wifi_fallback_as_ap();
 				}
@@ -473,6 +478,8 @@ void wifi_main(void)
 				// Did we just get connected ?
 				if (_isunset(STATUS_WIFI, STATUS_WIFI_IS_CO)) {
 					_set(STATUS_WIFI, STATUS_WIFI_IS_CO);
+
+					clientConfigSucceded = true;
 					wifi_print();
 					wifi_save_current_ip();
 					ota_configure_mdns();
