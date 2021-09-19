@@ -10,6 +10,7 @@
 #include "cmd/serial.hpp"
 #include "cmd/telnet.hpp"
 #include "cmd/term.hpp"
+#include "feu_rouge/feu_rouge.h"
 #include "file_sys/file_sys.hpp"
 #include "flash/flash.hpp"
 #include "global.hpp"
@@ -102,6 +103,9 @@ static int init_modules(void)
 #ifdef MODULE_TELEGRAM
 	CHECK_CALL(telegram_init())
 #endif
+#ifdef MODULE_FEU_ROUGE
+	CHECK_CALL(feu_rouge_init())
+#endif
 	return 0;
 }
 
@@ -153,6 +157,9 @@ void loop(void)
 #endif
 #ifdef MODULE_RELAY
 		relay_main();
+#endif
+#ifdef MODULE_FEU_ROUGE
+		feu_rouge_main();
 #endif
 		script_main();
 	}

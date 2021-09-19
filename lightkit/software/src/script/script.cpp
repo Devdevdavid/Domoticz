@@ -8,6 +8,7 @@
 #include "script/script.hpp"
 #include "cmd/cmd.hpp"
 #include "domoticz/domoticz.hpp"
+#include "feu_rouge/feu_rouge.h"
 #include "io/inputs.hpp"
 #include "io/outputs.hpp"
 #include "relay/relay.hpp"
@@ -269,6 +270,20 @@ void script_main(void)
 	if (tick > detectorEndTick) {
 		cmd_set_state(false);
 		detectorEndTick = UINT32_MAX;
+	}
+#endif
+
+#ifdef BOARD_FEU_ROUGE
+	static uint32_t ticTacTraficLightTick = tick + 5000;
+	static bool     ticTac                = false;
+
+	if (tick > ticTacTraficLightTick) {
+		ticTac                = !ticTac;
+		ticTacTraficLightTick = tick + 5000;
+		if (tick) {
+			ticTacTraficLightTick += 3000;
+		}
+		feu_rouge_command(ticTac ? CMD_OPEN : CMD_CLOSE);
 	}
 #endif
 

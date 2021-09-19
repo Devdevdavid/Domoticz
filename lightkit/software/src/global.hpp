@@ -415,6 +415,32 @@
 
 #endif /* BOARD_LIGHTKITV2_DAVID */
 
+/**
+ * This is the configuration for the board
+ * BOARD_FEU_ROUGE
+ *
+ * Just an ESP8266 connected to an IOI2C board in order to control traffic light
+ */
+#ifdef BOARD_FEU_ROUGE
+
+    #define FIRMWARE_VERSION      LIGHTKIT_VERSION" - FEU ROUGE"
+
+    /* MODULE DEFINITION (Use #define or #undef) */
+    #undef MODULE_TEMPERATURE
+    #undef MODULE_DOMOTICZ
+    #undef MODULE_STATUS_LED
+    #undef MODULE_INPUTS
+    #undef MODULE_OUTPUTS
+    #undef MODULE_RELAY
+    #undef MODULE_WEBSERVER
+    #undef MODULE_STRIPLED
+    #define MODULE_SERIAL
+    #define MODULE_TELNET
+    #define MODULE_TERM
+    #define MODULE_FEU_ROUGE
+
+#endif /* BOARD_FEU_ROUGE */
+
 /* ===========================
  * CHECKS
  * ===========================
