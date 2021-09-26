@@ -5,12 +5,16 @@
   * @date   12/08/2019
   */
 
+#ifndef GLOBAL_HPP
+#define GLOBAL_HPP
+
 // clang-format off
 
 #include <Arduino.h>
 #include "tools/tools.hpp"
 #include "tools/log.hpp"
 #include "status/status.hpp"
+#include "io/io.hpp"
 
 // If you get an error on this file, copy "private_tmpl.hpp" to "private.hpp"
 // and fill the blanked #define
@@ -429,8 +433,8 @@
     #undef MODULE_TEMPERATURE
     #undef MODULE_DOMOTICZ
     #undef MODULE_STATUS_LED
-    #undef MODULE_INPUTS
-    #undef MODULE_OUTPUTS
+    #define MODULE_INPUTS
+    #define MODULE_OUTPUTS
     #undef MODULE_RELAY
     #undef MODULE_WEBSERVER
     #undef MODULE_STRIPLED
@@ -438,6 +442,42 @@
     #define MODULE_TELNET
     #define MODULE_TERM
     #define MODULE_FEU_ROUGE
+
+    /** IOI2C BOARD */
+    #define HAS_IOI2C_BOARD                  // We have an IOI2C board connected to I2C bus
+    #define IOI2C_SDA 4                      // I2C interface to use to communicate with IOI2C boards
+    #define IOI2C_SCL 5
+    #define IOI2C_ADDRESSES { IOI2C_0_ADDR } // Adresses of IOI2C board (if chained, use coma separated list)
+
+    /* MODULE_INPUTS */
+    #define INPUTS_COUNT                           2                     /** Number of inputs managed by the module */
+    #define INPUTS_PINS                            {io_special_ioi2c(0), io_special_ioi2c(1)}       /** Define the pin of the input with following format: {x, y, z} */
+    #define INPUTS_MODES                           {I_U, I_U}            /** Define the init mode of the input pin (N, U or A) */
+    #define INPUTS_LONG_HOLD_TIME                  3*1000                /** Hold time in ms for long press on input */
+    // Aliases
+    #define INPUTS_UNUSED_E1                       0                     /** IOI2C Addr. IOI2C_0_ADDR - Input E1 */
+    #define INPUTS_DOOR_SWITCH                     1                     /** IOI2C Addr. IOI2C_0_ADDR - Input E2 */
+
+    /* MODULE_OUTPUTS */
+    #define OUTPUTS_COUNT                          6                     /** Number of outputs managed by the module */
+    #define OUTPUTS_PINS                           {                        \
+                                                       io_special_ioi2c(0), \
+                                                       io_special_ioi2c(1), \
+                                                       io_special_ioi2c(2), \
+                                                       io_special_ioi2c(3), \
+                                                       io_special_ioi2c(4), \
+                                                       io_special_ioi2c(5)  \
+                                                   }
+    // Aliases
+    #define OUTPUTS_TRAFFIC_LIGHT_RED              0                     /** IOI2C Addr. IOI2C_0_ADDR - Output S1 */
+    #define OUTPUTS_TRAFFIC_LIGHT_YELLOW           1                     /** IOI2C Addr. IOI2C_0_ADDR - Output S2 */
+    #define OUTPUTS_TRAFFIC_LIGHT_GREEN            2                     /** IOI2C Addr. IOI2C_0_ADDR - Output S3 */
+    #define OUTPUTS_UNUSED_S4                      3                     /** IOI2C Addr. IOI2C_0_ADDR - Output S4 */
+    #define OUTPUTS_UNUSED_S5                      4                     /** IOI2C Addr. IOI2C_0_ADDR - Output S5 */
+    #define OUTPUTS_UNUSED_S6                      5                     /** IOI2C Addr. IOI2C_0_ADDR - Output S6 */
+
+    /* MODULE_FEU_ROUGE */
+    #define FEU_ROUGE_INIT_FCT_MODE                MODE_FCT_DOOR         /** Look at MODE_FCT_* to define the initial functionning mode */
 
 #endif /* BOARD_FEU_ROUGE */
 
@@ -456,3 +496,9 @@
 #if defined(MODULE_SERIAL) && !defined(MODULE_TERM)
     #error MODULE_SERIAL needs MODULE_TERM to work properly
 #endif
+
+#if defined(HAS_IOI2C_BOARD) && (!defined(MODULE_INPUTS) || !defined(MODULE_OUTPUTS))
+    #error HAS_IOI2C_BOARD needs MODULE_INPUTS and MODULE_OUTPUTS to work properly
+#endif
+
+#endif /** GLOBAL_HPP */

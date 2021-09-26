@@ -274,16 +274,13 @@ void script_main(void)
 #endif
 
 #ifdef BOARD_FEU_ROUGE
-	static uint32_t ticTacTraficLightTick = tick + 5000;
-	static bool     ticTac                = false;
-
-	if (tick > ticTacTraficLightTick) {
-		ticTac                = !ticTac;
-		ticTacTraficLightTick = tick + 5000;
-		if (tick) {
-			ticTacTraficLightTick += 3000;
-		}
-		feu_rouge_command(ticTac ? CMD_OPEN : CMD_CLOSE);
+	if (is_input_falling(INPUTS_DOOR_SWITCH)) {
+		reset_input_falling(INPUTS_DOOR_SWITCH);
+		feu_rouge_mode_fct_door(DOOR_CMD_SOMEONE_COME_IN);
+	}
+	if (is_input_rising(INPUTS_DOOR_SWITCH)) {
+		reset_input_rising(INPUTS_DOOR_SWITCH);
+		feu_rouge_mode_fct_door(DOOR_CMD_SOMEONE_COME_OUT);
 	}
 #endif
 

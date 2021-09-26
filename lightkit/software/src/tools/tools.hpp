@@ -13,6 +13,11 @@
 
 #define OK 0
 
+#define TIME_SECOND (1000)
+#define TIME_MINUTE (60 * TIME_SECOND)
+#define TIME_HOUR   (60 * TIME_MINUTE)
+#define TIME_DAY    (24 * TIME_HOUR)
+
 #define POW_2(x) (x * x)
 #define POW_3(x) (x * x * x)
 #define POW_4(x) (POW_2(x) * POW_2(x))
