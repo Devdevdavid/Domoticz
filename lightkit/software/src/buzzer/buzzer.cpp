@@ -26,29 +26,20 @@ static struct buzzer_t buzzerData[BUZZERS_COUNT] = { 0 };
 
 // MELODY - binary
 static uint32_t melody1[] = {
-	NOTE(STATE_ON, 100),
-	NOTE(STATE_OF, 900),
-	NOTE(STATE_ON, 100),
-	NOTE(STATE_OF, 800),
-	NOTE(STATE_ON, 100),
-	NOTE(STATE_OF, 700),
-	NOTE(STATE_ON, 100),
-	NOTE(STATE_OF, 600),
-	NOTE(STATE_ON, 100),
+	NOTE(STATE_ON, 500),
 	NOTE(STATE_OF, 500),
-	NOTE(STATE_ON, 100),
-	NOTE(STATE_OF, 400),
-	NOTE(STATE_ON, 100),
-	NOTE(STATE_OF, 300),
-	NOTE(STATE_ON, 100),
-	NOTE(STATE_OF, 200),
-	NOTE(STATE_ON, 100),
-	NOTE(STATE_OF, 100),
-	NOTE(STATE_ON, 1000),
 };
 static uint32_t melody2[] = {
-	NOTE(STATE_ON, 20),
-	NOTE(STATE_OF, 20),
+	NOTE(STATE_ON, 500),
+	NOTE(STATE_OF, 1000),
+};
+static uint32_t melody3[] = {
+	NOTE(STATE_ON, 50),
+	NOTE(STATE_OF, 50),
+	NOTE(STATE_ON, 50),
+	NOTE(STATE_OF, 50),
+	NOTE(STATE_ON, 50),
+	NOTE(STATE_OF, 50),
 };
 
 int buzzer_init(void)
@@ -89,6 +80,10 @@ int buzzer_set_melody(uint8_t i, uint8_t melodyId, bool isRepeatEnabled)
 	case 2:
 		buzzerData[i].pMelody      = melody2;
 		buzzerData[i].melodyLength = sizeof(melody2) / sizeof(uint32_t);
+		break;
+	case 3:
+		buzzerData[i].pMelody      = melody3;
+		buzzerData[i].melodyLength = sizeof(melody3) / sizeof(uint32_t);
 		break;
 	default:
 		return -1;

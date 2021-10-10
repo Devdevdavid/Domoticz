@@ -7,6 +7,7 @@
 #define WIFI_CPP
 
 #include "wifi.hpp"
+#include "buzzer/buzzer.hpp"
 #include "flash/flash.hpp"
 #include "ota/ota.hpp"
 #include "script/script.hpp"
@@ -208,6 +209,10 @@ static int32_t wifi_end_scan(void)
 	// Disable fastReconnect
 	wifiFastReconnect.isValid = false;
 	wifiFastReconnect.mode    = MODE_NONE;
+
+#if defined(MODULE_BUZZER) && defined(BUZZERS_ALARM)
+	buzzer_set_melody(BUZZERS_ALARM, 3, false);
+#endif
 
 	return ret;
 }
