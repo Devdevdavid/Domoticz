@@ -459,14 +459,15 @@
     #define INPUTS_DOOR_SWITCH                     1                     /** IOI2C Addr. IOI2C_0_ADDR - Input E2 */
 
     /* MODULE_OUTPUTS */
-    #define OUTPUTS_COUNT                          6                     /** Number of outputs managed by the module */
+    #define OUTPUTS_COUNT                          7                     /** Number of outputs managed by the module */
     #define OUTPUTS_PINS                           {                        \
                                                        io_special_ioi2c(0), \
                                                        io_special_ioi2c(1), \
                                                        io_special_ioi2c(2), \
                                                        io_special_ioi2c(3), \
                                                        io_special_ioi2c(4), \
-                                                       io_special_ioi2c(5)  \
+                                                       io_special_ioi2c(5), \
+                                                       D5                   \
                                                    }
     // Aliases
     #define OUTPUTS_TRAFFIC_LIGHT_RED              0                     /** IOI2C Addr. IOI2C_0_ADDR - Output S1 */
@@ -475,6 +476,7 @@
     #define OUTPUTS_UNUSED_S4                      3                     /** IOI2C Addr. IOI2C_0_ADDR - Output S4 */
     #define OUTPUTS_UNUSED_S5                      4                     /** IOI2C Addr. IOI2C_0_ADDR - Output S5 */
     #define OUTPUTS_UNUSED_S6                      5                     /** IOI2C Addr. IOI2C_0_ADDR - Output S6 */
+    #define OUTPUTS_BUZZER                         6                     /** Buzzer connected to D5 through a transistor */
 
     /* MODULE_FEU_ROUGE */
     #define FEU_ROUGE_INIT_FCT_MODE                MODE_FCT_DOOR         /** Look at MODE_FCT_* to define the initial functionning mode */
