@@ -68,13 +68,16 @@ void buzzer_stop(uint8_t buzzerId)
 	buzzer_set_melody(buzzerId, 0, false);
 }
 
-void buzzer_set_melody(uint8_t i, uint8_t melodyId, bool isRepeatEnabled)
+int buzzer_set_melody(uint8_t i, uint8_t melodyId, bool isRepeatEnabled)
 {
+	if (i > BUZZERS_COUNT) {
+		return -1;
+	}
 	// 0 means stop
 	if (melodyId == 0) {
 		buzzerData[i].enabled = false;
 		output_set(buzzerData[i].output, false);
-		return;
+		return 0;
 	}
 
 	// Check melody id
@@ -88,7 +91,7 @@ void buzzer_set_melody(uint8_t i, uint8_t melodyId, bool isRepeatEnabled)
 		buzzerData[i].melodyLength = sizeof(melody2) / sizeof(uint32_t);
 		break;
 	default:
-		return;
+		return -1;
 	}
 
 	// Start at begin
@@ -98,6 +101,8 @@ void buzzer_set_melody(uint8_t i, uint8_t melodyId, bool isRepeatEnabled)
 
 	// Start now
 	buzzerData[i].timeout = 0;
+
+	return 0;
 }
 
 void buzzer_main(void)

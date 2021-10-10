@@ -43,7 +43,34 @@ int print_args(uint8_t argc, char * argv[])
 // GENERIC TOOLS
 
 /**
- * @brief Search for "on"/"off/"toggle" inside
+ * @brief Search for "on"/"off"/"true"/"false"/"toggle" inside
+ * str and update according boolean
+ *
+ * @param flag Pointer to boolean
+ * @param str String to parse
+ * @return 0: bool updated, -1: error
+ */
+static int parse_bool(bool * flag, char * str)
+{
+	if (strcmp(str, "on") == 0) {
+		(*flag) = true;
+	} else if (strcmp(str, "off") == 0) {
+		(*flag) = false;
+	} else if (strcmp(str, "true") == 0) {
+		(*flag) = true;
+	} else if (strcmp(str, "false") == 0) {
+		(*flag) = false;
+	} else if (strcmp(str, "toggle") == 0) {
+		(*flag) = !(*flag);
+	} else {
+		term_print("Unknown argument: " + String(str));
+		return -1;
+	}
+	return 0;
+}
+
+/**
+ * @brief Search for "on"/"off"/"true"/"false"/"toggle" inside
  * argv[] and update according boolean
  *
  * @param flag Pointer to boolean
@@ -56,17 +83,8 @@ static int call_set_bool(bool * flag, uint8_t argc, char * argv[])
 	if (argc != 1) {
 		term_print("Missing argument");
 		return -1;
-	} else if (strcmp(argv[0], "on") == 0) {
-		(*flag) = true;
-	} else if (strcmp(argv[0], "off") == 0) {
-		(*flag) = false;
-	} else if (strcmp(argv[0], "toggle") == 0) {
-		(*flag) = !(*flag);
-	} else {
-		term_print("Unknown argument: " + String(argv[0]));
-		return -1;
 	}
-	return 0;
+	return parse_bool(flag, argv[0]);
 }
 
 static int call_reset(uint8_t argc, char * argv[])
@@ -164,6 +182,25 @@ static int call_status_led_set_state(uint8_t argc, char * argv[])
 	ret  = call_set_bool(&flag, argc, argv);
 	if (ret == 0) {
 		cmd_set_status_led(flag);
+	}
+	return ret;
+}
+#endif
+
+#ifdef MODULE_BUZZER
+static int call_buzzer_set_state(uint8_t argc, char * argv[])
+{
+	// [id] [melody] [repeat]
+	int     ret;
+	uint8_t id, melody;
+	bool    repeat = false;
+
+	id     = strtol(argv[0], NULL, 10);
+	melody = strtol(argv[1], NULL, 10);
+	ret    = parse_bool(&repeat, argv[2]);
+
+	if (ret == 0) {
+		ret = cmd_set_buzzer(id, melody, repeat);
 	}
 	return ret;
 }
@@ -409,6 +446,17 @@ static int term_create_cli_commands(void)
 		curTok = cli_add_token("set", "[on|off|toggle] Set the relay state");
 		cli_set_callback(curTok, &call_status_led_set_state);
 		cli_set_argc(curTok, 1, 0);
+		cli_add_children(tokLvl1, curTok);
+	}
+	cli_add_children(tokRoot, tokLvl1);
+#endif
+
+#ifdef MODULE_BUZZER
+	tokLvl1 = cli_add_token("buzzer", "Manage buzzer alarms");
+	{
+		curTok = cli_add_token("set", "[id] [melody] [repeat] Set the buzzer alarm");
+		cli_set_callback(curTok, &call_buzzer_set_state);
+		cli_set_argc(curTok, 3, 0);
 		cli_add_children(tokLvl1, curTok);
 	}
 	cli_add_children(tokRoot, tokLvl1);

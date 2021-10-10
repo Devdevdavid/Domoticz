@@ -6,6 +6,7 @@
   */
 
 #include "script/script.hpp"
+#include "buzzer/buzzer.hpp"
 #include "cmd/cmd.hpp"
 #include "domoticz/domoticz.hpp"
 #include "feu_rouge/feu_rouge.h"

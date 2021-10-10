@@ -6,6 +6,7 @@
   */
 
 #include "cmd.hpp"
+#include "buzzer/buzzer.hpp"
 #include "flash/flash.hpp"
 #include "global.hpp"
 #include "relay/relay.hpp"
@@ -71,6 +72,16 @@ void cmd_set_status_led(uint8_t isEnabled)
 }
 #endif
 
+#ifdef MODULE_BUZZER
+/**
+ * Enable/Disable the status leds
+ */
+int cmd_set_buzzer(uint8_t buzzerId, uint8_t melody, bool repeat)
+{
+	return buzzer_set_melody(buzzerId, melody, repeat);
+}
+#endif
+
 /**
  * Set/Reset brightness in automayic mode
  * @param newValue [description]
@@ -93,7 +104,7 @@ void cmd_set_brightness_auto(bool newValue)
 void cmd_set_brightness(uint8_t newValue)
 {
 	if (newValue > 0 && newValue <= 100) {
-		stripled_brightness_set(((uint16_t)(newValue * 255)) / 100);
+		stripled_brightness_set(((uint16_t) (newValue * 255)) / 100);
 		cmd_set_brightness_auto(false);
 	}
 }
@@ -106,7 +117,7 @@ void cmd_set_brightness(uint8_t newValue)
 #ifdef MODULE_STRIPLED
 uint8_t cmd_get_brightness(void)
 {
-	return ((uint16_t)(flashSettings.stripledParams.brightness * 100)) / 255;
+	return ((uint16_t) (flashSettings.stripledParams.brightness * 100)) / 255;
 }
 #endif
 

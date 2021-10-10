@@ -16,6 +16,7 @@ int      cmd_set_module_name(String newName);
 String   cmd_get_module_name(void);
 void     cmd_print_status(void);
 void     cmd_set_status_led(uint8_t isEnabled);
+int      cmd_set_buzzer(uint8_t buzzerId, uint8_t melody, bool repeat);
 void     cmd_set_brightness_auto(bool newValue);
 void     cmd_set_brightness(uint8_t newValue);
 uint8_t  cmd_get_brightness(void);
