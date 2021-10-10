@@ -7,6 +7,7 @@
 
 #define MAIN_C
 
+#include "buzzer/buzzer.hpp"
 #include "cmd/serial.hpp"
 #include "cmd/telnet.hpp"
 #include "cmd/term.hpp"
@@ -106,6 +107,9 @@ static int init_modules(void)
 #ifdef MODULE_FEU_ROUGE
 	CHECK_CALL(feu_rouge_init())
 #endif
+#ifdef MODULE_BUZZER
+	CHECK_CALL(buzzer_init())
+#endif
 	return 0;
 }
 
@@ -160,6 +164,9 @@ void loop(void)
 #endif
 #ifdef MODULE_FEU_ROUGE
 		feu_rouge_main();
+#endif
+#ifdef MODULE_BUZZER
+		buzzer_main();
 #endif
 		script_main();
 	}

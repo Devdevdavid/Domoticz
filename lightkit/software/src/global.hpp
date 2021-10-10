@@ -442,6 +442,7 @@
     #define MODULE_TELNET
     #define MODULE_TERM
     #define MODULE_FEU_ROUGE
+    #define MODULE_BUZZER
 
     /** IOI2C BOARD */
     #define HAS_IOI2C_BOARD                  // We have an IOI2C board connected to I2C bus
@@ -480,6 +481,15 @@
 
     /* MODULE_FEU_ROUGE */
     #define FEU_ROUGE_INIT_FCT_MODE                MODE_FCT_DOOR         /** Look at MODE_FCT_* to define the initial functionning mode */
+
+    /* MODULE_BUZZER */
+    #define BUZZERS_COUNT                          1
+    #define BUZZERS_OUTPUTS                        { \
+                                                       OUTPUTS_BUZZER \
+                                                   }
+
+    // Aliases
+    #define BUZZERS_ALARM                          0                     /** A buzzer to signal something */
 
 #endif /* BOARD_FEU_ROUGE */
 
