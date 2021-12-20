@@ -34,6 +34,24 @@ static void feu_rouge_set_color(uint32_t color)
 	output_set(OUTPUTS_TRAFFIC_LIGHT_GREEN, _isset(color, COLOR_MASK_GREEN));
 }
 
+/**
+ * @brief Get the current mode of the traffic light
+ * @return FEU_ROUGE_MODE_FCT_E
+ */
+FEU_ROUGE_MODE_FCT_E feu_rouge_get_fct_mode(void)
+{
+	return curModeFct;
+}
+
+// ------------------------
+// MODE_FCT_TRAFFIC_LIGHT
+// ------------------------
+
+/**
+ * @brief Send new commands using MODE_FCT_TRAFFIC_LIGHT mode
+ *
+ * @param cmd The new command to execute
+ */
 void feu_rouge_mode_fct_trafic_light(TRAFIC_LIGHT_CMD_E cmd)
 {
 	// Detect changes of mode
@@ -45,19 +63,6 @@ void feu_rouge_mode_fct_trafic_light(TRAFIC_LIGHT_CMD_E cmd)
 	}
 
 	traficLightData.curCmd = cmd;
-}
-
-void feu_rouge_mode_fct_door(DOOR_CMD_E cmd)
-{
-	// Detect changes of mode
-	if (curModeFct != MODE_FCT_DOOR) {
-		curModeFct                   = MODE_FCT_DOOR;
-		doorData.prevState           = DOOR_STATE_NONE;
-		doorData.curState            = DOOR_STATE_WAIT_SOMEONE;
-		doorData.tickLastStateChange = tick;
-	}
-
-	doorData.curCmd = cmd;
 }
 
 static void run_state_machine_trafic_light(void)
@@ -136,6 +141,28 @@ static void run_state_machine_trafic_light(void)
 	}
 }
 
+// ----------------
+// MODE_FCT_DOOR
+// ----------------
+
+/**
+ * @brief Send new commands using MODE_FCT_DOOR mode
+ *
+ * @param cmd The new command to execute
+ */
+void feu_rouge_mode_fct_door(DOOR_CMD_E cmd)
+{
+	// Detect changes of mode
+	if (curModeFct != MODE_FCT_DOOR) {
+		curModeFct                   = MODE_FCT_DOOR;
+		doorData.prevState           = DOOR_STATE_NONE;
+		doorData.curState            = DOOR_STATE_WAIT_SOMEONE;
+		doorData.tickLastStateChange = tick;
+	}
+
+	doorData.curCmd = cmd;
+}
+
 static void run_state_machine_door(void)
 {
 	// Manage state change
@@ -192,6 +219,10 @@ static void run_state_machine_door(void)
 		}
 	}
 }
+
+// ---------
+// OTHERS
+// ---------
 
 int feu_rouge_init(void)
 {

@@ -33,6 +33,11 @@ uint32_t nextTelegramUpdateTick = SCRIPT_TELEGRAM_UPT_PERIOD; // Skip first call
 uint32_t nextTelegramConnOkNotify = SCRIPT_TELEGRAM_CONN_OK_NOTIFY_PERIOD; // Skip first call
 #endif
 
+#if defined(MODULE_FEU_ROUGE)
+uint32_t nextFeuRougeUpdateTick = 0;
+uint8_t  feuRougeDemoStep       = 0;
+#endif
+
 // CONSTANTS
 #if defined(SCRIPT_TEMP_ALERT_METHOD) && (SCRIPT_TEMP_ALERT_METHOD == METHOD_THRESHOLD)
 // Using extern and const together: https://stackoverflow.com/a/2190981
@@ -274,14 +279,51 @@ void script_main(void)
 	}
 #endif
 
-#ifdef BOARD_FEU_ROUGE
-	if (is_input_falling(INPUTS_DOOR_SWITCH)) {
-		reset_input_falling(INPUTS_DOOR_SWITCH);
-		feu_rouge_mode_fct_door(DOOR_CMD_SOMEONE_COME_IN);
-	}
-	if (is_input_rising(INPUTS_DOOR_SWITCH)) {
-		reset_input_rising(INPUTS_DOOR_SWITCH);
-		feu_rouge_mode_fct_door(DOOR_CMD_SOMEONE_COME_OUT);
+#if defined(BOARD_FEU_ROUGE)
+	{
+		FEU_ROUGE_MODE_FCT_E fctMode;
+
+		// Do something according to current mode
+		fctMode = feu_rouge_get_fct_mode();
+
+		// Use the door switch to control the light
+		// Simulate a real traffic light
+		if (fctMode == MODE_FCT_TRAFFIC_LIGHT) {
+			// Send new command every 4s
+			if (tick > nextFeuRougeUpdateTick) {
+				// Each step send a command
+				if (feuRougeDemoStep == 0) {
+					feu_rouge_mode_fct_trafic_light(TRAFIC_LIGHT_CMD_HS);
+					nextFeuRougeUpdateTick = tick + 10000;
+				} else if (feuRougeDemoStep <= 10) { // 1 -> 10 : 5 cycles
+					switch (feuRougeDemoStep & 1) {
+					case 0:
+						feu_rouge_mode_fct_trafic_light(TRAFIC_LIGHT_CMD_OPEN);
+						nextFeuRougeUpdateTick = tick + 10000;
+						break;
+					case 1:
+					default:
+						feu_rouge_mode_fct_trafic_light(TRAFIC_LIGHT_CMD_CLOSE);
+						nextFeuRougeUpdateTick = tick + 3000 + 10000;
+						break;
+					}
+				}
+
+				// Go to next step of the demo
+				if (++feuRougeDemoStep >= 11) {
+					feuRougeDemoStep = 0;
+				}
+			}
+		} else if (fctMode == MODE_FCT_DOOR) {
+			if (is_input_falling(INPUTS_DOOR_SWITCH)) {
+				reset_input_falling(INPUTS_DOOR_SWITCH);
+				feu_rouge_mode_fct_door(DOOR_CMD_SOMEONE_COME_IN);
+			}
+			if (is_input_rising(INPUTS_DOOR_SWITCH)) {
+				reset_input_rising(INPUTS_DOOR_SWITCH);
+				feu_rouge_mode_fct_door(DOOR_CMD_SOMEONE_COME_OUT);
+			}
+		}
 	}
 #endif
 
