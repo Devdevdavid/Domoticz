@@ -1,4 +1,4 @@
-#include "feu_rouge.h"
+#include "feu_rouge.hpp"
 #include "tools/tools.hpp"
 
 #ifdef MODULE_FEU_ROUGE
@@ -41,6 +41,29 @@ static void feu_rouge_set_color(uint32_t color)
 FEU_ROUGE_MODE_FCT_E feu_rouge_get_fct_mode(void)
 {
 	return curModeFct;
+}
+
+/**
+ * @brief Set the new mode for feu rouge using
+ * 	      defaut state and NONE command
+ *
+ * @param newMode The mode to use
+ */
+void feu_rouge_set_fct_mode(FEU_ROUGE_MODE_FCT_E newMode)
+{
+	// Set initial functionning mode
+	switch (newMode) {
+	case MODE_FCT_TRAFFIC_LIGHT:
+		feu_rouge_mode_fct_trafic_light(TRAFIC_LIGHT_CMD_NONE);
+		break;
+	case MODE_FCT_DOOR:
+		feu_rouge_mode_fct_door(DOOR_CMD_NONE);
+		break;
+	case MODE_FCT_NONE:
+	default:
+		curModeFct = newMode;
+		break;
+	}
 }
 
 // ------------------------
@@ -227,18 +250,7 @@ static void run_state_machine_door(void)
 int feu_rouge_init(void)
 {
 	// Set initial functionning mode
-	switch (FEU_ROUGE_INIT_FCT_MODE) {
-	case MODE_FCT_TRAFFIC_LIGHT:
-		feu_rouge_mode_fct_trafic_light(TRAFIC_LIGHT_CMD_NONE);
-		break;
-	case MODE_FCT_DOOR:
-		feu_rouge_mode_fct_door(DOOR_CMD_NONE);
-		break;
-	case MODE_FCT_NONE:
-	default:
-		curModeFct = FEU_ROUGE_INIT_FCT_MODE;
-		break;
-	}
+	feu_rouge_set_fct_mode(FEU_ROUGE_INIT_FCT_MODE);
 	return 0;
 }
 

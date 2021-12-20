@@ -74,7 +74,9 @@ typedef struct {
 
 // Functions
 
+// Mode
 FEU_ROUGE_MODE_FCT_E feu_rouge_get_fct_mode(void);
+void                 feu_rouge_set_fct_mode(FEU_ROUGE_MODE_FCT_E newMode);
 
 void feu_rouge_mode_fct_trafic_light(TRAFIC_LIGHT_CMD_E cmd);
 void feu_rouge_mode_fct_door(DOOR_CMD_E cmd);

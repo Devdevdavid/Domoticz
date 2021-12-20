@@ -7,6 +7,7 @@
 
 #include "term.hpp"
 #include "cmd.hpp"
+#include "feu_rouge/feu_rouge.hpp"
 #include "global.hpp"
 #include "relay/relay.hpp"
 #include "serial.hpp"
@@ -203,6 +204,24 @@ static int call_buzzer_set_state(uint8_t argc, char * argv[])
 		ret = cmd_set_buzzer(id, melody, repeat);
 	}
 	return ret;
+}
+#endif
+
+#ifdef MODULE_FEU_ROUGE
+static int call_feu_rouge_set_mode(uint8_t argc, char * argv[])
+{
+	// [mode: traffic/door]
+
+	if (_strncmp(argv[0], "traffic") == 0) {
+		feu_rouge_set_fct_mode(MODE_FCT_TRAFFIC_LIGHT);
+	} else if (_strncmp(argv[0], "door") == 0) {
+		feu_rouge_set_fct_mode(MODE_FCT_DOOR);
+	} else {
+		CLI_PRINTF("Unsuported mode");
+		return -1;
+	}
+
+	return 0;
 }
 #endif
 
@@ -458,6 +477,21 @@ static int term_create_cli_commands(void)
 		cli_set_callback(curTok, &call_buzzer_set_state);
 		cli_set_argc(curTok, 3, 0);
 		cli_add_children(tokLvl1, curTok);
+	}
+	cli_add_children(tokRoot, tokLvl1);
+#endif
+
+#ifdef MODULE_FEU_ROUGE
+	tokLvl1 = cli_add_token("feu", "Manage traffic light");
+	{
+		tokLvl2 = cli_add_token("set", "Define new configuration");
+		{
+			curTok = cli_add_token("mode", "<traffic/door> Set the FCT mode");
+			cli_set_callback(curTok, &call_feu_rouge_set_mode);
+			cli_set_argc(curTok, 1, 0);
+			cli_add_children(tokLvl2, curTok);
+		}
+		cli_add_children(tokLvl1, tokLvl2);
 	}
 	cli_add_children(tokRoot, tokLvl1);
 #endif

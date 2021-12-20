@@ -27,6 +27,8 @@
 #define _isset(base, flag)   (((base) & (flag)) != 0)
 #define _isunset(base, flag) (((base) & (flag)) == 0)
 
+#define _strncmp(str1, strCst) strncmp(argv[0], strCst, sizeof(strCst))
+
 #define CHECK_CALL(call)              \
 	if (call) {                       \
 		log_error(#call " failed()"); \

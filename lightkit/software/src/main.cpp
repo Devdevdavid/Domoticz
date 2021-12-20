@@ -11,7 +11,7 @@
 #include "cmd/serial.hpp"
 #include "cmd/telnet.hpp"
 #include "cmd/term.hpp"
-#include "feu_rouge/feu_rouge.h"
+#include "feu_rouge/feu_rouge.hpp"
 #include "file_sys/file_sys.hpp"
 #include "flash/flash.hpp"
 #include "global.hpp"
