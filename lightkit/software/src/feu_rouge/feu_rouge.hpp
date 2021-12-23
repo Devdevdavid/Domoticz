@@ -18,6 +18,7 @@ typedef enum
 	MODE_FCT_NONE = 0,
 	MODE_FCT_TRAFFIC_LIGHT,
 	MODE_FCT_DOOR,
+	MODE_FCT_COLOR,
 	MODE_FCT_DISCO
 } FEU_ROUGE_MODE_FCT_E;
 
@@ -72,6 +73,20 @@ typedef struct {
 	uint32_t     tickLastStateChange;
 } door_data_t;
 
+// FCT MODE - COLOR
+
+typedef enum
+{
+	COLOR_CMD_NONE = 0,
+	COLOR_CMD_RED,
+	COLOR_CMD_YELLOW,
+	COLOR_CMD_GREEN,
+	COLOR_CMD_RED_YELLOW,
+	COLOR_CMD_YELLOW_GREEN,
+	COLOR_CMD_RED_GREEN,
+	COLOR_CMD_RED_YELLOW_GREEN,
+} COLOR_CMD_E;
+
 // Functions
 
 // Mode
@@ -80,6 +95,7 @@ void                 feu_rouge_set_fct_mode(FEU_ROUGE_MODE_FCT_E newMode);
 
 void feu_rouge_mode_fct_trafic_light(TRAFIC_LIGHT_CMD_E cmd);
 void feu_rouge_mode_fct_door(DOOR_CMD_E cmd);
+void feu_rouge_mode_fct_color(COLOR_CMD_E cmd);
 
 int  feu_rouge_init(void);
 void feu_rouge_main(void);

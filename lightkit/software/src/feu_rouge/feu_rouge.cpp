@@ -59,6 +59,9 @@ void feu_rouge_set_fct_mode(FEU_ROUGE_MODE_FCT_E newMode)
 	case MODE_FCT_DOOR:
 		feu_rouge_mode_fct_door(DOOR_CMD_NONE);
 		break;
+	case MODE_FCT_COLOR:
+		feu_rouge_mode_fct_color(COLOR_CMD_NONE);
+		break;
 	case MODE_FCT_NONE:
 	default:
 		curModeFct = newMode;
@@ -243,6 +246,52 @@ static void run_state_machine_door(void)
 	}
 }
 
+// ----------------
+// MODE_FCT_COLOR
+// ----------------
+
+/**
+ * @brief Send new commands using MODE_FCT_COLOR mode
+ *
+ * @param cmd The new command to execute
+ */
+void feu_rouge_mode_fct_color(COLOR_CMD_E cmd)
+{
+	// Detect changes of mode
+	if (curModeFct != MODE_FCT_COLOR) {
+		curModeFct = MODE_FCT_COLOR;
+	}
+
+	// Don't bother with a state machine
+	switch (cmd) {
+	case COLOR_CMD_RED:
+		feu_rouge_set_color(COLOR_MASK_RED);
+		break;
+	case COLOR_CMD_YELLOW:
+		feu_rouge_set_color(COLOR_MASK_YELLOW);
+		break;
+	case COLOR_CMD_GREEN:
+		feu_rouge_set_color(COLOR_MASK_GREEN);
+		break;
+	case COLOR_CMD_RED_YELLOW:
+		feu_rouge_set_color(COLOR_MASK_RED | COLOR_MASK_YELLOW);
+		break;
+	case COLOR_CMD_YELLOW_GREEN:
+		feu_rouge_set_color(COLOR_MASK_YELLOW | COLOR_MASK_GREEN);
+		break;
+	case COLOR_CMD_RED_GREEN:
+		feu_rouge_set_color(COLOR_MASK_RED | COLOR_MASK_GREEN);
+		break;
+	case COLOR_CMD_RED_YELLOW_GREEN:
+		feu_rouge_set_color(COLOR_MASK_RED | COLOR_MASK_YELLOW | COLOR_MASK_GREEN);
+		break;
+	case COLOR_CMD_NONE:
+	default:
+		feu_rouge_set_color(COLOR_MASK_BLACK);
+		break;
+	}
+}
+
 // ---------
 // OTHERS
 // ---------
@@ -263,6 +312,9 @@ void feu_rouge_main(void)
 		break;
 	case MODE_FCT_DOOR:
 		run_state_machine_door();
+		break;
+	case MODE_FCT_COLOR:
+		// Not a dynamic mode
 		break;
 	case MODE_FCT_NONE:
 	default:
